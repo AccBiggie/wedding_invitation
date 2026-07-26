@@ -1,0 +1,22 @@
+import crypto from 'node:crypto';
+import mongoose from 'mongoose';
+import Invitation from '../models/Invitation.js';
+
+const ok = (res, data, message) => res.json({ success: true, ...(message && { message }), data });
+const fail = (res, status, message, errors) => res.status(status).json({ success: false, message, ...(errors && { errors }) });
+function idOrFail(id, res) { if (!mongoose.isValidObjectId(id)) { fail(res, 400, 'Identificador inválido.'); return false; } return true; }
+
+export async function list(req, res, next) { try {
+  const { name, status, startDate, endDate } = req.query; const page = Math.max(1, Number(req.query.page) || 1); const limit = Math.min(100, Math.max(1, Number(req.query.limit) || 20));
+  const allowedSort = ['createdAt','updatedAt','name','status']; const sortBy = allowedSort.includes(req.query.sortBy) ? req.query.sortBy : 'createdAt'; const sortOrder = req.query.sortOrder === 'asc' ? 1 : -1;
+  const query = {}; if (name) query.name = { $regex: name, $options: 'i' }; if (['confirmed','unconfirmed'].includes(status)) query.status = status;
+  if (startDate || endDate) { query.createdAt = {}; if (startDate) query.createdAt.$gte = new Date(`${startDate}T00:00:00.000Z`); if (endDate) query.createdAt.$lte = new Date(`${endDate}T23:59:59.999Z`); }
+  const [data,total] = await Promise.all([Invitation.find(query).sort({[sortBy]:sortOrder}).skip((page-1)*limit).limit(limit), Invitation.countDocuments(query)]);
+  ok(res, { data, pagination: { page, limit, total, totalPages: Math.ceil(total/limit) } });
+} catch(e){next(e);} }
+export async function getById(req,res,next){try{if(!idOrFail(req.params.id,res))return;const item=await Invitation.findById(req.params.id);if(!item)return fail(res,404,'Convite não encontrado.');ok(res,item);}catch(e){next(e);}}
+export async function create(req,res,next){try{const errors={}; if(typeof req.body.name!=='string'||!req.body.name.trim())errors.name=['O nome dos convidados é obrigatório.']; if(req.body.description?.length>1000)errors.description=['A descrição deve ter no máximo 1.000 caracteres.']; if(Object.keys(errors).length)return fail(res,422,'Os dados informados são inválidos.',errors);const item=await Invitation.create({name:req.body.name.trim(),description:(req.body.description||'').trim(),publicToken:crypto.randomBytes(32).toString('hex')});ok(res,item,'Convite criado com sucesso.');}catch(e){next(e);}}
+export async function update(req,res,next){try{if(!idOrFail(req.params.id,res))return;const item=await Invitation.findById(req.params.id);if(!item)return fail(res,404,'Convite não encontrado.');if(req.body.name!==undefined)item.name=req.body.name.trim();if(req.body.description!==undefined)item.description=req.body.description.trim();await item.save();ok(res,item,'Convite atualizado com sucesso.');}catch(e){next(e);}}
+export async function remove(req,res,next){try{if(!idOrFail(req.params.id,res))return;const item=await Invitation.findByIdAndDelete(req.params.id);if(!item)return fail(res,404,'Convite não encontrado.');ok(res,null,'Convite excluído com sucesso.');}catch(e){next(e);}}
+export async function publicGet(req,res,next){try{if(!idOrFail(req.params.id,res))return;const item=await Invitation.findById(req.params.id).select('-__v');const normalize=s=>s.normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase().trim().replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'');if(!item||normalize(item.name)!==decodeURIComponent(req.params.name)||req.query.token!==item.publicToken)return fail(res,404,'Convite não encontrado.');ok(res,{_id:item._id,name:item.name,description:item.description,status:item.status,confirmedAt:item.confirmedAt});}catch(e){next(e);}}
+export async function confirm(req,res,next){try{if(!idOrFail(req.params.id,res))return;const item=await Invitation.findById(req.params.id);if(!item)return fail(res,404,'Convite não encontrado.');if(item.status==='confirmed')return ok(res,item,'Este convite já possui presença confirmada.');item.status='confirmed';item.confirmedAt=new Date();await item.save();ok(res,item,'Presença confirmada com sucesso!');}catch(e){next(e);}}
