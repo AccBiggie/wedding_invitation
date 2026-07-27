@@ -70,7 +70,10 @@ export async function create(req, res, next) {
     if (req.body.type !== undefined && !['in_person', 'virtual'].includes(req.body.type)) errors.type = ['O tipo deve ser in_person ou virtual.'];
     if (Object.keys(errors).length) return fail(res, 422, 'Os dados informados sao invalidos.', errors);
     const name = req.body.name.trim();
-    const item = await Invitation.create({ name, description: (req.body.description || '').trim(), type: req.body.type || 'in_person', guests: guestNames(name).map(guestName => ({ name: guestName })), publicToken: crypto.randomBytes(32).toString('hex') });
+    const confirmationDeadline = req.body.confirmationDeadline ? new Date(`${req.body.confirmationDeadline}T23:59:59.999Z`) : null;
+    if (confirmationDeadline && Number.isNaN(confirmationDeadline.getTime())) errors.confirmationDeadline = ['A data limite e invalida.'];
+    if (Object.keys(errors).length) return fail(res, 422, 'Os dados informados sao invalidos.', errors);
+    const item = await Invitation.create({ name, description: (req.body.description || '').trim(), type: req.body.type || 'in_person', confirmationDeadline, guests: guestNames(name).map(guestName => ({ name: guestName })), publicToken: crypto.randomBytes(32).toString('hex') });
     ok(res, item, 'Convite criado com sucesso.');
   } catch (error) { next(error); }
 }
@@ -83,6 +86,11 @@ export async function update(req, res, next) {
     await ensureGuests(item);
     if (req.body.name !== undefined) { item.name = req.body.name.trim(); syncGuests(item, item.name); }
     if (req.body.description !== undefined) item.description = req.body.description.trim();
+    if (req.body.confirmationDeadline !== undefined) {
+      const deadline = req.body.confirmationDeadline ? new Date(`${req.body.confirmationDeadline}T23:59:59.999Z`) : null;
+      if (deadline && Number.isNaN(deadline.getTime())) return fail(res, 422, 'Os dados informados sao invalidos.', { confirmationDeadline: ['A data limite e invalida.'] });
+      item.confirmationDeadline = deadline;
+    }
     if (req.body.type !== undefined) { if (!['in_person', 'virtual'].includes(req.body.type)) return fail(res, 422, 'Os dados informados sao invalidos.', { type: ['O tipo deve ser in_person ou virtual.'] }); item.type = req.body.type; }
     const confirmedGuests = item.guests.filter(guest => guest.confirmed);
     item.status = confirmedGuests.length ? 'confirmed' : 'unconfirmed';
@@ -101,7 +109,7 @@ export async function publicGet(req, res, next) {
     const item = await Invitation.findById(req.params.id).select('-__v');
     if (!item || normalize(item.name) !== decodeURIComponent(req.params.name) || req.query.token !== item.publicToken) return fail(res, 404, 'Convite nao encontrado.');
     await ensureGuests(item);
-    ok(res, { _id: item._id, name: item.name, status: item.status, confirmedAt: item.confirmedAt, guests: item.guests.map(guest => ({ _id: guest._id, name: guest.name, confirmed: guest.confirmed })) });
+    ok(res, { _id: item._id, name: item.name, status: item.status, confirmedAt: item.confirmedAt, confirmationDeadline: item.confirmationDeadline, guests: item.guests.map(guest => ({ _id: guest._id, name: guest.name, confirmed: guest.confirmed })) });
   } catch (error) { next(error); }
 }
 
@@ -126,6 +134,6 @@ export async function confirm(req, res, next) {
     item.status = confirmedGuests.length ? 'confirmed' : 'unconfirmed';
     item.confirmedAt = confirmedGuests.length ? confirmedGuests[0].confirmedAt : null;
     await item.save();
-    ok(res, { _id: item._id, name: item.name, status: item.status, confirmedAt: item.confirmedAt, guests: item.guests.map(guest => ({ _id: guest._id, name: guest.name, confirmed: guest.confirmed })) }, selected.size ? 'Confirmacao atualizada com sucesso!' : 'Nenhuma pessoa foi selecionada.');
+    ok(res, { _id: item._id, name: item.name, status: item.status, confirmedAt: item.confirmedAt, confirmationDeadline: item.confirmationDeadline, guests: item.guests.map(guest => ({ _id: guest._id, name: guest.name, confirmed: guest.confirmed })) }, selected.size ? 'Confirmacao atualizada com sucesso!' : 'Nenhuma pessoa foi selecionada.');
   } catch (error) { next(error); }
 }
