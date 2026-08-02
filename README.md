@@ -4,7 +4,7 @@ Aplicação React + Tabler para criação, administração e confirmação públ
 
 ## Executar com Docker
 
-Pré-requisitos: Docker e Docker Compose. Execute `docker compose up --build` e acesse `http://localhost:5173`. A API fica em `http://localhost:3001`.
+Pré-requisitos: Docker e Docker Compose. Execute `docker compose up --build` e acesse `http://localhost:3002`. A API fica em `http://localhost:3001`.
 
 ## Executar localmente
 

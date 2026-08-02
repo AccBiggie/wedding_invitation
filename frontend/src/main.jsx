@@ -41,7 +41,7 @@ function InvitationFormModal({ editing, form, setForm, saving, error, onClose, o
     <div className="modal-header"><h3 className="modal-title">{editing ? 'Editar convite' : 'Novo convite'}</h3><button className="btn-close" onClick={onClose} /></div>
     <form onSubmit={onSubmit}><div className="modal-body">
       <label className="form-label">Nome dos convidados</label><input required maxLength="255" className="form-control" value={form.name} onChange={event => setForm({ ...form, name: event.target.value })} />
-      <small className="text-muted d-block mt-1">{'Para informar mais de um convidado, separe os nomes com ponto e vírgula (;). Ex.: Stefani; Andre;'}</small>
+      <small className="text-muted d-block mt-1">{'Para informar mais de um convidado, separe os nomes com ponto e vírgula (;). Ex.: Stéfani; André;'}</small>
       <label className="form-label mt-3">Tipo do convite</label><select className="form-select" value={form.type} onChange={event => setForm({ ...form, type: event.target.value })}><option value="in_person">Presencial</option><option value="virtual">Virtual</option></select>
       <label className="form-label mt-3">Data limite para confirmação</label><input type="date" className="form-control" value={form.confirmationDeadline} onChange={event => setForm({ ...form, confirmationDeadline: event.target.value })} />
       <label className="form-label mt-3">{'Descrição'}</label><textarea className="form-control" maxLength="1000" value={form.description} onChange={event => setForm({ ...form, description: event.target.value })} />
@@ -116,20 +116,145 @@ function Home() {
   </>;
 }
 
+const WEDDING = {
+  couple: ['Stéfani', 'André'],
+  verse: 'Com a bênção de Deus e a alegria de nossos corações, convidamos você para o nosso grande dia.',
+  photo: '/casal.jpg',
+  date: ['10 de abril', 'de 2027'],
+  time: ['17h00'],
+  party: {
+    lines: ['Igreja Luterana', 'de Sussuí'],
+    map: 'https://maps.app.goo.gl/PjsrKNU3og4HTd738'
+  },
+  ceremony: {
+    lines: ['R. Minas Gerais, 762-862', 'Eng. Beltrão/PR'],
+    name: 'Igreja de Ivailândia',
+    fullAddress: 'R. Minas Gerais, 762-862 - Ivailândia, Eng. Beltrão - PR, 87270-000',
+    query: 'Paróquia São Gabriel Arcanjo e São Sebastião, R. Minas Gerais, 762-862, Ivailândia, Engenheiro Beltrão - PR, 87270-000',
+    map: 'https://maps.app.goo.gl/R8X3S2GSwEqQ1ehn7'
+  }
+};
+const MAP_EMBED = `https://www.google.com/maps?q=${encodeURIComponent(WEDDING.ceremony.query)}&z=16&output=embed`;
+
+const Svg = ({ children, size = 24, viewBox = '0 0 24 24', ...props }) => <svg width={size} height={size} viewBox={viewBox} fill="none" stroke="currentColor" strokeWidth="1.3" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true" {...props}>{children}</svg>;
+const IconCalendar = props => <Svg {...props}><path d="M4 7a2 2 0 0 1 2 -2h12a2 2 0 0 1 2 2v12a2 2 0 0 1 -2 2h-12a2 2 0 0 1 -2 -2z" /><path d="M16 3v4M8 3v4M4 11h16M8 15h2v2h-2z" /></Svg>;
+const IconClock = props => <Svg {...props}><path d="M12 12m-9 0a9 9 0 1 0 18 0a9 9 0 1 0 -18 0" /><path d="M12 7v5l3 3" /></Svg>;
+const IconFlower = props => <Svg {...props}><path d="M12 12m-3 0a3 3 0 1 0 6 0a3 3 0 1 0 -6 0" /><path d="M12 6m-3 0a3 3 0 1 0 6 0a3 3 0 1 0 -6 0" /><path d="M12 18m-3 0a3 3 0 1 0 6 0a3 3 0 1 0 -6 0" /><path d="M6 12m-3 0a3 3 0 1 0 6 0a3 3 0 1 0 -6 0" /><path d="M18 12m-3 0a3 3 0 1 0 6 0a3 3 0 1 0 -6 0" /></Svg>;
+const IconMapPin = props => <Svg {...props}><path d="M12 11m-3 0a3 3 0 1 0 6 0a3 3 0 1 0 -6 0" /><path d="M17.657 16.657l-4.243 4.243a2 2 0 0 1 -2.827 0l-4.244 -4.243a8 8 0 1 1 11.314 0z" /></Svg>;
+const IconHeart = props => <Svg {...props} fill="currentColor" strokeWidth="0"><path d="M19.5 12.572l-7.5 7.428l-7.5 -7.428a5 5 0 1 1 7.5 -6.566a5 5 0 1 1 7.5 6.566z" /></Svg>;
+const IconCheck = props => <Svg {...props} strokeWidth="2.4"><path d="M5 12l5 5l10 -10" /></Svg>;
+const IconPhotoOff = props => <Svg {...props}><path d="M15 8h.01" /><path d="M6 3h12a3 3 0 0 1 3 3v12a3 3 0 0 1 -3 3h-12a3 3 0 0 1 -3 -3v-12a3 3 0 0 1 3 -3z" /><path d="M4 15l4 -4c.9 -.9 2 -.9 2.9 0l5.1 5" /><path d="M14 14l1 -1c.9 -.9 2 -.9 2.9 0l3.1 3" /><path d="M3 3l18 18" /></Svg>;
+
+const LEAF = 'M0 0c9 -3.6 16.5 -1.2 20.5 7c-9.3 3.6 -16.6 1.2 -20.5 -7z';
+const Sprig = ({ flip }) => <svg width="26" height="16" viewBox="0 0 26 16" fill="none" stroke="currentColor" strokeWidth="1.1" strokeLinecap="round" aria-hidden="true" style={flip ? { transform: 'scaleX(-1)' } : undefined}>
+  <path d="M2 14c5 0 11.5 -3 15.5 -9.5" /><path d="M6.4 12.4c-1 -2 -.3 -3.9 1.9 -4.8c.7 2 0 3.9 -1.9 4.8z" /><path d="M10.6 9.2c-1.1 -1.9 -.6 -3.8 1.4 -5c.9 1.9 .4 3.9 -1.4 5z" /><path d="M14.6 5.6c-1.3 -1.7 -1.1 -3.7 .5 -5.1c1.2 1.7 1 3.7 -.5 5.1z" />
+</svg>;
+const Branch = ({ className }) => <svg className={className} viewBox="0 0 110 320" fill="none" stroke="currentColor" strokeWidth="1.1" strokeLinecap="round" preserveAspectRatio="xMidYMid meet" aria-hidden="true">
+  <path d="M12 316c24 -48 40 -102 46 -158c5 -50 0 -102 -14 -152" />
+  {[[62, 106, -42], [58, 150, -26], [55, 196, -10], [50, 244, 8], [46, 62, -54]].map(([x, y, angle]) => <g key={`${x}-${y}`}>
+    <path d={LEAF} transform={`translate(${x} ${y}) rotate(${angle})`} /><path d={LEAF} transform={`translate(${x} ${y}) rotate(${180 - angle})`} />
+  </g>)}
+  <path d="M44 12m-5 0a5 5 0 1 0 10 0a5 5 0 1 0 -10 0" /><path d="M30 34m-3.5 0a3.5 3.5 0 1 0 7 0a3.5 3.5 0 1 0 -7 0" />
+</svg>;
+const Flourish = ({ className }) => <svg className={className} viewBox="0 0 240 60" fill="none" stroke="currentColor" strokeWidth="1.1" strokeLinecap="round" preserveAspectRatio="xMidYMid meet" aria-hidden="true">
+  <path d="M4 54c46 0 92 -8 130 -26c34 -16 70 -22 102 -20" />
+  {[[40, 50, 200], [78, 45, 210], [116, 35, 220], [154, 24, 235], [192, 16, 250]].map(([x, y, angle]) => <g key={`${x}-${y}`}>
+    <path d={LEAF} transform={`translate(${x} ${y}) rotate(${angle})`} /><path d={LEAF} transform={`translate(${x} ${y}) rotate(${angle - 110})`} />
+  </g>)}
+  <path d="M120 26m-5 0a5 5 0 1 0 10 0a5 5 0 1 0 -10 0" /><path d="M62 44m-3.5 0a3.5 3.5 0 1 0 7 0a3.5 3.5 0 1 0 -7 0" /><path d="M198 12m-4 0a4 4 0 1 0 8 0a4 4 0 1 0 -8 0" />
+</svg>;
+const MapArt = () => <svg className="wed-map-art" viewBox="0 0 400 190" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
+  <rect width="400" height="190" fill="#f1efe6" />
+  <g fill="#dde7d7"><rect x="12" y="18" width="92" height="50" rx="6" /><rect x="298" y="112" width="90" height="62" rx="6" /><rect x="146" y="140" width="72" height="42" rx="6" /><rect x="286" y="10" width="60" height="34" rx="6" /></g>
+  <g fill="none" stroke="#e5e0d1" strokeWidth="3"><path d="M0 38h400M0 116h400M58 0v190M188 0v190M330 0v190" /></g>
+  <g fill="none" stroke="#fff" strokeWidth="9" strokeLinecap="round"><path d="M0 80h400M0 152h400M118 0v190M262 0v190M338 0l-130 190" /></g>
+  <g transform="translate(178 34) scale(1.9)"><path d="M12 2a7.4 7.4 0 0 0 -7.4 7.4c0 5 6.5 11.6 7.4 11.6s7.4 -6.6 7.4 -11.6a7.4 7.4 0 0 0 -7.4 -7.4z" fill="#1f4536" /><g fill="none" stroke="#fdfaf2" strokeWidth="1.1"><path d="M12 9m-1.6 0a1.6 1.6 0 1 0 3.2 0a1.6 1.6 0 1 0 -3.2 0" /><path d="M12 5.8m-1.6 0a1.6 1.6 0 1 0 3.2 0a1.6 1.6 0 1 0 -3.2 0" /><path d="M12 12.2m-1.6 0a1.6 1.6 0 1 0 3.2 0a1.6 1.6 0 1 0 -3.2 0" /><path d="M8.8 9m-1.6 0a1.6 1.6 0 1 0 3.2 0a1.6 1.6 0 1 0 -3.2 0" /><path d="M15.2 9m-1.6 0a1.6 1.6 0 1 0 3.2 0a1.6 1.6 0 1 0 -3.2 0" /></g></g>
+</svg>;
+
+const InfoCard = ({ icon, label, lines, href }) => {
+  const Tag = href ? 'a' : 'div';
+  const linkProps = href ? { href, target: '_blank', rel: 'noreferrer' } : {};
+  return <Tag className={`wed-info${href ? ' wed-info-link' : ''}`} {...linkProps}>
+    <span className="wed-info-icon">{icon}</span><span className="wed-info-label">{label}</span>
+    <span className="wed-info-value">{lines.map(line => <span key={line}>{line}</span>)}</span>
+    {href && <span className="wed-info-hint">ver no mapa</span>}
+  </Tag>;
+};
+
+function WeddingShell({ children }) {
+  return <div className="wed">
+    <header className="wed-topbar"><span className="wed-brand"><IconFlower size={26} />Convites de casamento</span></header>
+    {children}
+    <footer className="wed-footer"><i /><IconHeart size={15} /><i /></footer>
+  </div>;
+}
+
 function Public() {
   const [, , id, name] = location.pathname.split('/');
-  const [item, setItem] = useState(); const [error, setError] = useState(false); const [confirming, setConfirming] = useState(false); const [notification, setNotification] = useState(null); const [selectedGuestIds, setSelectedGuestIds] = useState([]);
+  const [item, setItem] = useState(); const [error, setError] = useState(false); const [confirming, setConfirming] = useState(false); const [notification, setNotification] = useState(null); const [selectedGuestIds, setSelectedGuestIds] = useState([]); const [photoFailed, setPhotoFailed] = useState(false);
   const notify = (type, message) => setNotification({ type, message });
   useEffect(() => { if (!notification) return; const timer = setTimeout(() => setNotification(null), 4500); return () => clearTimeout(timer); }, [notification]);
   useEffect(() => { api.get('/public/invitations/' + id + '/' + name, { params: { token: new URLSearchParams(location.search).get('token') } }).then(response => setItem(response.data.data)).catch(() => setError(true)); }, [id, name]);
   useEffect(() => { if (item?.guests) setSelectedGuestIds(item.guests.filter(guest => guest.confirmed).map(guest => String(guest._id))); }, [item?._id]);
   const confirm = async () => { setConfirming(true); try { const response = await api.post('/public/invitations/' + id + '/confirm', { guestIds: selectedGuestIds }); setItem(response.data.data); notify('success', response.data.message); } catch { notify('danger', 'N\u00e3o foi poss\u00edvel confirmar a presen\u00e7a.'); } finally { setConfirming(false); } };
-  if (error) return <Layout><div className="empty"><h1>{'Convite não encontrado'}</h1></div></Layout>;
-  if (!item) return <Layout><p>Carregando...</p></Layout>;
+  if (error) return <WeddingShell><div className="wed-state">{'Convite não encontrado'}</div></WeddingShell>;
+  if (!item) return <WeddingShell><div className="wed-state">Carregando...</div></WeddingShell>;
   const toggleGuest = guestId => setSelectedGuestIds(current => current.includes(guestId) ? current.filter(idValue => idValue !== guestId) : [...current, guestId]);
   const guests = item.guests || [];
   const deadline = item.confirmationDeadline ? new Date(item.confirmationDeadline).toLocaleDateString('pt-BR', { timeZone: 'UTC' }) : null;
-  return <Layout><Toast notification={notification} onClose={() => setNotification(null)} /><div className="card mx-auto invitation-card"><div className="card-body text-center"><div className="mb-3"><img className="img-fluid rounded" src="/tricotlg.png" alt="Convite de casamento" /></div><p className="text-secondary">Selecione as pessoas que confirmam presença:</p><div className="list-group text-start mb-3">{guests.map(guest => <label className="list-group-item d-flex gap-3 align-items-center" key={guest._id}><input className="form-check-input flex-shrink-0" type="checkbox" checked={selectedGuestIds.includes(String(guest._id))} onChange={() => toggleGuest(String(guest._id))} /><span>{guest.name}</span>{guest.confirmed && <span className="badge bg-success-lt text-success ms-auto">Confirmado</span>}</label>)}</div>{deadline && <p className="text-muted mb-3">Confirme sua presença até {deadline}.</p>}<button className="btn btn-primary" disabled={confirming} onClick={confirm}>{confirming ? 'Atualizando...' : 'Atualizar confirmação'}</button></div></div></Layout>;
+  return <WeddingShell>
+    <Toast notification={notification} onClose={() => setNotification(null)} />
+    <div className="wed-main">
+      <section className="wed-hero">
+        <Branch className="wed-branch wed-branch-start" /><Branch className="wed-branch wed-branch-end" />
+        <div className="wed-hero-photo">
+          {photoFailed
+            ? <div className="wed-photo-empty"><IconPhotoOff size={56} /><span>Imagem do casal</span></div>
+            : <img src={WEDDING.photo} alt={`${WEDDING.couple[0]} e ${WEDDING.couple[1]}`} onError={() => setPhotoFailed(true)} />}
+        </div>
+        <div className="wed-hero-content">
+          <h1 className="wed-names">{WEDDING.couple[0]} <span className="wed-amp">&amp;</span> {WEDDING.couple[1]}</h1>
+          <div className="wed-rule"><i /><IconHeart size={14} /><i /></div>
+          <p className="wed-verse">{WEDDING.verse}</p>
+        </div>
+      </section>
+      <section className="wed-panel">
+        <div className="wed-info-grid">
+          <InfoCard icon={<IconCalendar size={28} />} label="Data" lines={WEDDING.date} />
+          <InfoCard icon={<IconClock size={28} />} label={'Horário'} lines={WEDDING.time} />
+          <InfoCard icon={<IconFlower size={28} />} label="Local da Festa" lines={WEDDING.party.lines} href={WEDDING.party.map} />
+          <InfoCard icon={<IconMapPin size={28} />} label={'Local Celebração'} lines={WEDDING.ceremony.lines} href={WEDDING.ceremony.map} />
+        </div>
+        <div className="wed-cols">
+          <div className="wed-card">
+            <h2 className="wed-card-title wed-card-title-start"><Sprig />{'Selecione as pessoas que confirmam presença:'}</h2>
+            <div className="wed-guests">{guests.map(guest => <label className="wed-guest" key={guest._id}>
+              <input type="checkbox" checked={selectedGuestIds.includes(String(guest._id))} onChange={() => toggleGuest(String(guest._id))} />
+              <span className="wed-check"><IconCheck size={13} /></span><span className="wed-guest-name">{guest.name}</span>
+              {guest.confirmed && <span className="wed-badge"><IconCheck size={12} />Confirmado</span>}
+            </label>)}</div>
+            <button className="wed-btn" disabled={confirming} onClick={confirm}><IconHeart size={20} />{confirming ? 'Atualizando...' : 'Atualizar confirmação'}</button>
+          </div>
+          <div className="wed-card">
+            <h2 className="wed-card-title"><Sprig />Como chegar<Sprig flip /></h2>
+            <div className="wed-map-frame">
+              <div className="wed-map-canvas">
+                <MapArt /><iframe title="Local da cerimônia" src={MAP_EMBED} loading="lazy" referrerPolicy="no-referrer-when-downgrade" allowFullScreen />
+                <a className="wed-map-tap" href={WEDDING.ceremony.map} target="_blank" rel="noreferrer" aria-label="Abrir no Google Maps" />
+              </div>
+              <a className="wed-map-foot" href={WEDDING.ceremony.map} target="_blank" rel="noreferrer">
+                <IconMapPin size={18} /><div><strong>{WEDDING.ceremony.name}</strong><span>{WEDDING.ceremony.fullAddress}</span></div>
+              </a>
+            </div>
+          </div>
+        </div>
+        {deadline && <div className="wed-card wed-deadline">
+          <span className="wed-deadline-icon"><IconCalendar size={22} /></span>
+          <p>{'Confirme sua presença até '}{deadline}</p><Flourish className="wed-flourish" />
+        </div>}
+      </section>
+    </div>
+  </WeddingShell>;
 }
 
 function App() { return location.pathname.startsWith('/invitation/') ? <Public /> : <Layout><Home /></Layout>; }

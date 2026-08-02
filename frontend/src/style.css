@@ -1,1 +1,146 @@
-body{background:#f5f7fb}.invitation-card{max-width:600px;margin-top:10vh}.empty{text-align:center;padding:5rem}
+body{background:#f5f7fb}
+
+.wed{--wed-green:#1f4536;--wed-green-dark:#173628;--wed-gold:#c0a057;--wed-gold-soft:#e7ddc4;--wed-cream:#fbf8f1;--wed-card:#fffdf9;min-height:100vh;min-height:100svh;display:flex;flex-direction:column;overflow-x:hidden;background:var(--wed-cream);color:#4a544e;font-family:'Cormorant Garamond',Georgia,'Times New Roman',serif;-webkit-text-size-adjust:100%}
+.wed-topbar{display:flex;align-items:center;padding:.8rem 1.6rem;background:#fdfbf5;border-bottom:1px solid var(--wed-gold-soft)}
+.wed-brand{display:flex;align-items:center;gap:.7rem;font-size:1.4rem;letter-spacing:.01em;color:var(--wed-green)}
+.wed-brand svg{color:var(--wed-gold)}
+.wed-main{flex:1;display:grid;grid-template-columns:minmax(0,.66fr) minmax(0,1fr)}
+
+.wed-hero{position:relative;overflow:hidden;min-height:460px;display:flex;flex-direction:column;justify-content:flex-end;background:linear-gradient(180deg,#f2eee3,var(--wed-cream) 76%);border-right:1px solid var(--wed-gold-soft)}
+.wed-hero::after{content:'';position:absolute;left:0;right:0;bottom:0;height:58%;background:linear-gradient(180deg,rgba(251,248,241,0),var(--wed-cream) 68%)}
+.wed-hero-photo{position:absolute;inset:0;display:flex;align-items:center;justify-content:center}
+.wed-hero-photo img{width:100%;height:100%;object-fit:cover;object-position:50% 32%;filter:saturate(.92)}
+.wed-hero-photo::after{content:'';position:absolute;inset:0;background:linear-gradient(180deg,rgba(251,248,241,.2),rgba(251,248,241,.04))}
+.wed-photo-empty{display:flex;flex-direction:column;align-items:center;gap:.7rem;margin-bottom:34%;color:#b7b0a0}
+.wed-photo-empty span{font-size:.95rem;letter-spacing:.14em;text-transform:uppercase}
+.wed-branch{position:absolute;color:var(--wed-gold);opacity:.45;pointer-events:none}
+.wed-branch-start{left:-14px;top:12%;width:78px;height:56%}
+.wed-branch-end{right:-26px;top:4%;width:62px;height:40%;transform:scaleX(-1)}
+.wed-hero-content{position:relative;z-index:1;padding:0 2rem 3.2rem;text-align:center}
+.wed-names{margin:0;font-weight:500;line-height:1.05;color:var(--wed-green);font-size:clamp(2.2rem,4.6vw,4.6rem)}
+.wed-amp{color:var(--wed-gold);font-style:italic}
+.wed-rule{display:flex;align-items:center;justify-content:center;gap:.8rem;margin:1.1rem 0 1.2rem;color:var(--wed-gold)}
+.wed-rule i{display:block;height:1px;width:clamp(48px,9vw,120px);background:linear-gradient(90deg,transparent,var(--wed-gold))}
+.wed-rule i:last-child{transform:scaleX(-1)}
+.wed-verse{margin:0 auto;max-width:26rem;font-style:italic;font-size:1.15rem;line-height:1.55;color:#5d6761}
+
+.wed-panel{display:flex;flex-direction:column;gap:1.1rem;padding:1.6rem}
+.wed-info-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:1rem}
+.wed-card,.wed-info{background:var(--wed-card);border:1px solid var(--wed-gold-soft);border-radius:10px}
+.wed-info{padding:1.1rem .8rem;text-align:center}
+.wed-info-link{display:block;color:inherit;text-decoration:none;cursor:pointer;transition:border-color .15s,background .15s,box-shadow .15s}
+.wed-info-link:hover{border-color:var(--wed-gold);background:#fffcf3;box-shadow:0 2px 10px rgba(192,160,87,.14)}
+.wed-info-link:active{background:#fdf7e9}
+.wed-info-hint{display:block;margin-top:.45rem;color:var(--wed-gold);font-size:.85rem;letter-spacing:.04em}
+.wed-info-hint::after{content:' \2197'}
+.wed-info-link:hover .wed-info-hint{text-decoration:underline}
+.wed-info-icon{display:block;margin-bottom:.6rem;color:var(--wed-gold)}
+.wed-info-label{display:block;margin-bottom:.4rem;font-size:1.3rem;color:var(--wed-green)}
+.wed-info-value span{display:block;font-size:1.02rem;line-height:1.35;color:#6c756f}
+.wed-cols{display:grid;grid-template-columns:minmax(0,1.12fr) minmax(0,.88fr);gap:1rem}
+.wed-card{padding:1.1rem}
+.wed-card-title{display:flex;align-items:center;justify-content:center;gap:.6rem;margin:0 0 .9rem;font-size:1.25rem;font-weight:500;color:var(--wed-green)}
+.wed-card-title-start{justify-content:flex-start}
+.wed-card-title svg{color:var(--wed-gold);flex-shrink:0}
+
+.wed-guests{display:flex;flex-direction:column;margin-bottom:1rem;border:1px solid #f0e8d8;border-radius:8px;overflow:hidden}
+.wed-guest{position:relative;display:flex;align-items:center;gap:.85rem;padding:.72rem .9rem;font-size:1.12rem;color:#4a544e;cursor:pointer;border-bottom:1px solid #f2ecdf}
+.wed-guest-name{flex:1;min-width:0;overflow-wrap:anywhere}
+.wed-guest:last-child{border-bottom:0}
+.wed-guest:hover{background:#fdfaf2}
+.wed-guest input{position:absolute;width:0;height:0;opacity:0;pointer-events:none}
+.wed-check{display:flex;align-items:center;justify-content:center;flex-shrink:0;width:21px;height:21px;border:1.5px solid #cec6b1;border-radius:4px;color:#fff;transition:background .15s,border-color .15s}
+.wed-check svg{opacity:0}
+.wed-guest input:checked+.wed-check{background:var(--wed-green);border-color:var(--wed-green)}
+.wed-guest input:checked+.wed-check svg{opacity:1}
+.wed-guest input:focus-visible+.wed-check{outline:2px solid var(--wed-gold);outline-offset:2px}
+.wed-badge{display:inline-flex;align-items:center;gap:.3rem;flex-shrink:0;padding:.16rem .7rem;border-radius:999px;background:#e9f1e4;color:#3f6b4d;font-size:.98rem;white-space:nowrap}
+.wed-btn{display:flex;align-items:center;justify-content:center;gap:.6rem;width:100%;padding:.85rem 1rem;border:0;border-radius:8px;background:var(--wed-green);color:#fdfaf2;font-family:inherit;font-size:1.28rem;cursor:pointer;transition:background .15s}
+.wed-btn:hover:not(:disabled){background:var(--wed-green-dark)}
+.wed-btn:disabled{opacity:.7;cursor:default}
+.wed-btn svg{color:var(--wed-gold)}
+
+.wed-map-frame{border:1px solid #f0e8d8;border-radius:8px;overflow:hidden}
+.wed-map-canvas{position:relative;height:190px}
+.wed-map-art{position:absolute;inset:0;width:100%;height:100%}
+.wed-map-canvas iframe{position:relative;display:block;width:100%;height:100%;border:0}
+.wed-map-tap{display:none}
+.wed-map-foot{display:flex;align-items:flex-start;gap:.6rem;padding:.7rem .85rem;background:#f6efdf;color:inherit;text-decoration:none;transition:background .15s}
+.wed-map-foot:hover{background:#f1e6cf}
+.wed-map-foot svg{flex-shrink:0;margin-top:3px;color:var(--wed-gold)}
+.wed-map-foot strong{display:block;font-weight:500;font-size:1.05rem;color:var(--wed-green)}
+.wed-map-foot span{font-size:.98rem;color:#78817b}
+
+.wed-deadline{position:relative;display:flex;align-items:center;gap:.9rem;overflow:hidden}
+.wed-deadline-icon{display:flex;align-items:center;justify-content:center;flex-shrink:0;width:44px;height:44px;border-radius:8px;background:#c9a961;color:#fffdf9}
+.wed-deadline p{margin:0;font-size:1.22rem;color:var(--wed-green)}
+.wed-flourish{position:absolute;right:.6rem;bottom:0;width:200px;height:52px;color:var(--wed-gold);opacity:.5;pointer-events:none}
+
+.wed-footer{display:flex;align-items:center;justify-content:center;gap:1rem;padding:.9rem;background:var(--wed-green)}
+.wed-footer i{display:block;height:1px;width:clamp(70px,18vw,200px);background:linear-gradient(90deg,transparent,var(--wed-gold))}
+.wed-footer i:last-child{transform:scaleX(-1)}
+.wed-footer svg{color:var(--wed-gold)}
+.wed-state{flex:1;display:flex;align-items:center;justify-content:center;padding:4rem 1rem;text-align:center;font-size:1.5rem;color:var(--wed-green)}
+
+@media(max-width:1180px){.wed-info-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.wed-cols{grid-template-columns:minmax(0,1fr)}}
+
+/* Uma coluna: o heroi passa a ocupar a largura toda, entao os nomes deixam de
+   escalar pela largura da coluna e precisam de outra referencia de vw. */
+@media(max-width:860px){
+  .wed-main{grid-template-columns:minmax(0,1fr)}
+  .wed-hero{min-height:440px;border-right:0;border-bottom:1px solid var(--wed-gold-soft)}
+  .wed-hero-content{padding:0 1.25rem 2.2rem}
+  .wed-names{font-size:clamp(2.1rem,10vw,3.6rem)}
+  .wed-verse{font-size:1.08rem;max-width:32rem}
+  .wed-panel{padding:1.1rem;gap:.9rem}
+}
+
+/* Celular em pe. */
+@media(max-width:560px){
+  .wed-topbar{padding:.7rem 1rem}
+  .wed-brand{font-size:1.25rem;gap:.55rem}
+  .wed-branch-start{width:56px}
+  .wed-branch-end{width:46px}
+  .wed-info{padding:.85rem .6rem}
+  .wed-info-icon{margin-bottom:.4rem}
+  .wed-info-label{font-size:1.08rem}
+  .wed-info-value span{font-size:.95rem}
+  .wed-info-hint{font-size:.8rem;margin-top:.35rem}
+  .wed-card{padding:.9rem}
+  .wed-card-title{align-items:flex-start;font-size:1.12rem;margin-bottom:.75rem}
+  .wed-card-title svg{margin-top:.15rem}
+  .wed-guest{font-size:1.05rem;padding:.7rem}
+  .wed-badge{padding:.14rem .55rem;font-size:.9rem}
+  .wed-btn{font-size:1.15rem;padding:.8rem 1rem}
+  .wed-map-canvas{height:200px}
+  .wed-deadline p{font-size:1.1rem}
+  .wed-flourish{display:none}
+  .wed-state{font-size:1.25rem;padding:3rem 1rem}
+}
+
+/* Celulares estreitos (iPhone SE, Galaxy A0x: 320-380px). */
+@media(max-width:380px){
+  .wed-panel{padding:.85rem;gap:.8rem}
+  .wed-info-grid{gap:.7rem}
+  .wed-info-label{font-size:1rem}
+  .wed-info-value span{font-size:.9rem}
+  .wed-cols{gap:.8rem}
+  .wed-hero{min-height:400px}
+  .wed-guest{gap:.6rem;font-size:1rem;padding:.65rem .6rem}
+  .wed-badge{font-size:.85rem}
+  .wed-map-foot span{font-size:.9rem}
+}
+
+/* Celular deitado: o heroi nao pode comer a tela inteira. */
+@media(max-width:860px) and (max-height:520px){
+  .wed-hero{min-height:300px}
+  .wed-names{font-size:clamp(2rem,7vw,3rem)}
+  .wed-hero-content{padding-bottom:1.5rem}
+}
+
+/* Touch: mapa vira previa clicavel — evita que o dedo role o mapa em vez da
+   pagina, e o toque abre o app do Maps com a rota. */
+@media(hover:none){
+  .wed-map-canvas iframe{pointer-events:none}
+  .wed-map-tap{display:block;position:absolute;inset:0;z-index:2}
+}
