@@ -144,3 +144,200 @@ body{background:#f5f7fb}
   .wed-map-canvas iframe{pointer-events:none}
   .wed-map-tap{display:block;position:absolute;inset:0;z-index:2}
 }
+
+/* ==========================================================================
+   Tela de confirmacao (link pessoal) — so a acao de confirmar presenca.
+   ========================================================================== */
+.wed-panel-confirm{justify-content:center}
+.wed-details{display:flex;align-items:center;gap:.9rem;padding:1rem 1.1rem;text-decoration:none;color:inherit}
+.wed-details-icon{flex-shrink:0;color:var(--wed-gold)}
+.wed-details-text{flex:1;min-width:0;display:flex;flex-direction:column}
+.wed-details-text strong{font-weight:500;font-size:1.12rem;color:var(--wed-green)}
+.wed-details-text span{font-size:1rem;color:#78817b}
+.wed-details .wed-info-hint{flex-shrink:0;margin-top:0}
+
+/* ==========================================================================
+   Landing page (/casamento)
+   ========================================================================== */
+/* overflow-x:hidden herdado de .wed cria um scroll container e quebra o
+   position:sticky da nav. overflow-x:clip corta igual, sem criar scroller. */
+.wed-lp{--nav-h:4.5rem;background:transparent;overflow:visible;overflow-x:clip}
+.wed-plain{background:var(--wed-cream)}
+
+/* A foto do casal e uma camada fixa na viewport: o conteudo rola por cima e
+   ela nunca acompanha o scroll. */
+.wed-lp-bg{position:fixed;inset:0;z-index:0;overflow:hidden}
+.wed-lp-bg img{width:100%;height:100%;object-fit:cover;object-position:50% 26%}
+.wed-lp-bg-empty{width:100%;height:100%;background:linear-gradient(160deg,#2c4b3c,#16281f)}
+/* Escurece a foto o bastante para o texto claro do heroi ter contraste, sem
+   apagar a imagem. */
+.wed-lp-bg::after{content:'';position:absolute;inset:0;background:linear-gradient(180deg,rgba(18,42,31,.6),rgba(18,42,31,.4) 28%,rgba(18,42,31,.46) 62%,rgba(18,42,31,.7))}
+.wed-lp-body{position:relative;z-index:1;flex:1}
+
+.wed-nav{position:sticky;top:0;z-index:30;border-bottom:1px solid transparent;transition:background .25s,box-shadow .25s,border-color .25s}
+.wed-nav-inner{position:relative;display:flex;align-items:center;gap:1rem;height:var(--nav-h);max-width:1180px;margin:0 auto;padding:0 1.25rem}
+.wed-nav-brand{display:flex;align-items:center;gap:.45rem;font-size:1.32rem;color:#fff;text-decoration:none;white-space:nowrap;text-shadow:0 1px 12px rgba(0,0,0,.45)}
+.wed-nav-brand span{margin:0 .1rem;color:var(--wed-gold);font-style:italic}
+.wed-nav-brand svg{color:var(--wed-gold)}
+.wed-nav-links{display:flex;align-items:center;gap:.15rem;margin-left:auto}
+.wed-nav-links a{padding:.45rem .7rem;border-radius:6px;color:#f3eee1;font-size:1.02rem;text-decoration:none;white-space:nowrap;text-shadow:0 1px 10px rgba(0,0,0,.5);transition:color .15s,background .15s}
+.wed-nav-links a:hover{color:#fff;background:rgba(255,255,255,.13)}
+.wed-nav-links a.is-active{color:var(--wed-gold-soft);background:rgba(255,255,255,.1)}
+.wed-nav-toggle{display:none;align-items:center;justify-content:center;width:42px;height:42px;margin-left:auto;border:0;border-radius:8px;background:rgba(20,45,33,.55);color:#fff;cursor:pointer}
+/* Ao rolar, a barra ganha fundo solido e continua colada no topo. */
+.wed-nav.is-scrolled{background:rgba(23,54,40,.97);border-bottom-color:rgba(192,160,87,.35);box-shadow:0 2px 20px rgba(0,0,0,.22)}
+
+.wed-lp-hero{display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:calc(100vh - var(--nav-h));min-height:calc(100svh - var(--nav-h));padding:2.5rem 1.25rem 3.5rem;text-align:center;color:#fdfaf2}
+.wed-lp-hero .wed-names{color:#fff;text-shadow:0 2px 26px rgba(0,0,0,.5)}
+.wed-lp-kicker{margin:0 0 .7rem;font-size:.92rem;letter-spacing:.28em;text-transform:uppercase;color:var(--wed-gold-soft);text-shadow:0 1px 10px rgba(0,0,0,.55)}
+.wed-lp-date{margin:.1rem 0 0;font-size:1.28rem;color:#f4efe2;text-shadow:0 1px 12px rgba(0,0,0,.55)}
+.wed-lp-scroll{margin-top:2.4rem;padding-bottom:.2rem;border-bottom:1px solid rgba(240,233,216,.5);color:#f0e9d8;font-size:1.02rem;letter-spacing:.05em;text-decoration:none;transition:color .15s,border-color .15s}
+.wed-lp-scroll:hover{color:#fff;border-color:#fff}
+
+.wed-count{display:flex;flex-wrap:wrap;justify-content:center;gap:.6rem;margin-top:1.9rem}
+.wed-count-box{min-width:84px;padding:.75rem .6rem;border:1px solid rgba(255,255,255,.32);border-radius:10px;background:rgba(18,42,31,.5)}
+.wed-count-box strong{display:block;font-size:2.1rem;font-weight:500;line-height:1;color:#fff}
+.wed-count-box span{display:block;margin-top:.35rem;font-size:.76rem;letter-spacing:.16em;text-transform:uppercase;color:var(--wed-gold-soft)}
+.wed-count-done{display:flex;align-items:center;justify-content:center;gap:.5rem;margin-top:1.7rem;font-size:1.35rem;color:#fff}
+.wed-count-done svg{color:var(--wed-gold)}
+
+/* Cada secao e um painel opaco flutuando sobre a foto fixa. Assim o texto fica
+   sempre 100% legivel e, pelas frestas entre os paineis, a imagem continua
+   aparecendo durante todo o scroll. Nada de backdrop-filter sobre a camada
+   fixed: em WebView/Safari antigos isso apaga o conteudo. */
+.wed-lp-sheet{padding:1.6rem 1.25rem 0}
+.wed-sec{max-width:1080px;margin:0 auto 1.6rem;padding:2.9rem 1.75rem;background:var(--wed-cream);border:1px solid var(--wed-gold-soft);border-radius:14px;box-shadow:0 12px 44px rgba(0,0,0,.2);scroll-margin-top:calc(var(--nav-h) + 1rem)}
+.wed-sec-title{display:flex;align-items:center;justify-content:center;gap:.75rem;margin:0 0 1rem;font-size:clamp(1.7rem,3.4vw,2.4rem);font-weight:500;color:var(--wed-green)}
+.wed-sec-title svg{flex-shrink:0;color:var(--wed-gold)}
+.wed-sec-intro{max-width:44rem;margin:0 auto 1.7rem;text-align:center;font-size:1.12rem;line-height:1.5;color:#6c756f}
+.wed-prose{max-width:46rem;margin:0 auto}
+.wed-prose p{margin:0 0 1.1rem;font-size:1.16rem;line-height:1.65}
+.wed-prose p:last-child{margin-bottom:0}
+
+.wed-grid-2{display:grid;grid-template-columns:repeat(auto-fit,minmax(255px,1fr));gap:1rem;margin-top:1rem}
+.wed-pad-icon{color:var(--wed-gold)}
+
+/* Carrossel: o trilho e um scroller com scroll-snap. A transicao suave vem do
+   scroll-behavior e o arrasto no celular e nativo. O padding do trilho da
+   espaco para a foto que vaza do card e para a sombra dos cards. */
+.wed-carousel{position:relative}
+.wed-carousel-track{display:flex;gap:1.2rem;padding:1.3rem;margin:-1.3rem -1.3rem -.7rem;overflow-x:auto;overflow-y:hidden;scroll-snap-type:x mandatory;scroll-behavior:smooth;scroll-padding-left:1.3rem;scrollbar-width:none;-ms-overflow-style:none;overscroll-behavior-x:contain}
+.wed-carousel-track::-webkit-scrollbar{display:none}
+.wed-carousel-track:focus-visible{outline:2px solid var(--wed-gold);outline-offset:-6px;border-radius:14px}
+.wed-carousel-track>*{flex:0 0 calc((100% - 2.4rem) / 3);scroll-snap-align:start}
+.wed-carousel-arrow{position:absolute;top:50%;z-index:2;display:flex;align-items:center;justify-content:center;width:42px;height:42px;margin-top:-1.4rem;transform:translateY(-50%);border:1px solid var(--wed-gold-soft);border-radius:50%;background:var(--wed-card);color:var(--wed-green);cursor:pointer;box-shadow:0 4px 14px rgba(0,0,0,.14);transition:background .15s,color .15s,border-color .15s,opacity .15s}
+.wed-carousel-arrow:hover:not(:disabled){background:var(--wed-green);border-color:var(--wed-green);color:#fdfaf2}
+.wed-carousel-arrow:disabled{opacity:.3;cursor:default}
+.wed-carousel-prev{left:-16px}
+.wed-carousel-next{right:-16px}
+.wed-carousel-dots{display:flex;justify-content:center;gap:.45rem;margin-top:1rem}
+.wed-carousel-dots button{width:9px;height:9px;padding:0;border:0;border-radius:999px;background:#d8cfb8;cursor:pointer;transition:width .2s,background .2s}
+.wed-carousel-dots button:hover{background:var(--wed-gold-soft)}
+.wed-carousel-dots button.is-active{width:26px;background:var(--wed-gold)}
+@media(prefers-reduced-motion:reduce){.wed-carousel-track{scroll-behavior:auto}}
+
+.wed-pad{position:relative;display:flex;flex-direction:column;align-items:center;gap:.35rem;padding:2rem 1rem 1.4rem;text-align:center}
+/* O icone divide a faixa do topo com a foto (um no centro, outra na direita);
+   o nome comeca abaixo dela para nunca correr por baixo. */
+.wed-pad strong{margin-top:1.6rem;font-weight:500;font-size:1.24rem;color:var(--wed-green)}
+.wed-pad-role{font-size:.98rem;color:#8a918b}
+/* Foto no topo, a direita. Fica dentro da borda de proposito: se vazasse, o
+   scroller do carrossel cortaria o circulo do card da ponta. */
+.wed-pad-photo{position:absolute;top:12px;right:12px;display:flex;align-items:center;justify-content:center;width:64px;height:64px;border:3px solid var(--wed-gold);border-radius:50%;background:var(--wed-cream);overflow:hidden;box-shadow:0 5px 15px rgba(31,69,54,.22)}
+.wed-pad-photo img{display:block;width:100%;height:100%;object-fit:cover}
+.wed-pad-initials{font-size:1.15rem;color:var(--wed-green)}
+.wed-map-card{margin-top:1rem}
+
+.wed-pix{display:flex;flex-wrap:wrap;align-items:center;gap:1rem;padding:1.2rem}
+.wed-pix-body{flex:1;min-width:200px;display:flex;flex-direction:column;gap:.25rem}
+.wed-pix-body strong{font-weight:500;font-size:1.16rem;color:var(--wed-green)}
+.wed-pix-body code{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:1rem;color:#4a544e;overflow-wrap:anywhere}
+.wed-pix-body span{font-size:.98rem;color:#8a918b}
+.wed-btn-ghost{width:auto;padding:.62rem 1.1rem;border:1px solid var(--wed-green);background:transparent;color:var(--wed-green);font-size:1.05rem}
+.wed-btn-ghost:hover:not(:disabled){background:var(--wed-green);color:#fdfaf2}
+.wed-btn-ghost svg{color:inherit}
+.wed-store{display:flex;flex-direction:column;gap:.35rem;padding:1.2rem;color:inherit;text-decoration:none}
+.wed-store strong{font-weight:500;font-size:1.2rem;color:var(--wed-green)}
+.wed-store>span{font-size:1rem;line-height:1.4;color:#78817b}
+.wed-soon{margin-top:.2rem;font-size:.82rem!important;letter-spacing:.12em;text-transform:uppercase;color:#b3aa96!important}
+
+.wed-recados{display:grid;grid-template-columns:minmax(0,.92fr) minmax(0,1.08fr);gap:1rem;align-items:start}
+.wed-recado-form{display:flex;flex-direction:column;gap:.85rem;padding:1.2rem}
+.wed-field{display:flex;flex-direction:column;gap:.3rem}
+.wed-field>span{font-size:1.02rem;color:var(--wed-green)}
+.wed-field input,.wed-field textarea{width:100%;padding:.65rem .8rem;border:1px solid #e6dcc6;border-radius:8px;background:#fffdf9;color:#4a544e;font-family:inherit;font-size:1.05rem;resize:vertical}
+.wed-field input:focus,.wed-field textarea:focus{outline:2px solid var(--wed-gold);outline-offset:1px;border-color:var(--wed-gold)}
+.wed-form-error{margin:0;color:#a3423a;font-size:1rem}
+.wed-form-ok{display:flex;align-items:center;gap:.4rem;margin:0;color:#3f6b4d;font-size:1rem}
+.wed-recado-list{display:flex;flex-direction:column;gap:.8rem;max-height:34rem;overflow-y:auto}
+.wed-recado{margin:0;padding:1rem 1.1rem}
+.wed-recado p{margin:0 0 .6rem;font-style:italic;font-size:1.08rem;line-height:1.5;overflow-wrap:anywhere}
+.wed-recado footer{display:flex;align-items:baseline;justify-content:space-between;gap:.6rem}
+.wed-recado strong{font-weight:500;color:var(--wed-green)}
+.wed-recado time{flex-shrink:0;font-size:.9rem;color:#a6ac9f}
+.wed-empty{margin:0;padding:1.6rem;text-align:center;color:#8a918b}
+
+.wed-sec-cta{margin-bottom:2.6rem}
+.wed-cta{display:flex;flex-direction:column;align-items:center;gap:1rem;max-width:38rem;margin:0 auto;padding:1.7rem;text-align:center}
+.wed-cta p{margin:0;font-size:1.15rem;line-height:1.55}
+.wed-cta .wed-cta-hint{font-size:1.02rem;color:#8a918b}
+.wed-cta .wed-btn{max-width:22rem;text-decoration:none}
+
+/* ==========================================================================
+   Rodape do site publico
+   ========================================================================== */
+.wed-foot{position:relative;z-index:1;background:#2e2e2e;color:#b0b0b0}
+.wed-foot-top{display:grid;grid-template-columns:1.25fr 1fr 1.15fr 1.35fr;gap:2rem;max-width:1180px;margin:0 auto;padding:3rem 1.5rem 2.7rem}
+.wed-foot-logo{display:flex;align-items:center;gap:.6rem;color:#fff;font-size:1.62rem}
+.wed-foot-logo svg{color:var(--wed-gold)}
+.wed-foot-logo em{font-style:italic}
+.wed-foot-social{display:flex;flex-wrap:wrap;gap:.7rem;margin-top:1.4rem}
+.wed-foot-social a{display:flex;align-items:center;justify-content:center;width:40px;height:40px;border-radius:50%;background:#3d3d3d;color:#c9c9c9;transition:background .15s,color .15s}
+.wed-foot-social a:hover{background:var(--wed-gold);color:#2e2e2e}
+.wed-foot-col h3{margin:0 0 1.05rem;font-size:1.02rem;font-weight:500;letter-spacing:.09em;text-transform:uppercase;color:#fff}
+.wed-foot-col ul{display:flex;flex-direction:column;gap:.55rem;margin:0;padding:0;list-style:none}
+.wed-foot-col a{display:flex;align-items:flex-start;gap:.5rem;color:#a5a5a5;font-size:1.05rem;line-height:1.35;text-decoration:none;transition:color .15s}
+.wed-foot-col a:hover{color:var(--wed-gold)}
+.wed-foot-col svg{flex-shrink:0;margin-top:3px;color:var(--wed-gold)}
+.wed-foot-plain{color:#8c8c8c;font-size:1.02rem}
+.wed-foot-bar{background:#1f1f1f}
+.wed-foot-bar-inner{display:flex;align-items:center;justify-content:space-between;gap:1rem;max-width:1180px;margin:0 auto;padding:1rem 1.5rem;font-size:.98rem;color:#8c8c8c}
+.wed-foot-fetech{display:flex;color:#e6e6e6}
+
+@media(max-width:980px){
+  .wed-nav-toggle{display:flex}
+  .wed-nav-links{position:absolute;left:0;right:0;top:var(--nav-h);display:none;flex-direction:column;align-items:stretch;gap:0;margin:0;padding:.4rem;background:rgba(23,54,40,.98);border-top:1px solid rgba(192,160,87,.3);box-shadow:0 12px 24px rgba(0,0,0,.25)}
+  .wed-nav-links.is-open{display:flex}
+  .wed-nav-links a{padding:.85rem 1rem;text-shadow:none}
+}
+@media(max-width:1180px){.wed-carousel-track>*{flex-basis:calc((100% - 1.2rem) / 2)}}
+@media(max-width:900px){.wed-foot-top{grid-template-columns:repeat(2,minmax(0,1fr));gap:1.9rem}}
+/* Uma coluna: as setas cobririam a foto, entao ficam so o arrasto e os pontos. */
+@media(max-width:700px){
+  .wed-carousel-track>*{flex-basis:100%}
+  .wed-carousel-arrow{display:none}
+}
+@media(max-width:860px){
+  .wed-recados{grid-template-columns:minmax(0,1fr)}
+  .wed-recado-list{max-height:none}
+  .wed-sec{padding:2.2rem 1.15rem;margin-bottom:1.1rem}
+  .wed-lp-sheet{padding:1.1rem .9rem 0}
+  .wed-lp-bg img{object-position:50% 22%}
+}
+@media(max-width:560px){
+  .wed-lp{--nav-h:4rem}
+  .wed-nav-brand{font-size:1.15rem}
+  .wed-lp-kicker{font-size:.82rem;letter-spacing:.22em}
+  .wed-lp-date{font-size:1.12rem}
+  .wed-count{gap:.45rem}
+  .wed-count-box{min-width:70px;padding:.6rem .4rem}
+  .wed-count-box strong{font-size:1.7rem}
+  .wed-count-box span{font-size:.68rem}
+  .wed-sec-intro{font-size:1.04rem}
+  .wed-prose p{font-size:1.08rem}
+  .wed-pix{gap:.8rem}
+  .wed-btn-ghost{width:100%}
+  .wed-foot-top{grid-template-columns:minmax(0,1fr);padding:2.3rem 1.25rem 2rem}
+  .wed-foot-bar-inner{flex-direction:column;align-items:flex-start;gap:.85rem}
+  .wed-details{flex-wrap:wrap}
+}

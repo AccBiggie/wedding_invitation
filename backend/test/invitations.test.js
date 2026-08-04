@@ -8,3 +8,6 @@ test('token inválido retorna 401', async()=>{const r=await request(app).get('/a
 test('/auth/me sem token retorna 401', async()=>{const r=await request(app).get('/api/auth/me');assert.equal(r.status,401);});
 test('/auth/me com token devolve o usuário', async()=>{const r=await request(app).get('/api/auth/me').set('Authorization',bearer);assert.equal(r.status,200);assert.equal(r.body.data.email,'accbiggie@gmail.com');});
 test('login sem credenciais retorna 422', async()=>{const r=await request(app).post('/api/auth/login').send({});assert.equal(r.status,422);assert.ok(r.body.errors.email);assert.ok(r.body.errors.password);});
+test('dados do casamento são públicos', async()=>{const r=await request(app).get('/api/public/wedding');assert.equal(r.status,200);assert.equal(r.body.data.couple.length,2);assert.ok(r.body.data.datetime);assert.ok(r.body.data.ceremony.map);});
+test('recado sem nome e sem texto retorna 422', async()=>{const r=await request(app).post('/api/public/messages').send({});assert.equal(r.status,422);assert.ok(r.body.errors.name);assert.ok(r.body.errors.message);});
+test('moderação de recados exige login', async()=>{const r=await request(app).get('/api/messages');assert.equal(r.status,401);});
