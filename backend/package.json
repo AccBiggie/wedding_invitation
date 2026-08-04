@@ -2,7 +2,21 @@
   "name": "wedding-invitations-backend",
   "private": true,
   "type": "module",
-  "scripts": { "dev": "node --watch src/server.js", "start": "node src/server.js", "test": "node --test" },
-  "dependencies": { "cors": "^2.8.5", "express": "^4.21.2", "express-rate-limit": "^7.5.0", "mongoose": "^8.9.5" },
-  "devDependencies": { "supertest": "^7.0.0", "mongodb-memory-server": "^10.1.4" }
+  "scripts": {
+    "dev": "node --watch src/server.js",
+    "start": "node src/server.js",
+    "test": "node --test"
+  },
+  "dependencies": {
+    "bcryptjs": "^3.0.3",
+    "cors": "^2.8.5",
+    "express": "^4.21.2",
+    "express-rate-limit": "^7.5.0",
+    "jsonwebtoken": "^9.0.3",
+    "mongoose": "^8.9.5"
+  },
+  "devDependencies": {
+    "mongodb-memory-server": "^10.1.4",
+    "supertest": "^7.0.0"
+  }
 }

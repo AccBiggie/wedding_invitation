@@ -1,4 +1,10 @@
-import test from 'node:test'; import assert from 'node:assert/strict'; import request from 'supertest'; import app from '../src/app.js';
+import test from 'node:test'; import assert from 'node:assert/strict'; import request from 'supertest'; import app from '../src/app.js'; import { signToken } from '../src/controllers/authController.js';
+const bearer = 'Bearer ' + signToken({ _id: 'test-admin', name: 'Administrador', email: 'accbiggie@gmail.com', role: 'admin' });
 test('health endpoint', async()=>{const r=await request(app).get('/api/health');assert.equal(r.status,200);assert.equal(r.body.success,true);});
-test('cadastro sem nome é rejeitado', async()=>{const r=await request(app).post('/api/invitations').send({description:'x'});assert.equal(r.status,422);assert.equal(r.body.success,false);});
-test('id inválido retorna 400', async()=>{const r=await request(app).get('/api/invitations/not-an-id');assert.equal(r.status,400);});
+test('cadastro sem nome é rejeitado', async()=>{const r=await request(app).post('/api/invitations').set('Authorization',bearer).send({description:'x'});assert.equal(r.status,422);assert.equal(r.body.success,false);});
+test('id inválido retorna 400', async()=>{const r=await request(app).get('/api/invitations/not-an-id').set('Authorization',bearer);assert.equal(r.status,400);});
+test('rota administrativa sem token retorna 401', async()=>{const r=await request(app).get('/api/invitations');assert.equal(r.status,401);assert.equal(r.body.success,false);});
+test('token inválido retorna 401', async()=>{const r=await request(app).get('/api/invitations').set('Authorization','Bearer nao-e-um-jwt');assert.equal(r.status,401);});
+test('/auth/me sem token retorna 401', async()=>{const r=await request(app).get('/api/auth/me');assert.equal(r.status,401);});
+test('/auth/me com token devolve o usuário', async()=>{const r=await request(app).get('/api/auth/me').set('Authorization',bearer);assert.equal(r.status,200);assert.equal(r.body.data.email,'accbiggie@gmail.com');});
+test('login sem credenciais retorna 422', async()=>{const r=await request(app).post('/api/auth/login').send({});assert.equal(r.status,422);assert.ok(r.body.errors.email);assert.ok(r.body.errors.password);});

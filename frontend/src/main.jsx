@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { createRoot } from 'react-dom/client';
 import { BrowserRouter, Link } from 'react-router-dom';
-import api from './services/api';
+import api, { tokenStore } from './services/api';
 import '@tabler/core/dist/css/tabler.min.css';
 import './style.css';
 
@@ -18,8 +18,43 @@ function Toast({ notification, onClose }) {
   </div>;
 }
 
-function Layout({ children }) {
-  return <div className="page"><header className="navbar d-print-none"><div className="container-xl"><Link className="navbar-brand" to="/">Convites de casamento</Link></div></header><main className="container-xl py-4">{children}</main></div>;
+function Layout({ user, onLogout, children }) {
+  return <div className="page"><header className="navbar d-print-none"><div className="container-xl">
+    <Link className="navbar-brand" to="/">Convites de casamento</Link>
+    <div className="ms-auto d-flex align-items-center gap-3">
+      <span className="text-secondary d-none d-sm-inline">{user.email}</span>
+      <button className="btn btn-sm" onClick={onLogout}>Sair</button>
+    </div>
+  </div></header><main className="container-xl py-4">{children}</main></div>;
+}
+
+function Login({ onSuccess }) {
+  const [form, setForm] = useState({ email: '', password: '' });
+  const [error, setError] = useState('');
+  const [sending, setSending] = useState(false);
+  const submit = async event => {
+    event.preventDefault(); setSending(true); setError('');
+    try {
+      const response = await api.post('/auth/login', form);
+      tokenStore.set(response.data.data.accessToken);
+      onSuccess(response.data.data.user);
+    } catch (requestError) { setError(requestError.response?.data?.message || 'Não foi possível entrar. Tente novamente.'); }
+    finally { setSending(false); }
+  };
+  return <div className="page page-center"><div className="container container-tight py-4">
+    <div className="text-center mb-4"><h1 className="navbar-brand navbar-brand-autodark">Convites de casamento</h1></div>
+    <form className="card card-md" onSubmit={submit}>
+      <div className="card-body">
+        <h2 className="card-title text-center mb-4">Entre na sua conta</h2>
+        <label className="form-label">E-mail</label>
+        <input type="email" required autoFocus autoComplete="username" className="form-control" placeholder="seu@email.com" value={form.email} onChange={event => setForm({ ...form, email: event.target.value })} />
+        <label className="form-label mt-3">Senha</label>
+        <input type="password" required autoComplete="current-password" className="form-control" placeholder="Sua senha" value={form.password} onChange={event => setForm({ ...form, password: event.target.value })} />
+        {error && <div className="alert alert-danger mt-3 mb-0">{error}</div>}
+        <div className="form-footer"><button className="btn btn-primary w-100" disabled={sending}>{sending ? 'Entrando...' : 'Entrar'}</button></div>
+      </div>
+    </form>
+  </div></div>;
 }
 
 function InvitationUrlModal({ invitation, onClose, notify }) {
@@ -257,5 +292,17 @@ function Public() {
   </WeddingShell>;
 }
 
-function App() { return location.pathname.startsWith('/invitation/') ? <Public /> : <Layout><Home /></Layout>; }
+function Admin() {
+  const [user, setUser] = useState(null);
+  const [checking, setChecking] = useState(Boolean(tokenStore.get()));
+  // Revalida o token guardado antes de liberar a tela principal.
+  useEffect(() => { if (!tokenStore.get()) return; api.get('/auth/me').then(response => setUser(response.data.data)).catch(() => tokenStore.clear()).finally(() => setChecking(false)); }, []);
+  useEffect(() => { const expire = () => setUser(null); window.addEventListener('auth:expired', expire); return () => window.removeEventListener('auth:expired', expire); }, []);
+  const logout = () => { tokenStore.clear(); setUser(null); };
+  if (checking) return <div className="page page-center"><div className="text-secondary">Carregando...</div></div>;
+  if (!user) return <Login onSuccess={setUser} />;
+  return <Layout user={user} onLogout={logout}><Home /></Layout>;
+}
+
+function App() { return location.pathname.startsWith('/invitation/') ? <Public /> : <Admin />; }
 createRoot(document.getElementById('root')).render(<BrowserRouter><App /></BrowserRouter>);

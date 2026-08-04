@@ -1,0 +1,2 @@
+import { Router } from 'express'; import rateLimit from 'express-rate-limit'; import * as c from '../controllers/authController.js'; import { adminAuth } from '../middlewares/adminAuth.js';
+const r=Router(); const limiter=rateLimit({windowMs:15*60*1000,max:20,message:{success:false,message:'Muitas tentativas de login. Tente novamente em alguns minutos.'}}); r.post('/login',limiter,c.login); r.get('/me',adminAuth,c.me); export default r;
