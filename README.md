@@ -4,7 +4,9 @@ Aplicação React + Tabler para criação, administração e confirmação públ
 
 ## Executar com Docker
 
-Pré-requisitos: Docker e Docker Compose. Execute `docker compose up --build` e acesse `http://localhost:3002`. A API fica em `http://localhost:3001`.
+No WSL, instale o Docker Engine e o plugin Docker Compose na distribuição Linux. Inicie o serviço com `sudo service docker start` (ou `sudo systemctl start docker`, se systemd estiver ativo) e configure seu usuário no grupo `docker` para acessar `/var/run/docker.sock`.
+
+Execute `bash start-dev.sh` no WSL. O script usa o socket do Docker Engine local mesmo se o contexto do Docker Desktop estiver selecionado. Acesse `http://localhost:3002`; a API fica em `http://localhost:3001`. Se a porta `3001` estiver ocupada, execute `API_PORT=3003 bash start-dev.sh`; o frontend continua em `3002` e usa `/api` pelo proxy do NGINX. Para parar, use `docker --host unix:///var/run/docker.sock compose down` (mantém os dados do MongoDB).
 
 ## Executar localmente
 
