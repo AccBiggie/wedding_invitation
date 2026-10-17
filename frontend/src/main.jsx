@@ -415,7 +415,7 @@ function Landing() {
         <section className="wed-sec" id="padrinhos">
           <h2 className="wed-sec-title"><Sprig />{wedding.godparents.title}<Sprig flip /></h2>
           <p className="wed-sec-intro">{wedding.godparents.intro}</p>
-          <PublicGodparents fallback={<Carousel label="Padrinhos">{wedding.godparents.couples.map(couple => <GodparentCard key={couple.names.join()} couple={couple} />)}</Carousel>} />
+          <PublicGodparents Carousel={Carousel} GodparentCard={GodparentCard} fallback={<Carousel label="Padrinhos">{wedding.godparents.couples.map(couple => <GodparentCard key={couple.names.join()} couple={couple} />)}</Carousel>} />
         </section>
 
         <section className="wed-sec" id="cerimonia">

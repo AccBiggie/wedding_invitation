@@ -8,7 +8,11 @@ export function validateGodparent(body) {
   const errors = {};
   const name = text(body.name, 120);
   if (!name || name.length > 120) errors.name = ['Informe um nome de ate 120 caracteres.'];
+  const partnerName = text(body.partnerName, 120);
+  if (partnerName.length > 120) errors.partnerName = ['Informe um segundo nome de ate 120 caracteres.'];
   if (!['groomsman', 'bridesmaid', 'mother', 'father', 'other'].includes(body.role)) errors.role = ['Selecione uma funcao valida.'];
+  const cardRole = text(body.cardRole, 120);
+  if (cardRole.length > 120) errors.cardRole = ['Informe uma legenda de ate 120 caracteres.'];
   const email = text(body.email, 254);
   if (email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) errors.email = ['Informe um e-mail valido.'];
   const phone = text(body.phone, 30);
@@ -19,7 +23,7 @@ export function validateGodparent(body) {
   if (!validImage(image)) errors.image = ['Informe uma URL de imagem valida.'];
   if (!validOrder(body.order ?? 0)) errors.order = ['A ordem deve ser um inteiro nao negativo.'];
   if (body.active !== undefined && !validBoolean(body.active)) errors.active = ['Status invalido.'];
-  return { errors, data: { name, role: body.role, phone, email: email.toLowerCase(), description, image, order: Number(body.order ?? 0), active: body.active ?? true } };
+  return { errors, data: { name, partnerName, role: body.role, cardRole, phone, email: email.toLowerCase(), description, image, order: Number(body.order ?? 0), active: body.active ?? true } };
 }
 
 export function validateGift(body) {

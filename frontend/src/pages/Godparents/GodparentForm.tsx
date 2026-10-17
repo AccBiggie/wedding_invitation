@@ -6,7 +6,7 @@ import { godparentsService } from '../../services/godparents.service';
 import type { GodparentInput } from '../../types/api';
 
 const roles = [{ value: 'groomsman', label: 'Padrinho' }, { value: 'bridesmaid', label: 'Madrinha' }, { value: 'mother', label: 'Mãe' }, { value: 'father', label: 'Pai' }, { value: 'other', label: 'Outro' }];
-const blank: GodparentInput = { name: '', role: 'groomsman', phone: '', email: '', description: '', image: '', order: 0, active: true };
+const blank: GodparentInput = { name: '', partnerName: '', role: 'groomsman', cardRole: '', phone: '', email: '', description: '', image: '', order: 0, active: true };
 
 export function GodparentForm({ id, onClose, onSaved }: { id?: string; onClose: () => void; onSaved: (notice: string) => void }) {
   const [form, setForm] = useState<GodparentInput>(blank);
@@ -15,7 +15,7 @@ export function GodparentForm({ id, onClose, onSaved }: { id?: string; onClose: 
   useEffect(() => {
     if (!id) return;
     let active = true;
-    godparentsService.getById(id).then(item => { if (active) setForm({ name: item.name, role: item.role, phone: item.phone, email: item.email, description: item.description, image: item.image, order: item.order, active: item.active }); }).catch(() => {
+    godparentsService.getById(id).then(item => { if (active) setForm({ name: item.name, partnerName: item.partnerName || '', role: item.role, cardRole: item.cardRole || '', phone: item.phone, email: item.email, description: item.description, image: item.image, order: item.order, active: item.active }); }).catch(() => {
       if (active) { setLoadFailed(true); setError('Não foi possível carregar o padrinho.'); }
     }).finally(() => { if (active) setLoading(false); });
     return () => { active = false; };
@@ -23,7 +23,7 @@ export function GodparentForm({ id, onClose, onSaved }: { id?: string; onClose: 
   const change = <K extends keyof GodparentInput>(key: K, value: GodparentInput[K]) => setForm(current => ({ ...current, [key]: value }));
   const submit = async (event: FormEvent) => {
     event.preventDefault(); if (saving || loading || loadFailed) return;
-    if (!form.name.trim() || !Number.isSafeInteger(form.order) || form.order < 0 || (form.email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.email))) { setError('Revise nome, e-mail e ordem.'); return; }
+    if (!form.name.trim() || form.partnerName.length > 120 || form.cardRole.length > 120 || !Number.isSafeInteger(form.order) || form.order < 0 || (form.email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.email))) { setError('Revise nomes, legenda, e-mail e ordem.'); return; }
     setSaving(true); setError('');
     try { if (id) await godparentsService.update(id, form); else await godparentsService.create(form); onSaved(id ? 'Padrinho atualizado com sucesso.' : 'Padrinho cadastrado com sucesso.'); }
     catch { setError('Não foi possível salvar o padrinho.'); } finally { setSaving(false); }
@@ -32,11 +32,13 @@ export function GodparentForm({ id, onClose, onSaved }: { id?: string; onClose: 
     {loading ? <CircularProgress aria-label="Carregando cadastro" /> : loadFailed ? <Alert severity="error">{error}</Alert> : <Paper component="form" onSubmit={submit} elevation={0} sx={{ py: 1 }}><Stack spacing={2}>
       {error && <Alert severity="error">{error}</Alert>}
       <Box sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr', md: '1fr 1fr' }, gap: 2 }}>
-        <TextField autoFocus label="Nome" required value={form.name} onChange={e => change('name', e.target.value)} slotProps={{ htmlInput: { maxLength: 120 } }} />
+        <TextField autoFocus label="Primeiro nome no card" required value={form.name} onChange={e => change('name', e.target.value)} slotProps={{ htmlInput: { maxLength: 120 } }} />
+        <TextField label="Segundo nome no card" value={form.partnerName} onChange={e => change('partnerName', e.target.value)} slotProps={{ htmlInput: { maxLength: 120 } }} />
         <TextField select label="Função" required value={form.role} onChange={e => change('role', e.target.value as GodparentInput['role'])}>{roles.map(role => <MenuItem key={role.value} value={role.value}>{role.label}</MenuItem>)}</TextField>
+        <TextField label="Legenda do card" value={form.cardRole} onChange={e => change('cardRole', e.target.value)} helperText="Ex.: Padrinhos da noiva. Em branco, usa a função." slotProps={{ htmlInput: { maxLength: 120 } }} />
         <TextField label="Telefone" value={form.phone} onChange={e => change('phone', e.target.value)} slotProps={{ htmlInput: { maxLength: 30 } }} />
         <TextField label="E-mail" type="email" value={form.email} onChange={e => change('email', e.target.value)} />
-        <TextField label="Imagem (URL)" value={form.image} onChange={e => change('image', e.target.value)} helperText="Informe uma URL pública da imagem." />
+        <TextField label="Foto do card (URL)" value={form.image} onChange={e => change('image', e.target.value)} helperText="Informe uma URL pública da foto." />
         <TextField label="Ordem" type="number" value={form.order} onChange={e => change('order', Number(e.target.value))} slotProps={{ htmlInput: { min: 0, step: 1 } }} />
       </Box>
       {form.image && <Box component="img" src={form.image} alt="Prévia do padrinho" sx={{ width: 120, height: 120, objectFit: 'cover', borderRadius: 2 }} />}

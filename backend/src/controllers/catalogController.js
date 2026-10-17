@@ -73,7 +73,7 @@ export const godparents = resource(Godparent, validateGodparent, ['order', 'name
 export const gifts = resource(GiftProduct, validateGift, ['order', 'name', 'category', 'price', 'active', 'createdAt']);
 
 export async function publicGodparents(req, res, next) {
-  try { ok(res, await Godparent.find({ active: true }).sort({ order: 1, name: 1 }).limit(200).select('name role description image')); } catch (error) { next(error); }
+  try { ok(res, await Godparent.find({ active: true }).sort({ order: 1, name: 1 }).limit(200).select('name partnerName role cardRole description image')); } catch (error) { next(error); }
 }
 export async function publicGifts(req, res, next) {
   try { ok(res, await GiftProduct.find({ active: true }).sort({ order: 1, name: 1 }).limit(200).select('name description price image category')); } catch (error) { next(error); }

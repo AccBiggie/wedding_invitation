@@ -28,8 +28,16 @@ test('CRUD de padrinhos valida, filtra e pagina', { skip: !connection }, async (
   assert.equal((await request(app).post(base).set('Authorization', bearer).send({ name: '' })).status, 422);
   const created = await request(app).post(base).set('Authorization', bearer).send({ name: 'Ana', role: 'bridesmaid', order: 2, active: true });
   assert.equal(created.status, 200); const id = created.body.data._id;
+  const withCouple = await request(app).put(base + '/' + id).set('Authorization', bearer).send({ partnerName: 'Ricardo', cardRole: 'Padrinhos da noiva', image: '/padrinhos/ana-ricardo.jpg' });
+  assert.equal(withCouple.status, 200);
+  assert.equal(withCouple.body.data.partnerName, 'Ricardo');
+  assert.equal((await request(app).put(base + '/' + id).set('Authorization', bearer).send({ partnerName: 'a'.repeat(121) })).status, 422);
   const list = await request(app).get(base + '?name=Ana&role=bridesmaid&active=true&page=1&limit=1').set('Authorization', bearer);
   assert.equal(list.body.data.pagination.total, 1); assert.equal(list.body.data.data[0]._id, id);
+  const publicList = await request(app).get('/api/public/godparents');
+  assert.equal(publicList.body.data[0].partnerName, 'Ricardo');
+  assert.equal(publicList.body.data[0].cardRole, 'Padrinhos da noiva');
+  assert.equal(publicList.body.data[0].image, '/padrinhos/ana-ricardo.jpg');
   assert.equal((await request(app).get(base + '/' + id).set('Authorization', bearer)).body.data.name, 'Ana');
   const updated = await request(app).put(base + '/' + id).set('Authorization', bearer).send({ active: false, order: 3 });
   assert.equal(updated.body.data.active, false);

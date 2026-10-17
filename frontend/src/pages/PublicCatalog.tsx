@@ -1,9 +1,9 @@
 import { useEffect, useId, useRef, useState, type ReactNode } from 'react';
-import { Box, Card, CardContent, CardMedia, Typography } from '@mui/material';
 import api from '../services/api';
 import type { ApiResponse, GiftProduct, Godparent } from '../types/api';
 const currency = (value: number) => new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(value);
 const roleName: Record<Godparent['role'], string> = { groomsman: 'Padrinho', bridesmaid: 'Madrinha', mother: 'Mãe', father: 'Pai', other: 'Outro' };
+interface Couple { names: string[]; role: string; photo: string }
 function GiftDescription({ description }: { description: string }) {
   const [expanded, setExpanded] = useState(false);
   const [overflow, setOverflow] = useState(false);
@@ -23,11 +23,11 @@ function GiftDescription({ description }: { description: string }) {
     {overflow && <button type="button" className="wed-gift-more" aria-controls={descriptionId} aria-expanded={expanded} onClick={() => setExpanded(value => !value)}>{expanded ? 'Ler menos' : 'Leia mais'}</button>}
   </>;
 }
-export function PublicGodparents({ fallback }: { fallback: ReactNode }) {
+export function PublicGodparents({ fallback, Carousel, GodparentCard }: { fallback: ReactNode; Carousel: ({ label, children }: { label: string; children: ReactNode }) => ReactNode; GodparentCard: ({ couple }: { couple: Couple }) => ReactNode }) {
   const [items, setItems] = useState<Godparent[] | null>(null);
   useEffect(() => { api.get<ApiResponse<Godparent[]>>('/public/godparents').then(r => setItems(r.data.data)).catch(() => setItems([])); }, []);
   if (!items?.length) return <>{fallback}</>;
-  return <Box sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr', sm: 'repeat(2,1fr)', md: 'repeat(3,1fr)' }, gap: 2 }}>{items.map(item => <Card key={item._id}>{item.image && <CardMedia component="img" image={item.image} alt={item.name} sx={{ height: 180, objectFit: 'cover' }} />}<CardContent><Typography variant="h6">{item.name}</Typography><Typography color="text.secondary">{roleName[item.role]}</Typography>{item.description && <Typography>{item.description}</Typography>}</CardContent></Card>)}</Box>;
+  return <Carousel label="Padrinhos">{items.map(item => <GodparentCard key={item._id} couple={{ names: [item.name, item.partnerName].filter(Boolean), role: item.cardRole || roleName[item.role], photo: item.image }} />)}</Carousel>;
 }
 export function PublicGifts({ Carousel }: { Carousel: ({ label, children }: { label: string; children: ReactNode }) => ReactNode }) {
   const [items, setItems] = useState<GiftProduct[]>([]);

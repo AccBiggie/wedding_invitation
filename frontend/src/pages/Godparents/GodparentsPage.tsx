@@ -21,8 +21,8 @@ export function GodparentsPage() {
   const remove = async () => { if (!deleting) return; setBusy(true); try { await godparentsService.remove(deleting._id); setNotice('Padrinho excluído com sucesso.'); setDeleting(null); setRefresh(value => value + 1); } catch { setError('Não foi possível excluir o padrinho.'); } finally { setBusy(false); } };
   const columns: GridColDef<Godparent>[] = [
     { field: '_id', headerName: 'Código', width: 100, sortable: false, valueFormatter: value => String(value).slice(-6) },
-    { field: 'name', headerName: 'Nome', flex: 1, minWidth: 170 },
-    { field: 'role', headerName: 'Função', width: 130, valueFormatter: value => roleName[value as Godparent['role']] },
+    { field: 'name', headerName: 'Nomes no card', flex: 1, minWidth: 190, renderCell: params => [params.row.name, params.row.partnerName].filter(Boolean).join(' & ') },
+    { field: 'role', headerName: 'Legenda do card', width: 180, renderCell: params => params.row.cardRole || roleName[params.row.role] },
     { field: 'phone', headerName: 'Telefone', width: 145, sortable: false },
     { field: 'active', headerName: 'Status', width: 100, valueFormatter: value => value ? 'Ativo' : 'Inativo' },
     { field: 'order', headerName: 'Ordem', width: 90 },
