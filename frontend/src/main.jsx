@@ -1,9 +1,16 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { createRoot } from 'react-dom/client';
-import { BrowserRouter, Link } from 'react-router-dom';
+import { BrowserRouter, useLocation, useNavigate } from 'react-router-dom';
+import { Button } from '@mui/material';
+import Add from '@mui/icons-material/Add';
+import { PageHeader } from './components/common/PageHeader';
 import api, { tokenStore } from './services/api';
+import { PublicGodparents, PublicGifts } from './pages/PublicCatalog';
+import { GravataEntry } from './pages/Pix/GravataEntry';
 import '@tabler/core/dist/css/tabler.min.css';
 import './style.css';
+
+const AdminApp = React.lazy(() => import('./routes/AdminApp').then(module => ({ default: module.AdminApp })));
 
 const statusLabel = status => status === 'confirmed' ? 'Confirmado' : 'N\u00e3o confirmado';
 const typeLabel = type => type === 'virtual' ? 'Virtual' : 'Presencial';
@@ -16,16 +23,6 @@ function Toast({ notification, onClose }) {
   return <div className={`alert alert-${notification.type} position-fixed top-0 end-0 m-3 shadow`} style={{ zIndex: 2000, minWidth: 300 }} role="alert">
     {notification.message}<button className="btn-close float-end" onClick={onClose} />
   </div>;
-}
-
-function Layout({ user, onLogout, children }) {
-  return <div className="page"><header className="navbar d-print-none"><div className="container-xl">
-    <Link className="navbar-brand" to="/">Convites de casamento</Link>
-    <div className="ms-auto d-flex align-items-center gap-3">
-      <span className="text-secondary d-none d-sm-inline">{user.email}</span>
-      <button className="btn btn-sm" onClick={onLogout}>Sair</button>
-    </div>
-  </div></header><main className="container-xl py-4">{children}</main></div>;
 }
 
 function Login({ onSuccess }) {
@@ -86,6 +83,7 @@ function InvitationFormModal({ editing, form, setForm, saving, error, onClose, o
 }
 
 function Home() {
+  const route = useLocation(); const navigate = useNavigate();
   const [items, setItems] = useState([]);
   const [filters, setFilters] = useState({ startDate: monthStart(), endDate: monthEnd() });
   const [pagination, setPagination] = useState({ page: 1, limit: 20, total: 0, totalPages: 0 });
@@ -114,11 +112,18 @@ function Home() {
   const applyFilter = values => { setPagination(current => ({ ...current, page: 1 })); setFilters({ ...filters, ...values }); };
   const openNew = () => { setEditing(null); setForm({ name: '', description: '', type: 'in_person', confirmationDeadline: '' }); setFormError(''); setFormOpen(true); };
   const openEdit = item => { setEditing(item); setForm({ name: item.name, description: item.description || '', type: item.type || 'in_person', confirmationDeadline: item.confirmationDeadline ? item.confirmationDeadline.slice(0, 10) : '' }); setFormError(''); setFormOpen(true); };
+  useEffect(() => {
+    if (route.pathname === '/convites/novo') openNew();
+    else if (/^\/convites\/[^/]+\/editar$/.test(route.pathname)) {
+      const id = route.pathname.split('/')[2];
+      api.get('/invitations/' + id).then(response => openEdit(response.data.data)).catch(() => notify('danger', 'Não foi possível carregar o convite.'));
+    } else setFormOpen(false);
+  }, [route.pathname]);
   const submit = async event => {
     event.preventDefault(); setSaving(true); setFormError('');
     try {
       const response = editing ? await api.put('/invitations/' + editing._id, form) : await api.post('/invitations', form);
-      setFormOpen(false); setEditing(null); load();
+      setFormOpen(false); setEditing(null); navigate('/convites'); load();
       if (editing) notify('success', 'Convite atualizado com sucesso.');
       else { setViewing(response.data.data); notify('success', 'Convite criado com sucesso.'); }
     } catch (error) { setFormError(error.response?.data?.message || 'N\u00e3o foi poss\u00edvel salvar o convite.'); }
@@ -134,7 +139,7 @@ function Home() {
   return <>
     <Toast notification={notification} onClose={() => setNotification(null)} />
     <InvitationUrlModal invitation={viewing} onClose={() => setViewing(null)} notify={notify} />
-    <div className="d-flex justify-content-between align-items-center mb-3"><h1>Convites</h1><button className="btn btn-primary" onClick={openNew}>Novo convite</button></div>
+    <PageHeader title="Convites" subtitle="Gerencie os convites e confirmações de presença." action={<Button variant="contained" startIcon={<Add />} onClick={() => navigate('/convites/novo')}>Novo convite</Button>} />
     <div className="card mb-3"><div className="card-body row g-2">
       <div className="col-md-3"><label className="form-label">Nome</label><input className="form-control" onChange={event => applyFilter({ name: event.target.value })} /></div>
       <div className="col-md-2"><label className="form-label">Status</label><select className="form-select" onChange={event => applyFilter({ status: event.target.value })}><option value="">Todos</option><option value="unconfirmed">{'Não confirmado'}</option><option value="confirmed">Confirmado</option></select></div>
@@ -143,10 +148,10 @@ function Home() {
       <div className="col-md-2"><label className="form-label">Data final</label><input type="date" className="form-control" value={filters.endDate} onChange={event => applyFilter({ endDate: event.target.value })} /></div>
     </div></div>
     <div className="card"><div className="table-responsive"><table className="table card-table table-vcenter"><thead><tr><th>{'Código'}</th><th>Nome</th><th>Tipo</th><th>{'Descrição'}</th><th>{'Data Criação'}</th><th>Status</th><th>{'Data Confirmação'}</th><th>{'Ações'}</th></tr></thead><tbody>
-      {loading ? <tr><td colSpan="8">Carregando...</td></tr> : items.length === 0 ? <tr><td colSpan="8" className="text-center py-4">Nenhum convite encontrado.</td></tr> : items.flatMap(item => { const guests = item.guests || []; const expanded = expandedId === item._id; return [<tr key={item._id}><td>{item._id.slice(-6)}</td><td>{item.name}</td><td>{typeLabel(item.type)}</td><td>{item.description || '-'}</td><td>{new Date(item.createdAt).toLocaleDateString()}</td><td>{item.status === 'confirmed' ? <button className="btn btn-sm p-0 border-0 bg-transparent" onClick={() => setExpandedId(expanded ? null : item._id)}><span className="badge bg-success-lt text-success"><span className="status-dot bg-success me-1" />{statusLabel(item.status)}</span></button> : <span className="badge bg-warning-lt text-warning"><span className="status-dot bg-warning me-1" />{statusLabel(item.status)}</span>}</td><td>{item.confirmedAt ? new Date(item.confirmedAt).toLocaleString() : '-'}</td><td><button className="btn btn-sm" onClick={() => setViewing(item)}>Visualizar</button> <button className="btn btn-sm" onClick={() => openEdit(item)}>Editar</button> <button className="btn btn-sm btn-danger" onClick={() => setDeleting(item)}>Excluir</button></td></tr>, expanded && <tr key={`${item._id}-guests`}><td colSpan="8" className="bg-light"><div className="p-3"><strong>Pessoas do convite</strong>{guests.length ? <div className="mt-2"><div className="row text-secondary small fw-bold border-bottom pb-2"><div className="col-5">Pessoa</div><div className="col-4">Confirmado em</div><div className="col-3 text-end">Status</div></div>{guests.map(guest => <div className="row align-items-center py-2 border-bottom" key={guest._id}><div className="col-5">{guest.name}</div><div className="col-4 text-secondary">{guest.confirmedAt ? new Date(guest.confirmedAt).toLocaleString('pt-BR') : '-'}</div><div className={`col-3 text-end ${guest.confirmed ? 'text-success' : 'text-warning'}`}>{guest.confirmed ? 'Confirmado' : 'Não confirmado'}</div></div>)}</div> : <p className="text-secondary mb-0 mt-2">Nenhuma pessoa cadastrada.</p>}</div></td></tr>].filter(Boolean); })}
+      {loading ? <tr><td colSpan="8">Carregando...</td></tr> : items.length === 0 ? <tr><td colSpan="8" className="text-center py-4">Nenhum convite encontrado.</td></tr> : items.flatMap(item => { const guests = item.guests || []; const expanded = expandedId === item._id; return [<tr key={item._id}><td>{item._id.slice(-6)}</td><td>{item.name}</td><td>{typeLabel(item.type)}</td><td>{item.description || '-'}</td><td>{new Date(item.createdAt).toLocaleDateString()}</td><td>{item.status === 'confirmed' ? <button className="btn btn-sm p-0 border-0 bg-transparent" onClick={() => setExpandedId(expanded ? null : item._id)}><span className="badge bg-success-lt text-success"><span className="status-dot bg-success me-1" />{statusLabel(item.status)}</span></button> : <span className="badge bg-warning-lt text-warning"><span className="status-dot bg-warning me-1" />{statusLabel(item.status)}</span>}</td><td>{item.confirmedAt ? new Date(item.confirmedAt).toLocaleString() : '-'}</td><td><button className="btn btn-sm" onClick={() => setViewing(item)}>Visualizar</button> <button className="btn btn-sm" onClick={() => navigate(`/convites/${item._id}/editar`)}>Editar</button> <button className="btn btn-sm btn-danger" onClick={() => setDeleting(item)}>Excluir</button></td></tr>, expanded && <tr key={`${item._id}-guests`}><td colSpan="8" className="bg-light"><div className="p-3"><strong>Pessoas do convite</strong>{guests.length ? <div className="mt-2"><div className="row text-secondary small fw-bold border-bottom pb-2"><div className="col-5">Pessoa</div><div className="col-4">Confirmado em</div><div className="col-3 text-end">Status</div></div>{guests.map(guest => <div className="row align-items-center py-2 border-bottom" key={guest._id}><div className="col-5">{guest.name}</div><div className="col-4 text-secondary">{guest.confirmedAt ? new Date(guest.confirmedAt).toLocaleString('pt-BR') : '-'}</div><div className={`col-3 text-end ${guest.confirmed ? 'text-success' : 'text-warning'}`}>{guest.confirmed ? 'Confirmado' : 'Não confirmado'}</div></div>)}</div> : <p className="text-secondary mb-0 mt-2">Nenhuma pessoa cadastrada.</p>}</div></td></tr>].filter(Boolean); })}
     </tbody></table></div>
     <div className="card-footer d-flex align-items-center"><span>Total Itens: {summary.total} | Total Pessoas: {summary.people} | Confirmados: {summary.confirmed} | Não confirmados: {summary.unconfirmed}</span><label className="ms-3 me-2">{'Por página:'}</label><select className="form-select form-select-sm w-auto" value={pagination.limit} onChange={event => setPagination(current => ({ ...current, limit: Number(event.target.value), page: 1 }))}><option value="10">10</option><option value="20">20</option><option value="50">50</option><option value="100">100</option><option value="200">200</option></select><ul className="pagination ms-auto m-0"><li className={`page-item ${pagination.page <= 1 ? 'disabled' : ''}`}><button className="page-link" disabled={pagination.page <= 1} onClick={() => setPagination(current => ({ ...current, page: current.page - 1 }))}>Anterior</button></li>{Array.from({ length: pagination.totalPages }, (_, index) => index + 1).map(page => <li key={page} className={`page-item ${page === pagination.page ? 'active' : ''}`}><button className="page-link" onClick={() => setPagination(current => ({ ...current, page }))}>{page}</button></li>)}<li className={`page-item ${pagination.page >= pagination.totalPages ? 'disabled' : ''}`}><button className="page-link" disabled={pagination.page >= pagination.totalPages} onClick={() => setPagination(current => ({ ...current, page: current.page + 1 }))}>{'Próxima'}</button></li></ul></div></div>
-    {formOpen && <InvitationFormModal editing={editing} form={form} setForm={setForm} saving={saving} error={formError} onClose={() => setFormOpen(false)} onSubmit={submit} />}
+    {formOpen && <InvitationFormModal editing={editing} form={form} setForm={setForm} saving={saving} error={formError} onClose={() => { setFormOpen(false); navigate('/convites'); }} onSubmit={submit} />}
     {deleting && <div className="modal modal-blur show d-block"><div className="modal-dialog modal-dialog-centered"><div className="modal-content"><div className="modal-header"><h3 className="modal-title">Excluir convite</h3><button className="btn-close" onClick={() => setDeleting(null)} /></div><div className="modal-body">Deseja realmente excluir <strong>{deleting.name}</strong>?</div><div className="modal-footer"><button className="btn" onClick={() => setDeleting(null)}>Cancelar</button><button className="btn btn-danger" disabled={saving} onClick={remove}>{saving ? 'Excluindo...' : 'Excluir'}</button></div></div></div></div>}
   </>;
 }
@@ -519,7 +524,7 @@ function Landing() {
         <section className="wed-sec" id="padrinhos">
           <h2 className="wed-sec-title"><Sprig />{wedding.godparents.title}<Sprig flip /></h2>
           <p className="wed-sec-intro">{wedding.godparents.intro}</p>
-          <Carousel label="Padrinhos">{wedding.godparents.couples.map(couple => <GodparentCard key={couple.names.join()} couple={couple} />)}</Carousel>
+          <PublicGodparents fallback={<Carousel label="Padrinhos">{wedding.godparents.couples.map(couple => <GodparentCard key={couple.names.join()} couple={couple} />)}</Carousel>} />
         </section>
 
         <section className="wed-sec" id="cerimonia">
@@ -547,6 +552,7 @@ function Landing() {
         <section className="wed-sec" id="presentes">
           <h2 className="wed-sec-title"><Sprig />{wedding.gifts.title}<Sprig flip /></h2>
           <p className="wed-sec-intro">{wedding.gifts.intro}</p>
+          <PublicGifts />
           <div className="wed-card wed-pix">
             <span className="wed-pad-icon"><IconGift size={24} /></span>
             <div className="wed-pix-body">
@@ -556,6 +562,7 @@ function Landing() {
             </div>
             <button className="wed-btn wed-btn-ghost" onClick={copyPix}><IconCopy size={18} />{copied ? 'Copiado!' : 'Copiar chave'}</button>
           </div>
+          <GravataEntry />
           <div className="wed-grid-2">{wedding.gifts.stores.map(store => {
             const Tag = store.url ? 'a' : 'div';
             const props = store.url ? { href: store.url, target: '_blank', rel: 'noreferrer' } : {};
@@ -665,7 +672,7 @@ function Admin() {
   const logout = () => { tokenStore.clear(); setUser(null); };
   if (checking) return <div className="page page-center"><div className="text-secondary">Carregando...</div></div>;
   if (!user) return <Login onSuccess={setUser} />;
-  return <Layout user={user} onLogout={logout}><Home /></Layout>;
+  return <React.Suspense fallback={<div className="page page-center">Carregando painel...</div>}><AdminApp user={user} onLogout={logout} InvitationsPage={Home} /></React.Suspense>;
 }
 
 function App() {

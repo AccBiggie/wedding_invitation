@@ -1,0 +1,9 @@
+import { useEffect, useState } from 'react'; import { Alert, Box, Card, CardContent, Skeleton, Typography } from '@mui/material';
+import { PageHeader } from '../../components/common/PageHeader'; import { invitationsService } from '../../services/invitations.service'; import { godparentsService } from '../../services/godparents.service'; import { giftsService } from '../../services/gifts.service';
+interface Counts { invitations: number; confirmed: number; godparents: number; gifts: number }
+export function DashboardPage() {
+  const [counts, setCounts] = useState<Counts | null>(null); const [error, setError] = useState('');
+  useEffect(() => { Promise.all([invitationsService.list({ page: 1, limit: 1 }), godparentsService.list({ page: 1, limit: 1 }), giftsService.list({ page: 1, limit: 1 })]).then(([invitations, godparents, gifts]) => setCounts({ invitations: invitations.summary.total, confirmed: invitations.summary.confirmed, godparents: godparents.pagination.total, gifts: gifts.pagination.total })).catch(() => setError('Não foi possível carregar os indicadores.')); }, []);
+  const cards = [{ label: 'Convites', value: counts?.invitations }, { label: 'Confirmados', value: counts?.confirmed }, { label: 'Padrinhos', value: counts?.godparents }, { label: 'Presentes', value: counts?.gifts }];
+  return <><PageHeader title="Dashboard" subtitle="Resumo do casamento." />{error && <Alert severity="error">{error}</Alert>}<Box sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr', sm: 'repeat(2,1fr)', lg: 'repeat(4,1fr)' }, gap: 2 }}>{cards.map(card => <Card key={card.label}><CardContent><Typography color="text.secondary">{card.label}</Typography>{counts ? <Typography variant="h3" color="primary.main" sx={{ fontWeight: 700 }}>{card.value}</Typography> : <Skeleton variant="text" width={80} height={65} />}</CardContent></Card>)}</Box></>;
+}
