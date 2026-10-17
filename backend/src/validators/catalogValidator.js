@@ -3,6 +3,17 @@ export const escapeRegex = value => value.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
 export const validOrder = value => Number.isSafeInteger(Number(value)) && Number(value) >= 0;
 export const validBoolean = value => typeof value === 'boolean';
 export const validImage = value => !value || /^https?:\/\/[^\s]+$/i.test(value) || /^\/[a-zA-Z0-9/_-]+\.(png|jpe?g|webp)$/i.test(value);
+const validGodparentImage = value => {
+  if (!value) return true;
+  if (value.length <= 2048 && validImage(value)) return true;
+  const match = /^data:image\/(jpeg|png|webp);base64,([A-Za-z0-9+/]+={0,2})$/.exec(value);
+  if (!match || value.length > 700000) return false;
+  const bytes = Buffer.from(match[2], 'base64');
+  if (!bytes.length || bytes.length > 512 * 1024) return false;
+  if (match[1] === 'jpeg') return bytes[0] === 0xff && bytes[1] === 0xd8 && bytes[2] === 0xff;
+  if (match[1] === 'png') return bytes.subarray(0, 8).equals(Buffer.from([137, 80, 78, 71, 13, 10, 26, 10]));
+  return bytes.toString('ascii', 0, 4) === 'RIFF' && bytes.toString('ascii', 8, 12) === 'WEBP';
+};
 
 export function validateGodparent(body) {
   const errors = {};
@@ -19,11 +30,13 @@ export function validateGodparent(body) {
   if (phone && !/^[+\d()\s-]{8,30}$/.test(phone)) errors.phone = ['Informe um telefone valido.'];
   const description = text(body.description, 1000);
   if (description.length > 1000) errors.description = ['Descricao muito longa.'];
-  const image = text(body.image, 2048);
-  if (!validImage(image)) errors.image = ['Informe uma URL de imagem valida.'];
+  const image = typeof body.image === 'string' ? body.image.trim() : '';
+  if (!validGodparentImage(image)) errors.image = ['Informe uma URL ou imagem JPG, PNG ou WebP de até 512 KB.'];
+  const images = Array.isArray(body.images) ? body.images.map(value => typeof value === 'string' ? value.trim() : value) : [];
+  if (body.images !== undefined && (!Array.isArray(body.images) || images.length > 4 || images.some(value => typeof value !== 'string' || !value || value.length > 200000 || !validGodparentImage(value)))) errors.images = ['Informe até quatro fotos adicionais válidas.'];
   if (!validOrder(body.order ?? 0)) errors.order = ['A ordem deve ser um inteiro nao negativo.'];
   if (body.active !== undefined && !validBoolean(body.active)) errors.active = ['Status invalido.'];
-  return { errors, data: { name, partnerName, role: body.role, cardRole, phone, email: email.toLowerCase(), description, image, order: Number(body.order ?? 0), active: body.active ?? true } };
+  return { errors, data: { name, partnerName, role: body.role, cardRole, phone, email: email.toLowerCase(), description, image: image || images[0] || '', images: image ? images : images.slice(1), order: Number(body.order ?? 0), active: body.active ?? true } };
 }
 
 export function validateGift(body) {

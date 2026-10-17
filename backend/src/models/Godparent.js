@@ -9,6 +9,7 @@ const schema = new mongoose.Schema({
   email: { type: String, trim: true, lowercase: true, default: '' },
   description: { type: String, trim: true, maxlength: 1000, default: '' },
   image: { type: String, trim: true, default: '' },
+  images: { type: [String], default: [] },
   order: { type: Number, min: 0, default: 0 },
   active: { type: Boolean, default: true }
 }, { timestamps: true, collection: 'godparents' });

@@ -4,7 +4,7 @@ import { BrowserRouter } from 'react-router-dom';
 import api, { tokenStore } from './services/api';
 import { PublicGodparents, PublicGifts } from './pages/PublicCatalog';
 import { GravataEntry } from './pages/Pix/GravataEntry';
-import { accentColors, baseColors, defaultAppearance, fontSizeScale, landingFont, weddingDisplayFonts } from './theme/appearance';
+import { appearanceAccent, baseColors, defaultAppearance, fontSizeScale, landingFont, weddingDisplayFonts } from './theme/appearance';
 import '@tabler/core/dist/css/tabler.min.css';
 import './style.css';
 
@@ -69,8 +69,10 @@ function usePublicAppearance(wedding) {
   const appearance = { ...defaultAppearance, ...wedding?.appearance };
   const dark = appearance.scheme === 'dark' || (appearance.scheme === 'auto' && systemDark);
   const base = baseColors[appearance.base] || baseColors.neutral;
-  const accent = accentColors[appearance.accent] || accentColors.wedding;
-  const brightAccent = ['azure', 'yellow', 'lime', 'green', 'cyan', 'white'].includes(appearance.accent);
+  const accent = appearanceAccent(appearance) || '#1f4536';
+  const brightAccent = appearance.accent === 'custom'
+    ? (parseInt(accent.slice(1, 3), 16) * .299 + parseInt(accent.slice(3, 5), 16) * .587 + parseInt(accent.slice(5, 7), 16) * .114) > 160
+    : ['azure', 'yellow', 'lime', 'green', 'cyan', 'white'].includes(appearance.accent);
   const textAccent = dark ? `color-mix(in srgb, ${accent} 65%, white)` : appearance.accent === 'white' ? '#4a544e' : brightAccent ? `color-mix(in srgb, ${accent} 55%, black)` : accent;
   return {
     style: { '--wed-green': textAccent, '--wed-accent': accent, '--wed-green-dark': `color-mix(in srgb, ${textAccent} 75%, black)`, '--wed-cream': dark ? base.dark : base.light, '--wed-card': dark ? base.darkPaper : base.paper, '--wed-font': landingFont[appearance.font] || landingFont.serif, '--wed-display-font': weddingDisplayFonts[appearance.font] || landingFont[appearance.font] || landingFont.serif, '--wed-font-scale': fontSizeScale[appearance.fontSize] || 1, '--wed-radius': `${10 * Number(appearance.radius)}px` },

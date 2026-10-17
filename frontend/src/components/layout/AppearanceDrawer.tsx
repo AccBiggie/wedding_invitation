@@ -1,8 +1,8 @@
-import { Alert, Box, Button, ButtonBase, Divider, Drawer, IconButton, Stack, Typography } from '@mui/material';
+import { Alert, Box, Button, ButtonBase, Divider, Drawer, IconButton, Stack, TextField, Typography } from '@mui/material';
 import Close from '@mui/icons-material/Close';
 import RestartAlt from '@mui/icons-material/RestartAlt';
 import Check from '@mui/icons-material/Check';
-import { accentColors, baseColors, defaultAppearance, landingFont, weddingDisplayFonts, type Appearance } from '../../theme/appearance';
+import { accentColors, appearanceAccent, baseColors, defaultAppearance, landingFont, weddingDisplayFonts, type Appearance } from '../../theme/appearance';
 
 type Choice<K extends keyof Appearance> = { value: Appearance[K]; label: string };
 const schemes: Choice<'scheme'>[] = [
@@ -59,7 +59,7 @@ function ChoiceGroup<K extends keyof Appearance>({ title, hint, kind, choices, s
       {choices.map(choice => {
         const selected = settings[kind] === choice.value;
         return <ButtonBase key={choice.value} type="button" aria-pressed={selected} onClick={() => change({ ...settings, [kind]: choice.value })} sx={{ display: 'block', minWidth: 0, p: .6, border: '1px solid', borderColor: selected ? 'primary.main' : 'divider', borderRadius: 1, textAlign: 'left', position: 'relative', '&:focus-visible': { outline: '2px solid', outlineColor: 'primary.main' } }}>
-          <Miniature kind={kind} value={choice.value} accent={accentColors[settings.accent]} />
+          <Miniature kind={kind} value={choice.value} accent={appearanceAccent(settings)} />
           <Box sx={{ position: 'absolute', top: 8, left: 8, width: 20, height: 20, borderRadius: '50%', bgcolor: selected ? 'primary.main' : 'background.paper', border: '1px solid', borderColor: selected ? 'primary.main' : 'divider', display: 'grid', placeItems: 'center', color: 'primary.contrastText' }}>{selected && <Check sx={{ fontSize: 13 }} />}</Box>
           <Typography variant="caption" sx={{ display: 'block', pt: .5, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{choice.label}</Typography>
         </ButtonBase>;
@@ -79,6 +79,7 @@ export function AppearanceDrawer({ open, settings, onChange, onClose, onSave, bu
       <Typography variant="overline" color="text.secondary">Aparência</Typography>
       <ChoiceGroup title="Esquema de cores" hint="Cores da página e da navegação." kind="scheme" choices={schemes} settings={settings} change={onChange} />
       <Box sx={{ mb: 3 }}><Typography variant="subtitle2" sx={{ fontWeight: 700 }}>Cor de destaque</Typography><Typography variant="caption" color="text.secondary" sx={{ display: 'block', mb: 1.5 }}>Cor usada nos títulos e botões do site público.</Typography><Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1 }}>{Object.entries(accentColors).map(([name, color]) => <ButtonBase key={name} type="button" title={name === 'wedding' ? 'Casamento' : name} aria-label={`Cor ${name}`} aria-pressed={settings.accent === name} onClick={() => onChange({ ...settings, accent: name as Appearance['accent'] })} sx={{ width: 25, height: 25, borderRadius: .7, bgcolor: color, color: name === 'white' ? '#171717' : '#fff', border: name === 'white' ? '1px solid #aaa' : 'none', '&:focus-visible': { outline: '2px solid', outlineOffset: 2, outlineColor: 'primary.main' } }}>{settings.accent === name && <Check sx={{ fontSize: 17 }} />}</ButtonBase>)}</Box></Box>
+      <Stack direction="row" spacing={1} sx={{ mb: 3, alignItems: 'center' }}><TextField label="Cor personalizada" type="color" size="small" value={settings.customAccent} onChange={event => onChange({ ...settings, accent: 'custom', customAccent: event.target.value })} sx={{ width: 150 }} /><Button type="button" variant={settings.accent === 'custom' ? 'contained' : 'outlined'} onClick={() => onChange({ ...settings, accent: 'custom' })}>Usar esta cor</Button></Stack>
       <ChoiceGroup title="Fonte" hint="Tipografia usada nas páginas públicas." kind="font" choices={fonts} settings={settings} change={onChange} />
       <ChoiceGroup title="Fontes para casamento" hint="Estilos formais e caligráficos. Nas opções caligráficas, os textos continuam legíveis." kind="font" choices={weddingFonts} settings={settings} change={onChange} />
       <ChoiceGroup title="Tamanho da fonte" hint="Escala dos textos nas páginas públicas." kind="fontSize" choices={fontSizes} settings={settings} change={onChange} />

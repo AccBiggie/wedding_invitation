@@ -10,7 +10,8 @@ export const baseColors = {
 } as const;
 export type Appearance = {
   scheme: 'auto' | 'light' | 'dark' | 'dark-nav' | 'colored';
-  accent: keyof typeof accentColors;
+  accent: keyof typeof accentColors | 'custom';
+  customAccent: string;
   font: 'sans-serif' | 'serif' | 'monospace' | 'comic' | 'playfair' | 'lora' | 'baskerville' | 'montserrat' | 'poppins' | 'nunito' | 'cinzel' | 'marcellus' | 'great-vibes' | 'parisienne';
   fontSize: 'small' | 'normal' | 'large' | 'extra-large';
   base: keyof typeof baseColors;
@@ -22,8 +23,9 @@ export type Appearance = {
   offcanvasStyle: 'attached' | 'floating';
 };
 export const defaultAppearance: Appearance = {
-  scheme: 'light', accent: 'wedding', font: 'serif', fontSize: 'normal', base: 'neutral', radius: '1', navigation: 'navbar', container: 'default', navbarBehavior: 'default', navigationStyle: 'attached', offcanvasStyle: 'attached'
+  scheme: 'light', accent: 'wedding', customAccent: '#1f4536', font: 'serif', fontSize: 'normal', base: 'neutral', radius: '1', navigation: 'navbar', container: 'default', navbarBehavior: 'default', navigationStyle: 'attached', offcanvasStyle: 'attached'
 };
+export const appearanceAccent = (settings: Appearance) => settings.accent === 'custom' ? settings.customAccent : accentColors[settings.accent];
 export const landingFont = {
   'sans-serif': 'Arial, sans-serif', serif: "'Cormorant Garamond', Georgia, serif", monospace: 'ui-monospace, Consolas, monospace', comic: 'Comic Sans MS, cursive',
   playfair: "'Playfair Display', Georgia, serif", lora: "'Lora', Georgia, serif", baskerville: "'Libre Baskerville', Georgia, serif",
