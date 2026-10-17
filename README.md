@@ -14,9 +14,9 @@ Tenha MongoDB disponível, copie `backend/.env.example` para `backend/.env` e `f
 
 ## Administração
 
-O painel autenticado usa `/dashboard`, `/convites`, `/padrinhos`, `/presentes` e `/pix`. Padrinhos e Presentes oferecem listagem com filtros, paginação, cadastro, edição e exclusão. A configuração PIX aceita uma chave válida e gera BR Code EMV com QR Code. O modal público Gravata Online aparece na página `/casamento` quando o PIX está ativo. As páginas públicas `/casamento` e `/invitation/:id/:name` continuam disponíveis; a confirmação individual de convidados permanece no convite.
+O painel autenticado usa `/dashboard`, `/convites`, `/padrinhos`, `/presentes` e `/pix`. Convites, Padrinhos e Presentes oferecem listagens com filtros e paginação, cadastro e edição em modais Material UI e confirmação de exclusão. As URLs de cadastro e edição continuam disponíveis e abrem o modal sobre a listagem, preservando os filtros ao fechar. A configuração PIX aceita uma chave válida e gera BR Code EMV com QR Code. O modal público Gravata Online aparece na página `/casamento` quando o PIX está ativo. As páginas públicas `/casamento` e `/invitation/:id/:name` continuam disponíveis; a confirmação individual de convidados permanece no convite.
 
-O frontend novo fica em `frontend/src/components`, `pages`, `services`, `types` e `theme`. O código público e o CRUD existente de convites continuam em `frontend/src/main.jsx` enquanto os novos componentes usam TypeScript. As imagens de Padrinhos e Presentes usam URLs públicas; não há upload de arquivos.
+O frontend novo fica em `frontend/src/components`, `pages`, `services`, `types` e `theme`. O código público continua em `frontend/src/main.jsx`; o CRUD de convites fica em `frontend/src/pages/Invitations` e compartilha o tema e os modais Material UI com os cadastros em TypeScript. As imagens de Padrinhos e Presentes usam URLs públicas; não há upload de arquivos.
 
 ## Rotas da API
 

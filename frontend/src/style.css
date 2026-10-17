@@ -246,6 +246,12 @@ body{background:#f5f7fb}
 .wed-pad-photo{position:absolute;top:12px;right:12px;display:flex;align-items:center;justify-content:center;width:64px;height:64px;border:3px solid var(--wed-gold);border-radius:50%;background:var(--wed-cream);overflow:hidden;box-shadow:0 5px 15px rgba(31,69,54,.22)}
 .wed-pad-photo img{display:block;width:100%;height:100%;object-fit:cover}
 .wed-pad-initials{font-size:1.15rem;color:var(--wed-green)}
+.wed-gift{display:flex;flex-direction:column;align-items:center;gap:.35rem;padding:1rem 1rem 1.3rem;text-align:center}
+.wed-gift-image{display:flex;align-items:center;justify-content:center;width:100%;height:150px;margin-bottom:.45rem;border-radius:8px;background:#f4f0e7;overflow:hidden;color:var(--wed-gold);font-size:3rem}
+.wed-gift-image img{width:100%;height:100%;object-fit:contain}
+.wed-gift strong{font-size:1.2rem;font-weight:500;color:var(--wed-green)}
+.wed-gift-price{font-size:1.12rem;color:var(--wed-gold)}
+.wed-gift p{margin:.25rem 0 0;color:#78817b;line-height:1.4}
 .wed-map-card{margin-top:1rem}
 
 .wed-pix{display:flex;flex-wrap:wrap;align-items:center;gap:1rem;padding:1.2rem}
