@@ -1,9 +1,28 @@
-import { useEffect, useState, type ReactNode } from 'react';
+import { useEffect, useId, useRef, useState, type ReactNode } from 'react';
 import { Box, Card, CardContent, CardMedia, Typography } from '@mui/material';
 import api from '../services/api';
 import type { ApiResponse, GiftProduct, Godparent } from '../types/api';
 const currency = (value: number) => new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(value);
 const roleName: Record<Godparent['role'], string> = { groomsman: 'Padrinho', bridesmaid: 'Madrinha', mother: 'Mãe', father: 'Pai', other: 'Outro' };
+function GiftDescription({ description }: { description: string }) {
+  const [expanded, setExpanded] = useState(false);
+  const [overflow, setOverflow] = useState(false);
+  const paragraphRef = useRef<HTMLParagraphElement>(null);
+  const descriptionId = useId();
+  useEffect(() => {
+    if (expanded || !paragraphRef.current) return;
+    const paragraph = paragraphRef.current;
+    const measure = () => setOverflow(paragraph.scrollHeight > paragraph.clientHeight + 1);
+    measure();
+    const observer = new ResizeObserver(measure);
+    observer.observe(paragraph);
+    return () => observer.disconnect();
+  }, [description, expanded]);
+  return <>
+    <p id={descriptionId} ref={paragraphRef} className={`wed-gift-description${expanded ? ' is-expanded' : ''}`}>{description}</p>
+    {overflow && <button type="button" className="wed-gift-more" aria-controls={descriptionId} aria-expanded={expanded} onClick={() => setExpanded(value => !value)}>{expanded ? 'Ler menos' : 'Leia mais'}</button>}
+  </>;
+}
 export function PublicGodparents({ fallback }: { fallback: ReactNode }) {
   const [items, setItems] = useState<Godparent[] | null>(null);
   useEffect(() => { api.get<ApiResponse<Godparent[]>>('/public/godparents').then(r => setItems(r.data.data)).catch(() => setItems([])); }, []);
@@ -18,6 +37,6 @@ export function PublicGifts({ Carousel }: { Carousel: ({ label, children }: { la
     <div className="wed-gift-image">{item.image ? <img src={item.image} alt={item.name} loading="lazy" /> : <span aria-hidden="true">{item.name.trim().charAt(0)}</span>}</div>
     <strong>{item.name}</strong>
     <span className="wed-gift-price">{currency(item.price)}</span>
-    {item.description && <p>{item.description}</p>}
+    {item.description && <GiftDescription description={item.description} />}
   </div>)}</Carousel>;
 }

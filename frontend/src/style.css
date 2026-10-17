@@ -252,6 +252,10 @@ body{background:#f5f7fb}
 .wed-gift strong{font-size:1.2rem;font-weight:500;color:var(--wed-green)}
 .wed-gift-price{font-size:1.12rem;color:var(--wed-gold)}
 .wed-gift p{margin:.25rem 0 0;color:#78817b;line-height:1.4}
+.wed-gift-description{display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:2;line-clamp:2;overflow:hidden}
+.wed-gift-description.is-expanded{display:block;overflow:visible}
+.wed-gift-more{padding:0;border:0;border-bottom:1px solid currentColor;background:none;color:var(--wed-green);font:inherit;cursor:pointer}
+.wed-gift-more:hover{color:var(--wed-gold)}
 .wed-map-card{margin-top:1rem}
 
 .wed-pix{display:flex;flex-wrap:wrap;align-items:center;gap:1rem;padding:1.2rem}
