@@ -4,6 +4,7 @@ import { BrowserRouter } from 'react-router-dom';
 import api, { tokenStore } from './services/api';
 import { PublicGodparents, PublicGifts } from './pages/PublicCatalog';
 import { GravataEntry } from './pages/Pix/GravataEntry';
+import { accentColors, baseColors, defaultAppearance, fontSizeScale, landingFont, weddingDisplayFonts } from './theme/appearance';
 import '@tabler/core/dist/css/tabler.min.css';
 import './style.css';
 
@@ -50,8 +51,38 @@ function Login({ onSuccess }) {
 // Todo o conteudo do casamento vem de /public/wedding (backend/src/config/wedding.js).
 function useWedding() {
   const [wedding, setWedding] = useState(null);
-  useEffect(() => { api.get('/public/wedding').then(response => setWedding(response.data.data)).catch(() => setWedding(false)); }, []);
+  useEffect(() => {
+    Promise.all([api.get('/public/wedding'), api.get('/public/appearance').catch(() => ({ data: { data: defaultAppearance } }))])
+      .then(([details, appearance]) => setWedding({ ...details.data.data, appearance: appearance.data.data }))
+      .catch(() => setWedding(false));
+  }, []);
   return wedding;
+}
+function usePublicAppearance(wedding) {
+  const [systemDark, setSystemDark] = useState(() => window.matchMedia('(prefers-color-scheme: dark)').matches);
+  useEffect(() => {
+    const media = window.matchMedia('(prefers-color-scheme: dark)');
+    const update = () => setSystemDark(media.matches);
+    media.addEventListener('change', update);
+    return () => media.removeEventListener('change', update);
+  }, []);
+  const appearance = { ...defaultAppearance, ...wedding?.appearance };
+  const dark = appearance.scheme === 'dark' || (appearance.scheme === 'auto' && systemDark);
+  const base = baseColors[appearance.base] || baseColors.neutral;
+  const accent = accentColors[appearance.accent] || accentColors.wedding;
+  const brightAccent = ['azure', 'yellow', 'lime', 'green', 'cyan', 'white'].includes(appearance.accent);
+  const textAccent = dark ? `color-mix(in srgb, ${accent} 65%, white)` : appearance.accent === 'white' ? '#4a544e' : brightAccent ? `color-mix(in srgb, ${accent} 55%, black)` : accent;
+  return {
+    style: { '--wed-green': textAccent, '--wed-accent': accent, '--wed-green-dark': `color-mix(in srgb, ${textAccent} 75%, black)`, '--wed-cream': dark ? base.dark : base.light, '--wed-card': dark ? base.darkPaper : base.paper, '--wed-font': landingFont[appearance.font] || landingFont.serif, '--wed-display-font': weddingDisplayFonts[appearance.font] || landingFont[appearance.font] || landingFont.serif, '--wed-font-scale': fontSizeScale[appearance.fontSize] || 1, '--wed-radius': `${10 * Number(appearance.radius)}px` },
+    'data-wed-scheme': appearance.scheme,
+    'data-wed-dark': dark,
+    'data-wed-bright-accent': brightAccent,
+    'data-wed-navigation': appearance.navigation,
+    'data-wed-container': appearance.container,
+    'data-wed-navbar-behavior': appearance.navbarBehavior,
+    'data-wed-navigation-style': appearance.navigationStyle,
+    'data-wed-offcanvas-style': appearance.offcanvasStyle
+  };
 }
 const mapEmbed = query => `https://www.google.com/maps?q=${encodeURIComponent(query)}&z=16&output=embed`;
 
@@ -378,6 +409,7 @@ function Guestbook() {
 
 function Landing() {
   const wedding = useWedding();
+  const appearanceProps = usePublicAppearance(wedding);
   const [photoFailed, setPhotoFailed] = useState(false);
   const [copied, setCopied] = useState(false);
   // Deep link (/casamento#presentes): a secao so existe depois que os dados chegam.
@@ -391,7 +423,7 @@ function Landing() {
   if (!wedding) return <div className="wed wed-plain"><div className="wed-state">Carregando...</div></div>;
   const target = new Date(wedding.datetime).getTime();
   const copyPix = async () => { try { await navigator.clipboard.writeText(wedding.gifts.pix.value); setCopied(true); setTimeout(() => setCopied(false), 2500); } catch { /* sem clipboard */ } };
-  return <div className="wed wed-lp">
+  return <div className="wed wed-lp" {...appearanceProps}>
     <div className="wed-lp-bg" aria-hidden="true">
       {photoFailed ? <div className="wed-lp-bg-empty" /> : <img src={wedding.photo} alt="" onError={() => setPhotoFailed(true)} />}
     </div>
@@ -489,7 +521,8 @@ function Landing() {
 }
 
 function WeddingShell({ children, wedding }) {
-  return <div className="wed">
+  const appearanceProps = usePublicAppearance(wedding);
+  return <div className="wed wed-invitation" {...appearanceProps}>
     <header className="wed-topbar"><span className="wed-brand"><IconFlower size={26} />Convites de casamento</span></header>
     {children}
     {wedding ? <SiteFooter wedding={wedding} /> : <footer className="wed-footer"><i /><IconHeart size={15} /><i /></footer>}

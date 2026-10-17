@@ -45,6 +45,25 @@ test('CRUD de padrinhos valida, filtra e pagina', { skip: !connection }, async (
   assert.equal((await request(app).get(base + '/' + id).set('Authorization', bearer)).status, 404);
 });
 
+test('aparencia do site publico exige login para salvar e aparece publicamente', { skip: !connection }, async () => {
+  const url = '/api/appearance';
+  const defaults = (await request(app).get('/api/public/appearance')).body.data;
+  assert.equal(defaults.navigation, 'navbar');
+  assert.equal(defaults.fontSize, 'normal');
+  assert.equal((await request(app).put(url).send(defaults)).status, 401);
+  assert.equal((await request(app).put(url).set('Authorization', bearer).send({ ...defaults, scheme: 'invalid' })).status, 422);
+  assert.equal((await request(app).put(url).set('Authorization', bearer).send({ ...defaults, fontSize: 'invalid' })).status, 422);
+  const changed = { ...defaults, scheme: 'dark', accent: 'blue', font: 'great-vibes', fontSize: 'large', navigation: 'sidebar' };
+  assert.equal((await request(app).put(url).set('Authorization', bearer).send(changed)).status, 200);
+  const publicResult = await request(app).get('/api/public/appearance');
+  assert.equal(publicResult.body.data.scheme, 'dark');
+  assert.equal(publicResult.body.data.accent, 'blue');
+  assert.equal(publicResult.body.data.font, 'great-vibes');
+  assert.equal(publicResult.body.data.fontSize, 'large');
+  assert.equal(publicResult.body.data.navigation, 'sidebar');
+  assert.equal((await request(app).get(url).set('Authorization', bearer)).body.data.scheme, 'dark');
+});
+
 test('CRUD de presentes rejeita preco invalido e preserva filtros', { skip: !connection }, async () => {
   const base = '/api/gift-products';
   for (const price of [0, -1, 'NaN', 'Infinity']) assert.equal((await request(app).post(base).set('Authorization', bearer).send({ name: 'Panela', price })).status, 422);
