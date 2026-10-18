@@ -777,3 +777,79 @@ a.wed-shop-badge:hover{border-color:var(--wed-gold);background:#fffcf3}
   .wed-story-landscape{width:calc(100% + 2.2rem);margin:0 -1.1rem;height:110px}
 }
 @media (prefers-reduced-motion:reduce){.wed-story *{transition:none!important}}
+
+/* Ramos de oliveira (components/decor/Olive.tsx): mesmo tema da "Nossa historia". */
+.wed-olive .stem{fill:none;stroke:#62775a;stroke-width:1.5;stroke-linecap:round}
+.wed-olive .leaf{fill:#8fa27f;stroke:#62775a;stroke-width:.7}
+.wed-olive-sprig{flex-shrink:0;overflow:visible}
+.wed-lp[data-wed-dark=true] .wed-olive .leaf{fill:#7d9170;stroke:#a7b99a}
+.wed-lp[data-wed-dark=true] .wed-olive .stem{stroke:#a7b99a}
+
+/* Fundo de papel a partir de "Padrinhos": a foto some e os ramos crescem nas laterais. */
+.wed-lp-paper{position:fixed;inset:0;z-index:0;overflow:hidden;pointer-events:none;background:radial-gradient(ellipse at 15% 20%,rgba(255,255,255,.75),transparent 55%),radial-gradient(ellipse at 85% 80%,rgba(232,220,196,.45),transparent 55%),#f6f0e3}
+.wed-lp-paper::before{content:'';position:absolute;inset:0;opacity:.4;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 .55 0 0 0 0 .48 0 0 0 0 .36 0 0 0 .08 0'/%3E%3C/filter%3E%3Crect width='160' height='160' filter='url(%23n)'/%3E%3C/svg%3E")}
+.wed-lp[data-wed-dark=true] .wed-lp-paper{background:var(--wed-cream)}
+.wed-lp-bg{transition:opacity 1s ease}
+.wed-lp.is-paper .wed-lp-bg{opacity:0}
+.wed-lp .wed-sec{transition:box-shadow 1s ease}
+.wed-lp.is-paper .wed-sec{box-shadow:0 10px 34px rgba(90,70,40,.12)}
+.wed-olive-vine{position:absolute;width:min(220px,17vw);height:auto;opacity:.92}
+.wed-olive-vine.is-left{left:-28px;top:12vh}
+.wed-olive-vine.is-right{right:-28px;bottom:-4vh;transform:scaleX(-1) rotate(4deg)}
+/* Crescimento: caule desenhado e folhas brotando em sequencia (delays no SVG). */
+.wed-olive-vine .stem{stroke-dasharray:1;stroke-dashoffset:1;transition:stroke-dashoffset 1.6s cubic-bezier(.4,0,.2,1) var(--grow-delay,0s)}
+.wed-olive-vine .leaf{transform-box:fill-box;transform-origin:left center;transform:scale(0);opacity:0;transition:transform .7s cubic-bezier(.34,1.3,.64,1) calc(var(--grow-delay,0s) + .25s),opacity .4s ease calc(var(--grow-delay,0s) + .25s)}
+.wed-lp.is-paper .wed-olive-vine .stem{stroke-dashoffset:0}
+.wed-lp.is-paper .wed-olive-vine .leaf{transform:scale(1);opacity:1}
+/* Ao voltar para a foto, os ramos recolhem rapido e sem atraso. */
+.wed-lp:not(.is-paper) .wed-olive-vine .stem,.wed-lp:not(.is-paper) .wed-olive-vine .leaf{transition-duration:.35s;transition-delay:0s}
+@media (max-width:820px){.wed-olive-vine{width:120px;opacity:.55}.wed-olive-vine.is-left{left:-40px}.wed-olive-vine.is-right{right:-40px}}
+@media (prefers-reduced-motion:reduce){.wed-lp-bg,.wed-lp .wed-sec,.wed-olive-vine .stem,.wed-olive-vine .leaf{transition:none!important}}
+
+/* Guirlanda dos titulos: denso junto ao texto, caule fino ate a borda da secao. */
+.wed-olive-garland{flex:1 1 0;min-width:44px;max-width:225px;height:30px;-webkit-mask-image:linear-gradient(90deg,rgba(0,0,0,.35),#000 45%);mask-image:linear-gradient(90deg,rgba(0,0,0,.35),#000 45%)}
+.wed-olive-garland.is-flip{transform:scaleX(-1)}
+.wed-sec-title:has(.wed-olive-garland){width:100%}
+/* Ramo esquerdo ocupa a altura toda da tela. */
+.wed-olive-vine.is-left{top:0;left:-70px;width:auto;height:100vh}
+/* Igreja em traco como marca d'agua do fundo de papel. */
+.wed-church{position:absolute;left:50%;bottom:2vh;width:min(880px,82vw);height:auto;transform:translateX(-50%);opacity:0;transition:opacity 1.4s ease .3s}
+.wed-lp.is-paper .wed-church{opacity:.55}
+.wed-church path,.wed-church circle{fill:none;stroke:#a8875a;stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round;vector-effect:non-scaling-stroke}
+.wed-church .thin{stroke-width:1;opacity:.85}
+.wed-church .glass{fill:#f1e7d2}
+.wed-church .door{fill:#e9dbbd}
+.wed-church .roof{fill:#efe2c6}
+.wed-church .cross{stroke:#b8955a;stroke-width:2.2}
+.wed-church .tree circle{fill:#e3e8d8;stroke:#8fa27f}
+.wed-church .tree path{stroke:#8fa27f}
+/* Secoes levemente translucidas no papel: a igreja aparece suave por tras. */
+.wed-lp.is-paper .wed-sec:not(.wed-story){background:color-mix(in srgb,var(--wed-cream) 84%,transparent)}
+.wed-lp .wed-sec:not(.wed-story){transition:box-shadow 1s ease,background-color 1s ease}
+@media (max-width:820px){.wed-olive-vine.is-left{left:-60px;height:100vh;width:auto}.wed-church{width:120vw;bottom:0}.wed-olive-garland{max-width:70px}}
+
+/* O Tabler desloca o <html> pela largura da barra de rolagem (margin-left:
+   calc(100vw - 100%)), deixando uma faixa vazia a esquerda da navbar no site publico. */
+:root:has(.wed){margin-left:0}
+
+/* Folhas procedurais (Olive.tsx): tons de oliveira (verso prateado) e nervura. */
+.wed-olive .leaf{stroke:#5d7154;stroke-width:.6}
+.wed-olive .leaf.tone-0{fill:#8a9e78}
+.wed-olive .leaf.tone-1{fill:#a6b597}
+.wed-olive .leaf.tone-2{fill:#6f8662}
+.wed-olive .leaf .vein{fill:none;stroke:#e9eedf;stroke-width:.7;opacity:.75}
+.wed-olive .stem{stroke:#5f7356}
+.wed-olive-garland{max-width:none;height:42px;overflow:visible;-webkit-mask-image:linear-gradient(90deg,rgba(0,0,0,.45),#000 30%);mask-image:linear-gradient(90deg,rgba(0,0,0,.45),#000 30%)}
+.wed-sec-title:has(.wed-olive-garland){gap:.5rem}
+.wed-olive-vine{width:auto;max-width:none}
+.wed-olive-vine.is-left{top:0;left:-34px;height:100vh}
+.wed-olive-vine.is-right{top:auto;bottom:0;right:-34px;height:86vh;width:auto;transform:scaleX(-1)}
+@media (max-width:820px){.wed-olive-vine.is-left,.wed-olive-vine.is-right{height:70vh;width:auto;opacity:.5}.wed-olive-vine.is-left{left:-60px}.wed-olive-vine.is-right{right:-60px}.wed-olive-garland{max-width:none}}
+
+/* Folhas nao podem ser recortadas: os SVGs desenham fora da propria caixa. */
+.wed-olive{overflow:visible}
+.wed-olive-garland{-webkit-mask-image:none;mask-image:none}
+/* Ramos das laterais um pouco mais para o meio; os galhos longos passam por tras das secoes. */
+.wed-olive-vine.is-left{left:clamp(-20px,calc((100vw - 1080px) / 2 - 190px),70px)}
+.wed-olive-vine.is-right{right:clamp(-20px,calc((100vw - 1080px) / 2 - 190px),70px)}
+@media (max-width:820px){.wed-olive-vine.is-left{left:-60px}.wed-olive-vine.is-right{right:-60px}}
