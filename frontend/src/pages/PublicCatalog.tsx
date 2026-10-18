@@ -3,6 +3,7 @@ import api from '../services/api';
 import { resolveImageUrl } from '../services/images.service';
 import { storeCategoriesService } from '../services/storeCategories.service';
 import { categoryImageUrl } from '../utils/categoryIcons';
+import { ScrollReveal } from '../components/reveal/ScrollReveal';
 import type { ApiResponse, GiftProduct, Godparent, PublicStoreCategory } from '../types/api';
 const currency = (value: number) => new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(value);
 const roleName: Record<Godparent['role'], string> = { groomsman: 'Padrinho', bridesmaid: 'Madrinha', mother: 'Mãe', father: 'Pai', other: 'Outro' };
@@ -85,7 +86,9 @@ function CategoryMarquee({ items, label }: { items: PublicStoreCategory[]; label
     onFocus={() => easeTo(0)} onBlur={event => { if (!event.currentTarget.contains(event.relatedTarget)) easeTo(1); }}
     onTouchStart={() => easeTo(0)} onTouchEnd={() => { clearTimeout(resume.current); resume.current = window.setTimeout(() => easeTo(1), 1800); }}>
     <div ref={track} className="wed-shop-track">
-      <ul ref={set} className="wed-shop-cats" aria-label={label}><CategoryItems items={items} /></ul>
+      <ScrollReveal as="ul" stagger delay={200} ref={set} className="wed-shop-cats" aria-label={label}><CategoryItems items={items} /></ScrollReveal>
+      {/* A copia so fecha o laco e nasce fora da tela: sem reveal proprio, senao os itens
+          surgiriam em fade bem na emenda da faixa. */}
       {marquee && !reduced && <ul className="wed-shop-cats" aria-hidden="true"><CategoryItems items={items} hidden /></ul>}
     </div>
   </div>;
@@ -99,17 +102,17 @@ export function PublicStoreCategories({ store, icon }: { store: Store; icon: Rea
   useEffect(() => { storeCategoriesService.listPublic().then(setItems).catch(() => setItems([])); }, []);
   const titleId = useId();
   const comingSoon = items !== null && !items.length;
-  return <article className="wed-card wed-shop" id="lista-na-loja" aria-labelledby={titleId}>
-    <div className="wed-shop-head">
+  return <ScrollReveal as="article" className="wed-card wed-shop" id="lista-na-loja" aria-labelledby={titleId}>
+    <ScrollReveal stagger preset="fade" delay={80} className="wed-shop-head">
       <span className="wed-shop-icon">{icon}</span>
       <h3 id={titleId} className="wed-shop-title">{store.name}</h3>
       {store.url ? <a className="wed-shop-badge is-link" href={store.url} target="_blank" rel="noreferrer">Abrir lista</a> : comingSoon && <span className="wed-shop-badge">Em breve</span>}
-    </div>
-    <p className="wed-shop-desc">{store.description}</p>
+    </ScrollReveal>
+    <ScrollReveal as="p" preset="fade" delay={160} className="wed-shop-desc">{store.description}</ScrollReveal>
     {items === null ? <div className="wed-shop-rail"><div className="wed-shop-marquee"><ul className="wed-shop-cats is-loading" aria-hidden="true">{[0, 1, 2, 3, 4].map(index => <li key={index}><span className="wed-shop-thumb" /><span className="wed-shop-name" /></li>)}</ul></div></div>
       : items.length ? <div className="wed-shop-rail"><CategoryMarquee items={items} label={`Categorias da ${store.name.toLowerCase()}`} /></div>
       : <p className="wed-shop-empty">Novas categorias serão disponibilizadas em breve.</p>}
-  </article>;
+  </ScrollReveal>;
 }
 export function PublicGifts({ Carousel }: { Carousel: ({ label, children }: { label: string; children: ReactNode }) => ReactNode }) {
   const [items, setItems] = useState<GiftProduct[]>([]);

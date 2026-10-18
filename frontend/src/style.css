@@ -638,3 +638,25 @@ a.wed-shop-badge:hover{border-color:var(--wed-gold);background:#fffcf3}
   .giftdlg-title{font-size:1.6rem}
 }
 @media (prefers-reduced-motion:reduce){.giftdlg-stage img{animation:none}.giftdlg-arrow:hover{transform:none}}
+
+/* ScrollReveal (components/reveal): entrada suave conforme o elemento chega na
+   tela. Estado inicial so ate data-revealed; data-reveal-done remove a transicao
+   depois da animacao. So opacity/transform (sem layout shift). Valores em
+   sincronia com config/animations.ts. */
+:root{--reveal-duration:600ms;--reveal-distance:24px;--reveal-ease:cubic-bezier(.22,.61,.36,1)}
+@media (max-width:700px){:root{--reveal-duration:480ms;--reveal-distance:16px}}
+[data-reveal]:not([data-revealed]),[data-reveal-group]:not([data-revealed])>*{opacity:0}
+[data-reveal=fade-up]:not([data-revealed]),[data-reveal-group=fade-up]:not([data-revealed])>*{transform:translate3d(0,var(--reveal-distance),0)}
+[data-reveal=fade-down]:not([data-revealed]),[data-reveal-group=fade-down]:not([data-revealed])>*{transform:translate3d(0,calc(var(--reveal-distance) * -1),0)}
+[data-reveal=fade-left]:not([data-revealed]),[data-reveal-group=fade-left]:not([data-revealed])>*{transform:translate3d(var(--reveal-distance),0,0)}
+[data-reveal=fade-right]:not([data-revealed]),[data-reveal-group=fade-right]:not([data-revealed])>*{transform:translate3d(calc(var(--reveal-distance) * -1),0,0)}
+[data-reveal=scale-soft]:not([data-revealed]),[data-reveal-group=scale-soft]:not([data-revealed])>*{transform:scale(.97)}
+[data-reveal]:not([data-reveal-done]),[data-reveal-group]:not([data-reveal-done])>*{transition:opacity var(--reveal-duration) var(--reveal-ease) var(--reveal-delay,0ms),transform var(--reveal-duration) var(--reveal-ease) var(--reveal-delay,0ms)}
+/* Hero: ja visivel no carregamento, so uma entrada curta e discreta. */
+@keyframes wed-hero-in{from{opacity:0;transform:translate3d(0,8px,0)}to{opacity:1;transform:none}}
+.wed-lp-hero>*{animation:wed-hero-in .7s var(--reveal-ease) both}
+.wed-lp-hero>:nth-child(2){animation-delay:60ms}.wed-lp-hero>:nth-child(3){animation-delay:120ms}.wed-lp-hero>:nth-child(4){animation-delay:160ms}.wed-lp-hero>:nth-child(5){animation-delay:200ms}.wed-lp-hero>:nth-child(n+6){animation-delay:240ms}
+@media (prefers-reduced-motion:reduce){
+  [data-reveal]:not([data-revealed]),[data-reveal-group]:not([data-revealed])>*{opacity:1!important;transform:none!important;transition:none!important}
+  .wed-lp-hero>*{animation:none}
+}
