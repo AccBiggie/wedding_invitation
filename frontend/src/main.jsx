@@ -484,18 +484,18 @@ function Landing() {
 
       <div className="wed-lp-sheet">
         <section className="wed-sec" id="sobre">
-          <ScrollReveal as="h2" className="wed-sec-title"><OliveGarland />{wedding.about.title}<OliveGarland flip /></ScrollReveal>
+          <ScrollReveal as="h2" className="wed-sec-title"><OliveGarland seed={53} />{wedding.about.title}<OliveGarland seed={53} flip /></ScrollReveal>
           <ScrollReveal stagger preset="fade" delay={80} className="wed-prose">{wedding.about.paragraphs.map(paragraph => <p key={paragraph.slice(0, 24)}>{paragraph}</p>)}</ScrollReveal>
         </section>
 
         <section className="wed-sec" id="padrinhos">
-          <ScrollReveal as="h2" className="wed-sec-title"><OliveGarland />{wedding.godparents.title}<OliveGarland flip /></ScrollReveal>
+          <ScrollReveal as="h2" className="wed-sec-title"><OliveGarland seed={66} />{wedding.godparents.title}<OliveGarland seed={66} flip /></ScrollReveal>
           <ScrollReveal as="p" className="wed-sec-intro" preset="fade" delay={80}>{wedding.godparents.intro}</ScrollReveal>
           <PublicGodparents Carousel={Carousel} GodparentCard={GodparentCard} fallback={<Carousel label="Padrinhos">{wedding.godparents.couples.map(couple => <GodparentCard key={couple.names.join()} couple={couple} />)}</Carousel>} />
         </section>
 
         <section className="wed-sec" id="cerimonia">
-          <ScrollReveal as="h2" className="wed-sec-title"><OliveGarland />Cerimônia<OliveGarland flip /></ScrollReveal>
+          <ScrollReveal as="h2" className="wed-sec-title"><OliveGarland seed={79} />Cerimônia<OliveGarland seed={79} flip /></ScrollReveal>
           <ScrollReveal stagger className="wed-info-grid">
             <InfoCard icon={<IconCalendar size={28} />} label="Data" lines={wedding.date} />
             <InfoCard icon={<IconClock size={28} />} label={'Horário'} lines={wedding.time} />
@@ -517,7 +517,7 @@ function Landing() {
         </section>
 
         <section className="wed-sec" id="presentes">
-          <ScrollReveal as="h2" className="wed-sec-title"><OliveGarland />{wedding.gifts.title}<OliveGarland flip /></ScrollReveal>
+          <ScrollReveal as="h2" className="wed-sec-title"><OliveGarland seed={92} />{wedding.gifts.title}<OliveGarland seed={92} flip /></ScrollReveal>
           <ScrollReveal as="p" className="wed-sec-intro" preset="fade" delay={80}>{wedding.gifts.intro}</ScrollReveal>
           <PublicGifts Carousel={Carousel} />
           {pix.loaded && <ScrollReveal className="wed-card wed-pix">
@@ -546,13 +546,13 @@ function Landing() {
         {wedding.story && <OurStory story={wedding.story} finalDate={wedding.date.join(' ')} />}
 
         <section className="wed-sec" id="recados">
-          <ScrollReveal as="h2" className="wed-sec-title"><OliveGarland />Recados<OliveGarland flip /></ScrollReveal>
+          <ScrollReveal as="h2" className="wed-sec-title"><OliveGarland seed={105} />Recados<OliveGarland seed={105} flip /></ScrollReveal>
           <ScrollReveal as="p" className="wed-sec-intro" preset="fade" delay={80}>Deixe uma mensagem para os noivos. Ela aparece aqui no mural para todo mundo ver.</ScrollReveal>
           <Guestbook />
         </section>
 
         <section className="wed-sec wed-sec-cta" id="confirmar">
-          <ScrollReveal as="h2" className="wed-sec-title"><OliveGarland />Confirme sua presença<OliveGarland flip /></ScrollReveal>
+          <ScrollReveal as="h2" className="wed-sec-title"><OliveGarland seed={118} />Confirme sua presença<OliveGarland seed={118} flip /></ScrollReveal>
           {invitePath
             ? <ScrollReveal className="wed-card wed-cta">
               <p>Seu convite pessoal está a um clique. Lá você marca quem da sua família vai com você.</p>

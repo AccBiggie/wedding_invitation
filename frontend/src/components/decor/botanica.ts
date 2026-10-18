@@ -76,14 +76,29 @@ function shape(o: ShapeOptions) {
   };
 }
 
-export function walk(x: number, y: number, angle: number, length: number, step: number, curvature: (s: number) => number) {
+// Linha suave pelos pontos (para mascaras e trajetos).
+export const smoothPath = (pts: Point[]) => m(pts[0]) + catmull(pts);
+
+// Caminhada com curvatura variavel: curvature(s, angulo) devolve graus por px.
+export function walk(x: number, y: number, angle: number, length: number, step: number, curvature: (s: number, a: number) => number) {
   const pts: Point[] = [[x, y]]; let s = 0, a = angle;
   while (s < length - .01) {
     const ds = Math.min(step, length - s);
-    a += curvature(s) * ds; x += Math.cos(a * D2R) * ds; y += Math.sin(a * D2R) * ds; s += ds;
+    a += curvature(s, a) * ds; x += Math.cos(a * D2R) * ds; y += Math.sin(a * D2R) * ds; s += ds;
     pts.push([x, y]);
   }
   return { pts, angle: a };
+}
+// Ondulacao suave (soma de senos) + mola que puxa o angulo de volta para 'target'.
+export function wobble(rng: Rng, amp: number, freq: number, target: number, spring: number) {
+  const f1 = freq * between(rng, .7, 1.3), f2 = freq * between(rng, 1.8, 2.6), p1 = between(rng, 0, 6.28), p2 = between(rng, 0, 6.28);
+  return (s: number, a: number) => amp * (Math.sin(s * f1 + p1) + .45 * Math.sin(s * f2 + p2)) + spring * ((((target - a) % 360) + 540) % 360 - 180);
+}
+// Galho que fecha a curva ate virar espiral: a curvatura cresce com o comprimento,
+// k(s) = lado * (k0 + k1 * (s/L)^p), somando 'turns' voltas no total.
+export function spiralBranch(x: number, y: number, angle: number, length: number, side: number, turns: number) {
+  const total = turns * 2 * Math.PI, k0 = .15, p = 2.6, k1 = (total - k0) * (p + 1);
+  return walk(x, y, angle, length, 2.5, s => side * (k0 + k1 * Math.pow(s / length, p)) / length * 57.2958);
 }
 export function pathLength(pts: Point[]) {
   let L = 0;
@@ -291,3 +306,38 @@ export function paintCluster(ctx: Palette, x: number, y: number, angle: number, 
   items.forEach(it => { if (!it.length) out.flowers.push({ svg: paintFlower(ctx, it.x, it.y, it.r, rng, it.a - 90 + between(rng, -20, 20)), r: it.r }); });
   return out;
 }
+
+// ---- galho vestido ----------------------------------------------------------
+export interface Piece { kind: 'leaf' | 'stem' | 'bud' | 'flower'; svg: string; s: number; r: number }
+interface DressOptions { step: number; leaf: number; free: number; flowerChance: number; flowerGap?: number; flowerScale?: number; allowed?: (x: number, y: number, r: number) => boolean }
+// Folhas em aquarela alternadas ao longo do galho, diminuindo ate ~55% na ponta;
+// flores e botoes pequenos em alguns nos, do lado oposto ao da folha. A ponta
+// enrolada (a fracao 'free' final do comprimento) fica nua, como gavinha.
+export function dressBranch(ctx: Palette, pts: Point[], rng: Rng, o: DressOptions): Piece[] {
+  const L = pathLength(pts), pieces: Piece[] = [], allowed = o.allowed || (() => true), gap = o.flowerGap || 46;
+  let side = sign(rng), last = -Infinity;
+  for (let s = o.step * .7; s < L * (1 - o.free); s += o.step * between(rng, .8, 1.2)) {
+    const q = pointAt(pts, s), t = s / L;
+    side = -side;
+    const length = o.leaf * between(rng, .8, 1.15) * (1 - .45 * t), angle = q.angle + side * between(rng, 35, 58);
+    if (allowed(q.x + Math.cos(angle * D2R) * length, q.y + Math.sin(angle * D2R) * length, 0)) pieces.push({ kind: 'leaf', svg: paintLeaf(ctx, q.x, q.y, angle, length, rng), s, r: 0 });
+    if (s - last > gap && chance(rng, o.flowerChance)) {
+      const a = q.angle - side * between(rng, 35, 60), pc = between(rng, 5, 9);
+      const fx = q.x + Math.cos(a * D2R) * pc, fy = q.y + Math.sin(a * D2R) * pc;
+      const bud = chance(rng, .3), r = bud ? PARAMS.budLength * .35 : between(rng, 6, 9) * (o.flowerScale || 1);
+      if (!allowed(fx, fy, r)) continue;
+      last = s;
+      pieces.push({ kind: 'stem', svg: paintStem(quad([q.x, q.y], [(q.x + fx) / 2, (q.y + fy) / 2 + 1], [fx, fy], 5), .8, .5, COLORS.stem), s, r: 0 });
+      pieces.push(bud ? { kind: 'bud', svg: paintBud(ctx, fx, fy, a, PARAMS.budLength * between(rng, .6, .85), rng), s, r: 0 } : { kind: 'flower', svg: paintFlower(ctx, fx, fy, r, rng, a - 90), s, r });
+    }
+  }
+  return pieces;
+}
+// Converte um cacho em pecas posicionadas em 's' (para a ordem e o atraso da animacao).
+export const clusterPieces = (l: Layers, s: number): Piece[] => [
+  ...l.stems.map(svg => ({ kind: 'stem' as const, svg, s, r: 0 })), ...l.leaves.map(svg => ({ kind: 'leaf' as const, svg, s, r: 0 })),
+  ...l.buds.map(svg => ({ kind: 'bud' as const, svg, s, r: 0 })), ...l.flowers.map(f => ({ kind: 'flower' as const, svg: f.svg, s, r: f.r }))
+];
+// Ordem de pintura das pecas: pedicelos -> folhas -> botoes -> flores (as maiores por ultimo).
+const ORDER = { stem: 0, leaf: 1, bud: 2, flower: 3 };
+export const sortPieces = <T extends Piece>(pieces: T[]) => pieces.slice().sort((a, b) => ORDER[a.kind] - ORDER[b.kind] || a.r - b.r);

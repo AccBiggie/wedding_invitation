@@ -1,6 +1,7 @@
 import type { ReactNode } from 'react';
 import { ScrollReveal } from '../reveal/ScrollReveal';
 import { FloralFrame } from '../decor/FloralFrame';
+import { OliveCorner } from '../decor/Olive';
 
 export interface StoryChapter { title: string; subtitle: string; photo: string; text: string; note?: string; doodle?: Doodle }
 export interface Story { kicker: string; title: string; tagline: string; lead: string; cover: string; chapters: StoryChapter[]; closing: [string, string]; polaroids?: { photo: string; caption: string }[] }
@@ -8,13 +9,6 @@ type Doodle = 'camera' | 'signpost' | 'ring' | 'toast' | 'chapel';
 
 // ---- Ilustracoes em traco (cores e espessura via CSS) ----------------------
 const Heart = ({ className }: { className?: string }) => <svg className={className} viewBox="0 0 24 22" aria-hidden="true"><path d="M12 21 3.2 12.4a5.3 5.3 0 0 1 7.5-7.5L12 6.2l1.3-1.3a5.3 5.3 0 0 1 7.5 7.5z" /></svg>;
-
-// Raminho de oliveira dos cantos: caule curvo com folhas alternadas.
-const LEAVES: [number, number, number][] = [[18, 60, -20], [30, 48, 200], [44, 42, -40], [56, 32, 190], [70, 27, -50], [82, 18, 175], [95, 14, -60], [106, 7, 160]];
-const Branch = ({ className }: { className?: string }) => <svg className={`wed-story-branch ${className || ''}`} viewBox="0 0 120 80" aria-hidden="true">
-  <path className="stem" d="M4 74 C34 62 62 40 116 6" />
-  {LEAVES.map(([x, y, r]) => <path key={`${x}-${y}`} className="leaf" transform={`translate(${x} ${y}) rotate(${r})`} d="M0 0 C6 -7 17 -9 25 -5 C18 3 7 5 0 0 Z" />)}
-</svg>;
 
 const doodles: Record<Doodle, ReactNode> = {
   camera: <svg viewBox="0 0 110 90" aria-hidden="true"><path d="M14 30h18l7-11h30l7 11h18a6 6 0 0 1 6 6v38a6 6 0 0 1-6 6H14a6 6 0 0 1-6-6V36a6 6 0 0 1 6-6z" /><circle cx="55" cy="54" r="18" /><circle cx="55" cy="54" r="11" /><circle cx="51" cy="50" r="3" className="fill" /><rect x="80" y="37" width="12" height="7" rx="2" /><path d="M18 37h10" /><path d="M8 40c-6 10-4 26 6 34" className="thin" /></svg>,
@@ -61,7 +55,7 @@ export function OurStory({ story, finalDate }: { story: Story; finalDate: string
     </header>
 
     <div className="wed-story-body">
-      <Branch className="wed-story-corner left" />
+      <OliveCorner className="wed-story-corner left" seed={23} />
       <ol className="wed-story-timeline">
         {chapters.map((chapter, index) => {
           const right = index % 2 === 1;
@@ -100,7 +94,7 @@ export function OurStory({ story, finalDate }: { story: Story; finalDate: string
           <p className="wed-story-closing-bottom">{story.closing[1]}</p>
         </ScrollReveal>
       </footer>
-      <Branch className="wed-story-corner right" />
+      <OliveCorner className="wed-story-corner right" seed={58} />
       <Landscape />
     </div>
   </section>;
