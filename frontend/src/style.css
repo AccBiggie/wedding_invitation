@@ -231,6 +231,8 @@ body{background:#f5f7fb}
 .wed-carousel-prev{left:-16px}
 .wed-carousel-next{right:-16px}
 .wed-carousel-dots{display:flex;justify-content:center;gap:.45rem;margin-top:1rem}
+/* Respiro entre a paginacao e o bloco seguinte (ex.: card da chave PIX). */
+.wed-carousel+*{margin-top:1.75rem}
 .wed-carousel-dots button{width:9px;height:9px;padding:0;border:0;border-radius:999px;background:#d8cfb8;cursor:pointer;transition:width .2s,background .2s}
 .wed-carousel-dots button:hover{background:var(--wed-gold-soft)}
 .wed-carousel-dots button.is-active{width:26px;background:var(--wed-gold)}
@@ -267,6 +269,7 @@ body{background:#f5f7fb}
 .wed-pix-body strong{font-weight:500;font-size:calc(1.16rem * var(--wed-font-scale, 1));color:var(--wed-green)}
 .wed-pix-body code{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:calc(1rem * var(--wed-font-scale, 1));color:#4a544e;overflow-wrap:anywhere}
 .wed-pix-body span{font-size:calc(.98rem * var(--wed-font-scale, 1));color:#8a918b}
+.wed-pix-actions{display:flex;flex-wrap:wrap;gap:.6rem}
 .wed-btn-ghost{width:auto;padding:.62rem 1.1rem;border:1px solid var(--wed-green);background:transparent;color:var(--wed-green);font-size:calc(1.05rem * var(--wed-font-scale, 1))}
 .wed-btn-ghost:hover:not(:disabled){background:var(--wed-green);color:#fdfaf2}
 .wed-btn-ghost svg{color:inherit}
@@ -351,6 +354,7 @@ body{background:#f5f7fb}
   .wed-prose p{font-size:calc(1.08rem * var(--wed-font-scale, 1))}
   .wed-pix{gap:.8rem}
   .wed-btn-ghost{width:100%}
+  .wed-pix-actions{width:100%;flex-direction:column}
   .wed-foot-top{grid-template-columns:minmax(0,1fr);padding:2.3rem 1.25rem 2rem}
   .wed-foot-bar-inner{flex-direction:column;align-items:flex-start;gap:.85rem}
   .wed-details{flex-wrap:wrap}
@@ -416,3 +420,76 @@ body{background:#f5f7fb}
   .wed-lp[data-wed-offcanvas-style=floating] .wed-nav-links.is-open{left:10px;right:10px;top:calc(var(--nav-h) + 6px);border:1px solid var(--wed-gold-soft);border-radius:var(--wed-radius,10px)}
   .wed-lp[data-wed-scheme=colored] .wed-nav-links.is-open{background:var(--wed-accent)}
 }
+
+/* Gravata online: modal aberto pela action "Gravata" do menu da landing. Fica
+   num portal fora de .wed, por isso redefine as cores e a fonte do convite. */
+.MuiDialog-paper.gravata-paper{--g-green:#1f4536;--g-green-dark:#123326;--g-gold:#c0a057;--g-gold-soft:#e7ddc4;position:relative;display:grid;grid-template-columns:44% 1fr;width:100%;max-width:940px;min-height:596px;margin:24px;overflow:hidden;border:1px solid var(--g-gold-soft);border-radius:18px;background:linear-gradient(180deg,#fbf8f1,#f8f3e8);color:#5d6761;font-family:'Cormorant Garamond',Georgia,'Times New Roman',serif;box-shadow:0 24px 60px rgba(20,35,28,.35)}
+.gravata-paper::after{content:'';position:absolute;inset:7px;border:1px solid rgba(192,160,87,.32);border-radius:13px;pointer-events:none}
+.gravata-close{position:absolute;top:14px;right:14px;z-index:3;display:flex;align-items:center;justify-content:center;width:44px;height:44px;padding:0;border:1px solid var(--g-gold-soft);border-radius:50%;background:#fffdf9;color:var(--g-green);cursor:pointer;box-shadow:0 2px 8px rgba(120,96,40,.12);transition:border-color .15s,transform .15s}
+.gravata-close:hover{border-color:var(--g-gold);transform:rotate(90deg)}
+.gravata-close:focus-visible,.gravata-btn:focus-visible,.gravata-link:focus-visible{outline:2px solid var(--g-gold);outline-offset:2px}
+.gravata-art{position:relative;overflow:hidden;background:radial-gradient(ellipse 62% 55% at 50% 34%,rgba(244,196,96,.85),rgba(246,220,160,.5) 50%,rgba(251,248,241,0) 100%)}
+.gravata-glow{position:absolute;left:10%;right:10%;top:4%;height:52%;border-radius:50%;background:radial-gradient(circle,rgba(255,214,120,.95),rgba(255,226,150,0) 70%);filter:blur(10px)}
+.gravata-arch{position:absolute;left:4%;top:3%;width:118%;aspect-ratio:1;border:1.5px solid rgba(192,160,87,.6);border-radius:50%}
+.gravata-branch{position:absolute;left:10px;top:10px;width:150px;height:auto;color:var(--g-gold);opacity:.75;z-index:1}
+.gravata-art img{position:absolute;left:-7%;top:3%;z-index:2;width:114%;height:104%;object-fit:cover;object-position:50% 0;-webkit-mask-image:linear-gradient(90deg,#000 82%,transparent);mask-image:linear-gradient(90deg,#000 82%,transparent)}
+.gravata-body{position:relative;z-index:1;display:flex;flex-direction:column;align-items:center;padding:30px 52px 26px 40px;text-align:center}
+.gravata-badge{display:flex;align-items:center;justify-content:center;width:62px;height:62px;border:1px solid var(--g-gold-soft);border-radius:50%;background:#fffdf9;color:var(--g-gold);box-shadow:0 4px 14px rgba(150,120,50,.14)}
+.gravata-curls{display:flex;justify-content:space-between;width:132px;margin:-6px 0 -10px;color:var(--g-gold)}
+.gravata-curl.is-flip,.gravata-leaf.is-flip{transform:scaleX(-1)}
+.gravata-title{display:flex;align-items:center;gap:.7rem;margin:0;font-family:inherit;font-size:2.65rem;font-weight:500;line-height:1.1;color:var(--g-green)}
+.gravata-leaf{flex-shrink:0;color:var(--g-gold)}
+.gravata-dot{display:flex;align-items:center;gap:.45rem;margin:.55rem 0 .7rem}
+.gravata-dot i{display:block;width:26px;height:1px;background:var(--g-gold)}
+.gravata-dot b{width:5px;height:5px;border-radius:50%;background:var(--g-gold)}
+.gravata-lead{max-width:360px;margin:0;font-size:2.15rem;font-weight:500;line-height:1.12;color:var(--g-green)}
+.gravata-lead-sm{font-size:1.45rem;line-height:1.3}
+.gravata-lead-sm strong{display:block;font-size:2rem;font-weight:600}
+.gravata-rule{display:flex;align-items:center;gap:.7rem;width:100%;max-width:260px;margin:.9rem 0 .8rem;color:var(--g-gold)}
+.gravata-rule i{flex:1;height:1px;background:linear-gradient(90deg,transparent,var(--g-gold))}
+.gravata-rule i:last-child{background:linear-gradient(90deg,var(--g-gold),transparent)}
+.gravata-text{max-width:380px;margin:0 0 1.5rem;font-size:1.14rem;line-height:1.45;color:#6b746e}
+.gravata-form{display:flex;flex-direction:column;gap:.7rem;width:100%;max-width:354px;text-align:left}
+.gravata-form label{font-size:1.25rem;font-weight:500;color:#3e4b43}
+.gravata-input{display:flex;align-items:stretch;height:52px;border:1px solid #e3d6b6;border-radius:8px;background:#fffdf8;box-shadow:inset 0 1px 3px rgba(150,120,50,.08);transition:border-color .15s,box-shadow .15s}
+.gravata-input:focus-within{border-color:var(--g-gold);box-shadow:0 0 0 3px rgba(192,160,87,.18)}
+.gravata-input span{display:flex;align-items:center;padding:0 .9rem;border-right:1px solid #e3d6b6;font-size:1.25rem;color:#5d6761}
+.gravata-input input{flex:1;min-width:0;padding:0 .9rem;border:0;outline:0;background:transparent;font-family:inherit;font-size:1.3rem;color:#3e4b43}
+.gravata-input input::placeholder{color:#b9b3a3}
+.gravata-btn{display:flex;align-items:center;justify-content:center;gap:.8rem;height:58px;margin-top:.6rem;border:1.5px solid var(--g-gold);border-radius:8px;background:linear-gradient(180deg,#24503d,var(--g-green-dark));color:#fbf5e6;font-family:inherit;font-size:1.6rem;cursor:pointer;box-shadow:inset 0 0 0 2px rgba(18,51,38,.9),inset 0 1px 0 3px rgba(192,160,87,.22),0 8px 18px rgba(18,51,38,.28);transition:filter .15s,transform .15s}
+.gravata-btn svg{color:var(--g-gold)}
+.gravata-btn:hover:not(:disabled){filter:brightness(1.12);transform:translateY(-1px)}
+.gravata-btn:disabled{opacity:.7;cursor:wait}
+.gravata-error{margin:0;font-size:1.05rem;color:#a2412f}
+.gravata-qr{margin:1rem 0;padding:10px;border:1px solid var(--g-gold-soft);border-radius:12px;background:#fff;box-shadow:0 4px 14px rgba(150,120,50,.12)}
+.gravata-qr img{display:block;width:200px;height:200px}
+.gravata-code{width:100%;padding:.6rem .8rem;border:1px solid #e3d6b6;border-radius:8px;background:#fffdf8;font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:.82rem;color:#3e4b43;resize:none;word-break:break-all}
+.gravata-link{display:flex;align-items:center;justify-content:center;gap:.4rem;padding:.3rem;border:0;background:none;font-family:inherit;font-size:1.12rem;color:var(--g-green);cursor:pointer}
+.gravata-link:hover{text-decoration:underline}
+.gravata-safe{display:flex;align-items:center;gap:.7rem;width:100%;max-width:354px;margin:1.6rem 0 0;font-size:1.12rem;color:#5d6761}
+.gravata-safe svg{flex-shrink:0;color:var(--g-gold)}
+.gravata-safe span{white-space:nowrap}
+.gravata-safe strong{font-weight:600;color:#3e4b43}
+.gravata-safe i{flex:1;height:1px;background:linear-gradient(90deg,transparent,var(--g-gold))}
+.gravata-safe i:last-child{background:linear-gradient(90deg,var(--g-gold),transparent)}
+@media (max-width:760px){
+  .MuiDialog-paper.gravata-paper{grid-template-columns:1fr;min-height:0;max-height:calc(100% - 24px);margin:12px;overflow-y:auto}
+  .gravata-art{height:250px;flex-shrink:0}
+  .gravata-art img{left:0;top:0;width:100%;height:100%;object-position:50% 2%;-webkit-mask-image:linear-gradient(180deg,#000 80%,transparent);mask-image:linear-gradient(180deg,#000 80%,transparent)}
+  .gravata-arch{left:12%;width:76%;top:4%}
+  .gravata-branch{width:110px}
+  .gravata-body{margin-top:-34px;padding:0 18px 22px}
+  .gravata-title{font-size:2.1rem;gap:.4rem}
+  .gravata-leaf{width:26px}
+  .gravata-lead{font-size:1.7rem}
+  .gravata-btn{font-size:1.4rem}
+  .gravata-safe{font-size:1.02rem}
+}
+
+/* Modal "Visualizar QR Code" do card Chave PIX: so o QR e o botao de copiar. */
+.MuiDialog-paper.pixqr-paper{--g-green:#1f4536;--g-green-dark:#123326;--g-gold:#c0a057;--g-gold-soft:#e7ddc4;position:relative;display:flex;flex-direction:column;align-items:center;gap:1rem;width:100%;max-width:380px;margin:16px;padding:64px 32px 30px;border:1px solid var(--g-gold-soft);border-radius:18px;background:linear-gradient(180deg,#fbf8f1,#f8f3e8);font-family:'Cormorant Garamond',Georgia,'Times New Roman',serif;box-shadow:0 24px 60px rgba(20,35,28,.35)}
+.pixqr-paper::after{content:'';position:absolute;inset:7px;border:1px solid rgba(192,160,87,.32);border-radius:13px;pointer-events:none}
+.pixqr-code{display:flex;align-items:center;justify-content:center;width:260px;max-width:100%;aspect-ratio:1;padding:10px;border:1px solid var(--g-gold-soft);border-radius:12px;background:#fff;box-shadow:0 4px 14px rgba(150,120,50,.12)}
+.pixqr-code img{display:block;width:100%;height:100%}
+.pixqr-loading{font-size:1.1rem;color:#8a918b}
+.pixqr-paper .gravata-btn{width:100%;margin-top:0}
