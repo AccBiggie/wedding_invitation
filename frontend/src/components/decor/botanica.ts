@@ -244,6 +244,12 @@ export function paintLeaf(ctx: Palette, x: number, y: number, angle: number, len
     `<path d="${f.vein}" fill="none" stroke="${c.leafVein}" stroke-opacity=".75" stroke-width="${n(Math.max(.5, length * .022))}" stroke-linecap="round"/></g>`;
 }
 
+// Petala solta caindo: o mesmo degrade das petalas, girada e achatada.
+export function paintLoosePetal(ctx: Palette, x: number, y: number, angle: number, length: number, rng: Rng) {
+  const f = shape({ x0: 0, length, width: length * between(rng, .24, .3), bow: between(rng, -.12, .12), skew: between(rng, -.15, .15), profile: PROFILE.petal, steps: 10 });
+  return `<g transform="translate(${n(x)} ${n(y)}) rotate(${n(angle)}) scale(1 ${n(between(rng, .55, 1))})"><path d="${f.d}" fill="${ctx.url(`pt${int(rng, 1, 2)}`)}" stroke="${COLORS.petalEdge}" stroke-opacity=".45" stroke-width=".5"/></g>`;
+}
+
 // Fio dourado: curva longa em S que termina num caracol, com um pontinho na ponta.
 export function tendrilPoints(x: number, y: number, angle: number, length: number, rng: Rng) {
   const side = sign(rng), force = between(rng, 11, 15), N = 64, ds = length / N, pts: Point[] = [[x, y]];

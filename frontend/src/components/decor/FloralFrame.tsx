@@ -78,7 +78,7 @@ function frameMarkup(id: string, seed: number, layout: keyof typeof BOXES, water
 }
 
 const STACK_QUERY = '(max-width: 820px)';
-const useStacked = () => {
+export const useStacked = () => {
   const [stacked, setStacked] = useState(() => typeof window !== 'undefined' && window.matchMedia(STACK_QUERY).matches);
   useEffect(() => {
     const query = window.matchMedia(STACK_QUERY), update = () => setStacked(query.matches);

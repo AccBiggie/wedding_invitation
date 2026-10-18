@@ -786,12 +786,15 @@ a.wed-shop-badge:hover{border-color:var(--wed-gold);background:#fffcf3}
 .wed-lp.is-paper .wed-lp-bg{opacity:0}
 .wed-lp .wed-sec{transition:box-shadow 1s ease}
 .wed-lp.is-paper .wed-sec{box-shadow:0 10px 34px rgba(90,70,40,.12)}
-.wed-olive-vine{position:absolute;width:min(220px,17vw);height:auto;opacity:.92}
+.wed-olive-vine{position:absolute;width:min(220px,17vw);height:auto;opacity:.92;will-change:transform}
 .wed-olive-vine.is-left{left:-28px;top:12vh}
 .wed-olive-vine.is-right{right:-28px;bottom:-4vh;transform:scaleX(-1) rotate(4deg)}
 /* Crescimento: caules revelados por mascara e folhas e flores brotando em sequencia (delays no SVG). */
 .wed-olive-vine .grow{stroke-dasharray:1;stroke-dashoffset:1;transition:stroke-dashoffset var(--grow-duration,1.6s) cubic-bezier(.4,0,.2,1) var(--grow-delay,0s)}
 .wed-lp.is-paper .wed-olive-vine .grow{stroke-dashoffset:0}
+/* Depois de crescer, as mascaras dos caules saem: com elas a coluna repinta a cada quadro da rolagem. */
+.wed-lp.is-paper .wed-olive-vine g[mask]{animation:wed-unmask 0s linear 3.6s forwards}
+@keyframes wed-unmask{to{mask:none}}
 /* Ao voltar para a foto, os ramos recolhem rapido e sem atraso. */
 .wed-lp:not(.is-paper) .wed-olive-vine .grow{transition-duration:.35s;transition-delay:0s}
 @media (max-width:820px){.wed-olive-vine{width:120px;opacity:.55}.wed-olive-vine.is-left{left:-40px}.wed-olive-vine.is-right{right:-40px}}
@@ -814,8 +817,8 @@ a.wed-shop-badge:hover{border-color:var(--wed-gold);background:#fffcf3}
 .wed-church .cross{stroke:#b8955a;stroke-width:2.2}
 .wed-church .tree circle{fill:#e3e8d8;stroke:#8fa27f}
 .wed-church .tree path{stroke:#8fa27f}
-/* Secoes levemente translucidas no papel: a igreja aparece suave por tras. */
-.wed-lp.is-paper .wed-sec:not(.wed-story){background:color-mix(in srgb,var(--wed-cream) 84%,transparent)}
+/* Secoes levemente translucidas no meio (a igreja aparece suave por tras) e opacas nas bordas, por onde os ramos do jardim passam por baixo. */
+.wed-lp.is-paper .wed-sec:not(.wed-story){background:linear-gradient(90deg,var(--wed-cream) 0 120px,color-mix(in srgb,var(--wed-cream) 84%,transparent) 190px calc(100% - 190px),var(--wed-cream) calc(100% - 120px))}
 .wed-lp .wed-sec:not(.wed-story){transition:box-shadow 1s ease,background-color 1s ease}
 @media (max-width:820px){.wed-olive-vine.is-left{left:-60px;height:100vh;width:auto}.wed-church{width:120vw;bottom:0}.wed-olive-garland{max-width:70px}}
 
@@ -827,15 +830,16 @@ a.wed-shop-badge:hover{border-color:var(--wed-gold);background:#fffcf3}
 .wed-sec-title:has(.wed-olive-garland){gap:.5rem}
 .wed-olive-vine{width:auto;max-width:none}
 .wed-olive-vine.is-left{top:0;left:-34px;height:100vh}
-.wed-olive-vine.is-right{top:auto;bottom:0;right:-34px;height:86vh;width:auto;transform:scaleX(-1)}
+.wed-olive-vine.is-right{top:0;bottom:auto;right:-34px;height:100vh;width:auto;transform:scaleX(-1)}
 @media (max-width:820px){.wed-olive-vine.is-left,.wed-olive-vine.is-right{height:70vh;width:auto;opacity:.5}.wed-olive-vine.is-left{left:-60px}.wed-olive-vine.is-right{right:-60px}.wed-olive-garland{max-width:none}}
 
 /* Folhas nao podem ser recortadas: os SVGs desenham fora da propria caixa. */
 .wed-olive{overflow:visible}
 .wed-olive-garland{-webkit-mask-image:none;mask-image:none}
-/* Ramos das laterais um pouco mais para o meio; os galhos longos passam por tras das secoes. */
-.wed-olive-vine.is-left{left:clamp(-20px,calc((100vw - 1080px) / 2 - 190px),70px)}
-.wed-olive-vine.is-right{right:clamp(-20px,calc((100vw - 1080px) / 2 - 190px),70px)}
+/* Jardim lateral: a coluna (300 de 390 unidades, 30vh) termina na borda do card e o resto passa por baixo dele. */
+.wed-lp{--wed-sec-w:1080px}.wed-lp[data-wed-container=boxed]{--wed-sec-w:940px}.wed-lp[data-wed-container=fluid]{--wed-sec-w:100vw}
+.wed-olive-vine.is-left{left:calc(max(0px,(100vw - var(--wed-sec-w)) / 2) - 30vh)}
+.wed-olive-vine.is-right{right:calc(max(0px,(100vw - var(--wed-sec-w)) / 2) - 30vh)}
 @media (max-width:820px){.wed-olive-vine.is-left{left:-60px}.wed-olive-vine.is-right{right:-60px}}
 
 /* Folhas e flores dos ramos laterais (Olive.tsx): brotam em sequencia. */
