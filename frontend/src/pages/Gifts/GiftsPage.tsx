@@ -5,6 +5,7 @@ import { DataGrid, type GridColDef, type GridPaginationModel, type GridSortModel
 import Add from '@mui/icons-material/Add'; import EditOutlined from '@mui/icons-material/EditOutlined'; import DeleteOutline from '@mui/icons-material/DeleteOutlined';
 import { PageHeader } from '../../components/common/PageHeader'; import { ConfirmDialog } from '../../components/common/ConfirmDialog'; import { EmptyState } from '../../components/common/EmptyState';
 import { giftsService, type GiftFilters } from '../../services/gifts.service'; import type { GiftProduct } from '../../types/api';
+import { resolveImageUrl } from '../../services/images.service';
 const currency = (value: number) => new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(value);
 export function GiftsPage() {
   const { id } = useParams(); const navigate = useNavigate(); const location = useLocation(); const mobile = useMediaQuery(useTheme().breakpoints.down('sm'));
@@ -17,7 +18,7 @@ export function GiftsPage() {
   const changeFilter = (patch: GiftFilters) => { setPagination(current => ({ ...current, page: 0 })); setFilters(current => ({ ...current, ...patch })); };
   const remove = async () => { if (!deleting) return; setBusy(true); try { await giftsService.remove(deleting._id); setNotice('Presente excluído com sucesso.'); setDeleting(null); setRefresh(value => value + 1); } catch { setError('Não foi possível excluir o presente.'); } finally { setBusy(false); } };
   const columns: GridColDef<GiftProduct>[] = [
-    { field: 'image', headerName: 'Imagem', width: 80, sortable: false, renderCell: params => params.value ? <Box component="img" src={String(params.value)} alt="" sx={{ width: 44, height: 44, objectFit: 'cover', borderRadius: 1 }} /> : null },
+    { field: 'image', headerName: 'Imagem', width: 80, sortable: false, renderCell: params => params.value ? <Box component="img" src={resolveImageUrl(String(params.value))} loading="lazy" alt="" sx={{ width: 44, height: 44, objectFit: 'cover', borderRadius: 1 }} /> : <Box aria-label="Sem imagem" sx={{ width: 44, height: 44, borderRadius: 1, bgcolor: 'action.hover' }} /> },
     { field: 'name', headerName: 'Nome', flex: 1, minWidth: 160 },
     { field: 'category', headerName: 'Categoria', width: 145 },
     { field: 'price', headerName: 'Valor', width: 130, valueFormatter: value => currency(Number(value)) },

@@ -2,7 +2,7 @@ export const text = (value, max) => typeof value === 'string' ? value.trim().sli
 export const escapeRegex = value => value.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
 export const validOrder = value => Number.isSafeInteger(Number(value)) && Number(value) >= 0;
 export const validBoolean = value => typeof value === 'boolean';
-export const validImage = value => !value || /^https?:\/\/[^\s]+$/i.test(value) || /^\/[a-zA-Z0-9/_-]+\.(png|jpe?g|webp)$/i.test(value);
+export const validImage = value => !value || /^https?:\/\/[^\s]+$/i.test(value) || /^\/[a-zA-Z0-9/_-]+\.(png|jpe?g|webp)$/i.test(value) || /^\/api\/images\/[a-f\d]{24}$/i.test(value);
 const validGodparentImage = value => {
   if (!value) return true;
   if (value.length <= 2048 && validImage(value)) return true;

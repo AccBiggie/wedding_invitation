@@ -5,5 +5,14 @@ export const env = {
   jwtSecret: process.env.JWT_SECRET || 'dev-secret-apenas-para-desenvolvimento',
   jwtExpiresIn: process.env.JWT_EXPIRES_IN || '7d',
   adminEmail: (process.env.ADMIN_EMAIL || 'accbiggie@gmail.com').toLowerCase(),
-  adminPassword: process.env.ADMIN_PASSWORD || ''
+  adminPassword: process.env.ADMIN_PASSWORD || '',
+  r2: {
+    accountId: process.env.R2_ACCOUNT_ID || '',
+    accessKeyId: process.env.R2_ACCESS_KEY_ID || '',
+    secretAccessKey: process.env.R2_SECRET_ACCESS_KEY || '',
+    bucket: process.env.R2_BUCKET || '',
+    endpoint: process.env.R2_ENDPOINT || '',
+    publicBaseUrl: process.env.R2_PUBLIC_BASE_URL || '',
+    quality: Math.min(95, Math.max(50, Number(process.env.IMAGE_WEBP_QUALITY) || 80))
+  }
 };

@@ -7,6 +7,7 @@ import { DataGrid, type GridColDef, type GridPaginationModel, type GridSortModel
 import Add from '@mui/icons-material/Add'; import EditOutlined from '@mui/icons-material/EditOutlined'; import DeleteOutline from '@mui/icons-material/DeleteOutlined';
 import { PageHeader } from '../../components/common/PageHeader'; import { ConfirmDialog } from '../../components/common/ConfirmDialog'; import { EmptyState } from '../../components/common/EmptyState';
 import { godparentsService, type GodparentFilters } from '../../services/godparents.service'; import type { Godparent } from '../../types/api';
+import { resolveImageUrl } from '../../services/images.service';
 
 const roleName: Record<Godparent['role'], string> = { groomsman: 'Padrinho', bridesmaid: 'Madrinha', mother: 'Mãe', father: 'Pai', other: 'Outro' };
 export function GodparentsPage() {
@@ -21,7 +22,7 @@ export function GodparentsPage() {
   const remove = async () => { if (!deleting) return; setBusy(true); try { await godparentsService.remove(deleting._id); setNotice('Padrinho excluído com sucesso.'); setDeleting(null); setRefresh(value => value + 1); } catch { setError('Não foi possível excluir o padrinho.'); } finally { setBusy(false); } };
   const columns: GridColDef<Godparent>[] = [
     { field: '_id', headerName: 'Código', width: 100, sortable: false, valueFormatter: value => String(value).slice(-6) },
-    { field: 'image', headerName: 'Fotos', width: 130, sortable: false, renderCell: params => <AvatarGroup max={3} sx={{ my: .8, '& .MuiAvatar-root': { width: 38, height: 38, fontSize: 13 } }}>{[params.row.image, ...(params.row.images || [])].filter(Boolean).length ? [params.row.image, ...(params.row.images || [])].filter(Boolean).map((photo, index) => <Avatar key={index} src={photo} alt={`${params.row.name} ${index + 1}`} />) : <Avatar>{params.row.name.charAt(0)}</Avatar>}</AvatarGroup> },
+    { field: 'image', headerName: 'Fotos', width: 130, sortable: false, renderCell: params => <AvatarGroup max={3} sx={{ my: .8, '& .MuiAvatar-root': { width: 38, height: 38, fontSize: 13 } }}>{[params.row.image, ...(params.row.images || [])].filter(Boolean).length ? [params.row.image, ...(params.row.images || [])].filter(Boolean).map((photo, index) => <Avatar key={index} src={resolveImageUrl(photo)} alt={`${params.row.name} ${index + 1}`} />) : <Avatar>{params.row.name.charAt(0)}</Avatar>}</AvatarGroup> },
     { field: 'name', headerName: 'Nomes no card', flex: 1, minWidth: 190, renderCell: params => [params.row.name, params.row.partnerName].filter(Boolean).join(' & ') },
     { field: 'role', headerName: 'Legenda do card', width: 180, renderCell: params => params.row.cardRole || roleName[params.row.role] },
     { field: 'phone', headerName: 'Telefone', width: 145, sortable: false },
