@@ -2,6 +2,7 @@ import { lazy, Suspense, useEffect, useState, type ReactNode } from 'react';
 import axios from 'axios';
 import { resolveImageUrl } from '../../services/images.service';
 import { storeCategoriesService } from '../../services/storeCategories.service';
+import { categoryImageUrl } from '../../utils/categoryIcons';
 import type { Pagination, PublicGiftProduct, PublicStoreCategory } from '../../types/api';
 const GiftDetailsDialog = lazy(() => import('./GiftDetailsDialog').then(module => ({ default: module.GiftDetailsDialog })));
 const currency = (value: number) => new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(value);
@@ -68,7 +69,7 @@ export function StoreCategoryContent({ slug, icons }: { slug: string; icons: { b
       <ol><li><a href={LANDING_PATH}>Início</a></li><li><a href={STORE_LIST_HREF}>Lista na loja</a></li><li aria-current="page">{ready ? ready.category.name : '…'}</li></ol>
     </nav>
     <header className="wed-catpage-head">
-      <span className={`wed-shop-thumb wed-catpage-thumb${ready ? '' : ' is-loading'}`}>{ready && <img src={resolveImageUrl(ready.category.image)} alt="" />}</span>
+      <span className={`wed-shop-thumb wed-catpage-thumb${ready ? '' : ' is-loading'}`}>{ready && categoryImageUrl(ready.category) && <img src={categoryImageUrl(ready.category)} alt="" />}</span>
       <div>
         {ready ? <h1 className="wed-catpage-title">{ready.category.name}</h1> : <span className="wed-catpage-title is-loading" />}
         {ready ? <p className="wed-catpage-desc">{ready.category.description}</p> : <span className="wed-catpage-desc is-loading" />}

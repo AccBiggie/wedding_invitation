@@ -191,7 +191,14 @@ test('CRUD de categorias da loja valida campos e publica so as ativas em ordem',
   assert.equal(list.body.data.pagination.total, 2);
   const publicList = (await request(app).get('/api/public/store-categories')).body.data;
   assert.deepEqual(publicList.map(item => item.name), ['Taças e copos', 'Panelas']);
-  assert.deepEqual(Object.keys(publicList[0]).sort(), ['_id', 'description', 'image', 'name', 'slug']);
+  assert.deepEqual(Object.keys(publicList[0]).sort(), ['_id', 'description', 'icon', 'image', 'name', 'slug']);
+  // Icone tematico: dispensa a imagem; formato da chave validado.
+  const iconOnly = await create({ name: 'Copos', description: 'Copos de vidro', icon: 'tacas' });
+  assert.equal(iconOnly.status, 200); assert.equal(iconOnly.body.data.icon, 'tacas'); assert.equal(iconOnly.body.data.image, '');
+  assert.equal((await create({ name: 'X', description: 'Y', icon: '../etc' })).status, 422);
+  assert.equal((await request(app).put(base + '/' + iconOnly.body.data._id).set('Authorization', bearer).send({ icon: '' })).status, 422);
+  assert.equal((await request(app).put(base + '/' + iconOnly.body.data._id).set('Authorization', bearer).send({ image: '/categorias/copos.jpg' })).body.data.icon, 'tacas');
+  assert.equal((await request(app).delete(base + '/' + iconOnly.body.data._id).set('Authorization', bearer)).status, 200);
   assert.equal(list.body.data.data[0].productCount, 0);
   assert.equal((await request(app).get(base + '/invalido').set('Authorization', bearer)).status, 400);
   assert.equal((await request(app).delete(base + '/' + id).set('Authorization', bearer)).status, 200);

@@ -1,0 +1,18 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 240 240" role="img" aria-label="Utensílios">
+  <defs><radialGradient id="bg" cx="50%" cy="38%" r="72%"><stop offset="0" stop-color="#fffdf7"/><stop offset="1" stop-color="#efe5cf"/></radialGradient></defs>
+  <rect width="240" height="240" fill="url(#bg)"/>
+  <ellipse cx="120" cy="188" rx="64" ry="7" fill="#e2d4b4" opacity=".55"/>
+  <g fill="none" stroke="#1f4536" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M112 118 L97 64" stroke="#a07a45" stroke-width="5"/>
+    <ellipse cx="93" cy="50" rx="10" ry="15" transform="rotate(-16 93 50)" fill="#e6cd9f"/>
+    <path d="M120 118 V74" stroke-width="4"/>
+    <path d="M120 74 C104 62 107 30 120 27 C133 30 136 62 120 74" stroke-width="2.4"/>
+    <path d="M120 74 C112 62 113 37 120 34 C127 37 128 62 120 74" stroke-width="2.4"/>
+    <path d="M129 118 L144 70" stroke="#a07a45" stroke-width="5"/>
+    <rect x="138" y="36" width="22" height="30" rx="7" transform="rotate(17 149 51)" fill="#e6cd9f"/>
+    <path d="M146 44 l-3 12 M153 46 l-3 12" transform="rotate(17 149 51)" stroke-width="2"/>
+    <rect x="80" y="112" width="80" height="9" rx="4.5" fill="#efe5cf"/>
+    <path d="M84 121 L88 174 C88 178 92 180 96 180 L144 180 C148 180 152 178 152 174 L156 121 Z" fill="#fffaf0"/>
+    <path d="M86 140 H154" stroke="#c0a057" stroke-width="2"/>
+  </g>
+</svg>

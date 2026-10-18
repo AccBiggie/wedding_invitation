@@ -50,10 +50,14 @@ export function validateStoreCategory(body) {
   const description = text(body.description, 500);
   if (!description || description.length > 500) errors.description = ['Informe uma descricao de ate 500 caracteres.'];
   const image = text(body.image, 2048);
-  if (!image || !validImage(image)) errors.image = ['Envie uma imagem ou informe uma URL de imagem valida.'];
+  if (!validImage(image)) errors.image = ['Envie uma imagem ou informe uma URL de imagem valida.'];
+  // A lista de icones vive nos assets do frontend; aqui so garantimos o formato da chave.
+  const icon = text(body.icon, 40);
+  if (icon && !/^[a-z0-9-]{1,40}$/.test(icon)) errors.icon = ['Icone invalido.'];
+  if (!image && !icon && !errors.image) errors.image = ['Escolha um icone ou envie uma imagem.'];
   if (!validOrder(body.order ?? 0)) errors.order = ['A ordem deve ser um inteiro nao negativo.'];
   if (body.active !== undefined && !validBoolean(body.active)) errors.active = ['Status invalido.'];
-  return { errors, data: { name, description, image, order: Number(body.order ?? 0), active: body.active ?? true } };
+  return { errors, data: { name, description, image, icon, order: Number(body.order ?? 0), active: body.active ?? true } };
 }
 
 export const GIFT_MAX_IMAGES = 10;

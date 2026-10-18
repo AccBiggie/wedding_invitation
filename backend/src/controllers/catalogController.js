@@ -174,13 +174,13 @@ export async function publicGifts(req, res, next) {
   } catch (error) { next(error); }
 }
 export async function publicStoreCategories(req, res, next) {
-  try { ok(res, await StoreCategory.find({ active: true }).sort({ order: 1, name: 1 }).limit(100).select('name slug description image')); } catch (error) { next(error); }
+  try { ok(res, await StoreCategory.find({ active: true }).sort({ order: 1, name: 1 }).limit(100).select('name slug description image icon')); } catch (error) { next(error); }
 }
 // Pagina /lista-na-loja/:slug: categoria ativa + seus produtos ativos, paginados.
 export async function publicStoreCategory(req, res, next) {
   try {
     const slug = String(req.params.slug).toLowerCase();
-    const category = /^[a-z0-9-]{1,90}$/.test(slug) && await StoreCategory.findOne({ slug, active: true }).select('name slug description image');
+    const category = /^[a-z0-9-]{1,90}$/.test(slug) && await StoreCategory.findOne({ slug, active: true }).select('name slug description image icon');
     if (!category) return fail(res, 404, 'Categoria não encontrada.');
     const { page, limit } = pageParams(req.query, 12, 48);
     const query = { categoryId: category._id, active: true };

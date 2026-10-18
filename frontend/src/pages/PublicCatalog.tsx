@@ -2,6 +2,7 @@ import { useEffect, useId, useLayoutEffect, useRef, useState, type ReactNode } f
 import api from '../services/api';
 import { resolveImageUrl } from '../services/images.service';
 import { storeCategoriesService } from '../services/storeCategories.service';
+import { categoryImageUrl } from '../utils/categoryIcons';
 import type { ApiResponse, GiftProduct, Godparent, PublicStoreCategory } from '../types/api';
 const currency = (value: number) => new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(value);
 const roleName: Record<Godparent['role'], string> = { groomsman: 'Padrinho', bridesmaid: 'Madrinha', mother: 'Mãe', father: 'Pai', other: 'Outro' };
@@ -32,8 +33,8 @@ export function PublicGodparents({ fallback, Carousel, GodparentCard }: { fallba
   return <Carousel label="Padrinhos">{items.map(item => <GodparentCard key={item._id} couple={{ names: [item.name, item.partnerName].filter(Boolean), role: item.cardRole || roleName[item.role], photos: [item.image, ...(item.images || [])].filter(Boolean).slice(0, 2).map(resolveImageUrl) }} />)}</Carousel>;
 }
 function CategoryThumb({ category }: { category: PublicStoreCategory }) {
-  const [failed, setFailed] = useState(false);
-  return <span className="wed-shop-thumb">{failed ? <span className="wed-shop-initial" aria-hidden="true">{category.name.trim().charAt(0)}</span> : <img src={resolveImageUrl(category.image)} alt="" loading="lazy" onError={() => setFailed(true)} />}</span>;
+  const [failed, setFailed] = useState(false); const src = categoryImageUrl(category);
+  return <span className="wed-shop-thumb">{failed || !src ? <span className="wed-shop-initial" aria-hidden="true">{category.name.trim().charAt(0)}</span> : <img src={src} alt="" loading="lazy" onError={() => setFailed(true)} />}</span>;
 }
 const MARQUEE_SPEED = 45; // px por segundo
 const CategoryItems = ({ items, hidden }: { items: PublicStoreCategory[]; hidden?: boolean }) => <>{items.map(item => <li key={item._id}><a className="wed-shop-link" href={`/lista-na-loja/${item.slug}`} aria-label={hidden ? undefined : `Ver presentes de ${item.name}`} tabIndex={hidden ? -1 : undefined}><CategoryThumb category={item} /><span className="wed-shop-name">{item.name}</span></a></li>)}</>;

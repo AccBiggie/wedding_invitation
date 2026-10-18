@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 240 240" role="img" aria-label="Eletrodomésticos">
+  <defs><radialGradient id="bg" cx="50%" cy="38%" r="72%"><stop offset="0" stop-color="#fffdf7"/><stop offset="1" stop-color="#efe5cf"/></radialGradient></defs>
+  <rect width="240" height="240" fill="url(#bg)"/>
+  <ellipse cx="120" cy="186" rx="64" ry="7" fill="#e2d4b4" opacity=".55"/>
+  <g fill="none" stroke="#1f4536" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round">
+    <rect x="74" y="84" width="28" height="90" rx="9" fill="#fffaf0"/>
+    <path d="M72 72 C72 59 82 52 96 52 L160 52 C176 52 186 62 186 74 C186 84 178 90 168 90 L86 90 C78 90 72 84 72 78 Z" fill="#fffaf0"/>
+    <path d="M100 70 H176" stroke="#c0a057" stroke-width="2"/>
+    <circle cx="88" cy="70" r="5" fill="#c0a057" stroke="#c0a057" stroke-width="1.4"/>
+    <path d="M146 90 V112" stroke-width="3"/>
+    <path d="M102 150 H120"/>
+    <path d="M116 118 L176 118 C176 146 163 164 146 164 C129 164 116 146 116 118 Z" fill="#e9dcc0"/>
+    <path d="M146 112 c-8 5 -8 20 0 25 c8 -5 8 -20 0 -25" stroke-width="2.2"/>
+    <path d="M112 118 H180"/>
+    <rect x="62" y="172" width="122" height="12" rx="6" fill="#efe5cf"/>
+  </g>
+</svg>

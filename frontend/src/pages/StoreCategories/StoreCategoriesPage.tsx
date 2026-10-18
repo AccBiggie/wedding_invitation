@@ -6,7 +6,7 @@ import { DataGrid, type GridColDef, type GridPaginationModel, type GridSortModel
 import Add from '@mui/icons-material/Add'; import EditOutlined from '@mui/icons-material/EditOutlined'; import DeleteOutline from '@mui/icons-material/DeleteOutlined';
 import { PageHeader } from '../../components/common/PageHeader'; import { ConfirmDialog } from '../../components/common/ConfirmDialog'; import { EmptyState } from '../../components/common/EmptyState';
 import { storeCategoriesService } from '../../services/storeCategories.service'; import type { ListFilters, StoreCategory } from '../../types/api';
-import { resolveImageUrl } from '../../services/images.service';
+import { categoryImageUrl } from '../../utils/categoryIcons';
 import { Link as RouterLink } from 'react-router-dom';
 const products = (total: number) => `${total} ${total === 1 ? 'produto' : 'produtos'}`;
 export function StoreCategoriesPage() {
@@ -29,7 +29,7 @@ export function StoreCategoriesPage() {
     } finally { setBusy(false); }
   };
   const columns: GridColDef<StoreCategory>[] = [
-    { field: 'image', headerName: 'Imagem', width: 80, sortable: false, renderCell: params => <Box component="img" src={resolveImageUrl(String(params.value))} loading="lazy" alt="" sx={{ width: 44, height: 44, objectFit: 'cover', borderRadius: '50%', border: '1px solid #e7ddc4', verticalAlign: 'middle' }} /> },
+    { field: 'image', headerName: 'Imagem', width: 80, sortable: false, renderCell: params => <Box component="img" src={categoryImageUrl(params.row)} loading="lazy" alt="" sx={{ width: 44, height: 44, objectFit: 'cover', borderRadius: '50%', border: '1px solid #e7ddc4', verticalAlign: 'middle' }} /> },
     { field: 'name', headerName: 'Nome', width: 170 },
     { field: 'description', headerName: 'Descrição', flex: 1, minWidth: 200, sortable: false },
     { field: 'productCount', headerName: 'Produtos', width: 120, sortable: false, renderCell: params => params.row.productCount ? <Link component={RouterLink} to={`/presentes?categoryId=${params.row._id}`} underline="hover">{products(params.row.productCount)}</Link> : <Box component="span" sx={{ color: 'text.secondary' }}>Nenhum</Box> },
