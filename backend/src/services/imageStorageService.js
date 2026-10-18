@@ -131,7 +131,7 @@ export async function removeUnusedImages(values) {
     const image = await getImage(id);
     if (!image) continue;
     const url = getImageUrl(image);
-    const [godparent, gift, category] = await Promise.all([Godparent.exists({ $or: [{ image: url }, { images: url }] }), GiftProduct.exists({ image: url }), StoreCategory.exists({ image: url })]);
+    const [godparent, gift, category] = await Promise.all([Godparent.exists({ $or: [{ image: url }, { images: url }] }), GiftProduct.exists({ $or: [{ image: url }, { images: url }] }), StoreCategory.exists({ image: url })]);
     if (!godparent && !gift && !category) {
       try { await deleteImage(image); } catch (error) {
         console.error('Falha ao remover imagem não utilizada:', error);

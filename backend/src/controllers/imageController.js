@@ -12,7 +12,7 @@ const isReferenced = async image => {
   const url = getImageUrl(image);
   return Boolean(await Promise.all([
     Godparent.exists({ $or: [{ image: url }, { images: url }] }),
-    GiftProduct.exists({ image: url }),
+    GiftProduct.exists({ $or: [{ image: url }, { images: url }] }),
     StoreCategory.exists({ image: url })
   ]).then(results => results.some(Boolean)));
 };

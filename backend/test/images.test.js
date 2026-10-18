@@ -90,7 +90,12 @@ test('upload, vínculo, substituição e exclusão preservam banco e objetos', {
     assert.equal(replaced.status, 200);
     assert.equal(objects.has(oldKey), false);
     assert.equal(objects.size, 1);
-    assert.equal((await request(app).put('/api/gift-products/' + gift.body.data._id).set('Authorization', token).send({ image: '' })).status, 200);
+    // A mesma imagem como foto extra da galeria continua referenciada e servida.
+    assert.equal((await request(app).put('/api/gift-products/' + gift.body.data._id).set('Authorization', token).send({ image: '/produtos/capa.jpg', images: [url] })).status, 200);
+    assert.notEqual(await StoredImage.findById(id), null);
+    assert.equal((await request(app).get(url)).status, 200);
+    assert.equal((await request(app).delete(url).set('Authorization', token)).status, 409);
+    assert.equal((await request(app).put('/api/gift-products/' + gift.body.data._id).set('Authorization', token).send({ image: '', images: [] })).status, 200);
     assert.equal(await StoredImage.findById(id), null);
     assert.equal(objects.size, 0);
     failPut = true;

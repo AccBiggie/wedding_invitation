@@ -6,9 +6,10 @@ export interface Godparent { _id: string; name: string; partnerName: string; rol
 export type GodparentInput = Omit<Godparent, '_id' | 'createdAt' | 'updatedAt'>;
 export interface CategoryRef { _id: string; name: string; slug: string; active: boolean }
 // categoryId null so em produtos antigos ainda nao migrados; legacyCategory traz o texto antigo.
-export interface GiftProduct { _id: string; name: string; description: string; price: number; image: string; categoryId: string | null; category: CategoryRef | null; legacyCategory?: string; active: boolean; order: number; createdAt: string; updatedAt: string }
-export interface GiftInput { name: string; description: string; price: number; image: string; categoryId: string; order: number; active: boolean }
-export type PublicGiftProduct = Pick<GiftProduct, '_id' | 'name' | 'description' | 'price' | 'image'>;
+// image e a foto principal; images, as extras da galeria. storeUrl abre a pagina do produto na loja.
+export interface GiftProduct { _id: string; name: string; description: string; price: number; image: string; images: string[]; storeUrl: string; categoryId: string | null; category: CategoryRef | null; legacyCategory?: string; active: boolean; order: number; createdAt: string; updatedAt: string }
+export interface GiftInput { name: string; description: string; price: number; image: string; images: string[]; storeUrl: string; categoryId: string; order: number; active: boolean }
+export type PublicGiftProduct = Pick<GiftProduct, '_id' | 'name' | 'description' | 'price' | 'image'> & Partial<Pick<GiftProduct, 'images' | 'storeUrl'>>;
 export interface StoreCategory { _id: string; name: string; slug: string; description: string; image: string; active: boolean; order: number; productCount: number; createdAt: string; updatedAt: string }
 export type StoreCategoryInput = Pick<StoreCategory, 'name' | 'description' | 'image' | 'active' | 'order'>;
 export type PublicStoreCategory = Pick<StoreCategory, '_id' | 'name' | 'slug' | 'description' | 'image'>;

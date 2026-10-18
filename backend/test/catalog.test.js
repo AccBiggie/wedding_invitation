@@ -101,13 +101,22 @@ test('CRUD de presentes exige categoria valida, filtra por ela e publica por slu
   assert.equal((await request(app).get(base + '?categoryId=' + mesa._id).set('Authorization', bearer)).body.data.pagination.total, 0);
   assert.equal((await request(app).get(base + '/' + id).set('Authorization', bearer)).status, 200);
   assert.equal((await request(app).put(base + '/' + id).set('Authorization', bearer).send({ price: 200 })).body.data.price, 200);
+  // Galeria e link da loja.
+  const gallery = await request(app).put(base + '/' + id).set('Authorization', bearer).send({ image: '/produtos/a.jpg', images: ['/produtos/b.jpg', 'https://example.com/c.webp'], storeUrl: 'https://loja.example.com/panela' });
+  assert.equal(gallery.status, 200);
+  assert.deepEqual(gallery.body.data.images, ['/produtos/b.jpg', 'https://example.com/c.webp']);
+  assert.equal(gallery.body.data.storeUrl, 'https://loja.example.com/panela');
+  for (const invalid of [{ storeUrl: 'javascript:alert(1)' }, { storeUrl: 'loja.com' }, { images: ['javascript:alert(1)'] }, { images: Array(10).fill('/produtos/x.jpg') }, { images: 'nao-e-lista' }]) assert.equal((await request(app).put(base + '/' + id).set('Authorization', bearer).send(invalid)).status, 422, JSON.stringify(invalid));
+  const promoted = await request(app).put(base + '/' + id).set('Authorization', bearer).send({ image: '', images: ['/produtos/b.jpg', '/produtos/c.jpg'] });
+  assert.equal(promoted.body.data.image, '/produtos/b.jpg'); assert.deepEqual(promoted.body.data.images, ['/produtos/c.jpg']);
+  assert.equal((await request(app).put(base + '/' + id).set('Authorization', bearer).send({ storeUrl: '' })).body.data.storeUrl, '');
   const counted = await request(app).get('/api/store-categories/' + cozinha._id).set('Authorization', bearer);
   assert.equal(counted.body.data.productCount, 2);
   const page = await request(app).get('/api/public/store-categories/Cozinha-Gourmet?limit=1');
   assert.equal(page.status, 200);
   assert.equal(page.body.data.category.name, 'Cozinha Gourmet');
   assert.deepEqual(page.body.data.products.map(item => item.name), ['Panela']);
-  assert.deepEqual(Object.keys(page.body.data.products[0]).sort(), ['_id', 'description', 'image', 'name', 'price']);
+  assert.deepEqual(Object.keys(page.body.data.products[0]).sort(), ['_id', 'description', 'image', 'images', 'name', 'price', 'storeUrl']);
   assert.equal(page.body.data.pagination.total, 1);
   assert.equal((await request(app).get('/api/public/store-categories/mesa')).status, 404);
   assert.equal((await request(app).get('/api/public/store-categories/nao-existe')).status, 404);

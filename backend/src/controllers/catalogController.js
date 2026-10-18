@@ -19,7 +19,7 @@ const pageParams = (query, fallback, max) => {
 //   present(items, { single })      objetos enviados ao painel (ex.: anexa a categoria)
 //   beforeRemove(item)              devolve { status, message } para bloquear a exclusao
 function resource(Model, validate, fields, entityType, hooks = {}) {
-  const references = item => Model === Godparent ? [item.image, ...(item.images || [])] : [item.image];
+  const references = item => [item.image, ...(item.images || [])];
   const present = async (items, options = {}) => hooks.present ? hooks.present(items, options) : items;
   const presentOne = async (item, options = {}) => (await present([item], { ...options, single: true }))[0];
   const prepare = async (data, current) => {
@@ -185,7 +185,7 @@ export async function publicStoreCategory(req, res, next) {
     const { page, limit } = pageParams(req.query, 12, 48);
     const query = { categoryId: category._id, active: true };
     const [products, total] = await Promise.all([
-      GiftProduct.find(query).sort({ order: 1, name: 1, _id: 1 }).skip((page - 1) * limit).limit(limit).select('name description price image'),
+      GiftProduct.find(query).sort({ order: 1, name: 1, _id: 1 }).skip((page - 1) * limit).limit(limit).select('name description price image images storeUrl'),
       GiftProduct.countDocuments(query)
     ]);
     ok(res, { category, products, pagination: { page, limit, total, totalPages: Math.ceil(total / limit) } });

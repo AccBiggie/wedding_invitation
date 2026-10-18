@@ -5,6 +5,10 @@ const schema = new mongoose.Schema({
   description: { type: String, trim: true, maxlength: 1000, default: '' },
   price: { type: Number, required: true, min: 0.01 },
   image: { type: String, trim: true, default: '' },
+  // Fotos extras da galeria do "Ver presente" (a principal continua em image).
+  images: { type: [String], default: [] },
+  // Pagina do produto na loja, aberta pelo botao "Ver produto na loja".
+  storeUrl: { type: String, trim: true, maxlength: 2048, default: '' },
   // Categoria da "Lista na loja". null so em produtos antigos ainda nao migrados
   // (ver scripts/migrate-product-categories.js); a API exige categoria ao salvar.
   categoryId: { type: mongoose.Schema.Types.ObjectId, ref: 'StoreCategory', default: null },

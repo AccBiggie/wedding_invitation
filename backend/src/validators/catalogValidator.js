@@ -56,6 +56,9 @@ export function validateStoreCategory(body) {
   return { errors, data: { name, description, image, order: Number(body.order ?? 0), active: body.active ?? true } };
 }
 
+export const GIFT_MAX_IMAGES = 10;
+const validStoreUrl = value => !value || (value.length <= 2048 && /^https?:\/\/[^\s]+$/i.test(value));
+
 export function validateGift(body) {
   const errors = {};
   const name = text(body.name, 120);
@@ -68,7 +71,12 @@ export function validateGift(body) {
   if (!categoryId || !validObjectId(categoryId)) errors.categoryId = ['Selecione uma categoria.'];
   const image = text(body.image, 2048);
   if (!validImage(image)) errors.image = ['Informe uma URL de imagem valida.'];
+  const images = Array.isArray(body.images) ? body.images.map(value => typeof value === 'string' ? value.trim() : value) : [];
+  if (body.images !== undefined && (!Array.isArray(body.images) || images.length > GIFT_MAX_IMAGES - (image ? 1 : 0) || images.some(value => typeof value !== 'string' || !value || value.length > 2048 || !validImage(value)))) errors.images = [`Informe no maximo ${GIFT_MAX_IMAGES} imagens validas.`];
+  const storeUrl = text(body.storeUrl, 2048);
+  if (!validStoreUrl(storeUrl)) errors.storeUrl = ['Informe um link http(s) valido para a loja.'];
   if (!validOrder(body.order ?? 0)) errors.order = ['A ordem deve ser um inteiro nao negativo.'];
   if (body.active !== undefined && !validBoolean(body.active)) errors.active = ['Status invalido.'];
-  return { errors, data: { name, description, price, categoryId, image, order: Number(body.order ?? 0), active: body.active ?? true } };
+  // Sem principal, a primeira extra assume o lugar (mesma regra dos padrinhos).
+  return { errors, data: { name, description, price, categoryId, image: image || images[0] || '', images: image ? images : images.slice(1), storeUrl, order: Number(body.order ?? 0), active: body.active ?? true } };
 }

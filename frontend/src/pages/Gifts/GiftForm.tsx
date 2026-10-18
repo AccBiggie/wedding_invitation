@@ -7,7 +7,9 @@ import { resolveImageUrl } from '../../services/images.service';
 import { formatMoneyInput, formatMoneyValue, parseMoneyInput } from '../../utils/money';
 import { CrudDialog } from '../../components/common/CrudDialog'; import { giftsService } from '../../services/gifts.service'; import { storeCategoriesService } from '../../services/storeCategories.service'; import type { GiftInput, StoreCategory } from '../../types/api';
 
-const blank: GiftInput = { name: '', description: '', price: 0, categoryId: '', image: '', order: 0, active: true };
+const blank: GiftInput = { name: '', description: '', price: 0, categoryId: '', image: '', images: [], storeUrl: '', order: 0, active: true };
+const MAX_IMAGES = 10;
+const validStoreUrl = (value: string) => !value || /^https?:\/\/\S+$/i.test(value);
 const currency = (value: number) => new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(value);
 export function GiftForm({ id, onClose, onSaved }: { id?: string; onClose: () => void; onSaved: (notice: string) => void }) {
   const [form, setForm] = useState<GiftInput>(blank); const [loadFailed, setLoadFailed] = useState(false);
@@ -19,14 +21,17 @@ export function GiftForm({ id, onClose, onSaved }: { id?: string; onClose: () =>
   useEffect(() => {
     if (!id) return;
     let active = true;
-    giftsService.getById(id).then(item => { if (active) { setForm({ name: item.name, description: item.description, price: item.price, categoryId: item.categoryId || '', image: item.image, order: item.order, active: item.active }); setPriceText(formatMoneyValue(item.price)); setSavedCategoryId(item.categoryId || ''); setLegacyCategory(item.legacyCategory || ''); } }).catch(() => {
+    giftsService.getById(id).then(item => { if (active) { setForm({ name: item.name, description: item.description, price: item.price, categoryId: item.categoryId || '', image: item.image, images: item.images || [], storeUrl: item.storeUrl || '', order: item.order, active: item.active }); setPriceText(formatMoneyValue(item.price)); setSavedCategoryId(item.categoryId || ''); setLegacyCategory(item.legacyCategory || ''); } }).catch(() => {
       if (active) { setLoadFailed(true); setError('Não foi possível carregar o presente.'); }
     }).finally(() => { if (active) setLoading(false); });
     return () => { active = false; };
   }, [id]);
   const change = <K extends keyof GiftInput>(key: K, value: GiftInput[K]) => setForm(current => ({ ...current, [key]: value }));
+  // A primeira foto e a principal (card e capa da galeria); as demais vao para images.
+  const photos = [form.image, ...form.images].filter(Boolean);
+  const setPhotos = (images: string[]) => setForm(current => ({ ...current, image: images[0] || '', images: images.slice(1) }));
   const changePrice = (value: string) => { const masked = formatMoneyInput(value); setPriceText(masked); change('price', parseMoneyInput(masked)); };
-  const submit = async (event: FormEvent) => { event.preventDefault(); if (saving || uploading || loading || loadFailed) return; if (!form.name.trim() || !Number.isFinite(form.price) || form.price <= 0 || !form.categoryId || !Number.isSafeInteger(form.order) || form.order < 0) { setError('Revise nome, preço, categoria e ordem.'); return; } setSaving(true); setError(''); try { if (id) await giftsService.update(id, form); else await giftsService.create(form); onSaved(id ? 'Presente atualizado com sucesso.' : 'Presente cadastrado com sucesso.'); } catch (reason) { const message = axios.isAxiosError<{ errors?: Record<string, string[]> }>(reason) ? reason.response?.data?.errors?.categoryId?.[0] : undefined; setError(message || 'Não foi possível salvar o presente.'); } finally { setSaving(false); } };
+  const submit = async (event: FormEvent) => { event.preventDefault(); if (saving || uploading || loading || loadFailed) return; if (!form.name.trim() || !Number.isFinite(form.price) || form.price <= 0 || !form.categoryId || !Number.isSafeInteger(form.order) || form.order < 0) { setError('Revise nome, preço, categoria e ordem.'); return; } if (!validStoreUrl(form.storeUrl.trim())) { setError('Informe o link da loja começando com http:// ou https://.'); return; } setSaving(true); setError(''); try { if (id) await giftsService.update(id, form); else await giftsService.create(form); onSaved(id ? 'Presente atualizado com sucesso.' : 'Presente cadastrado com sucesso.'); } catch (reason) { const message = axios.isAxiosError<{ errors?: Record<string, string[]> }>(reason) ? (reason.response?.data?.errors?.categoryId || reason.response?.data?.errors?.storeUrl || reason.response?.data?.errors?.images)?.[0] : undefined; setError(message || 'Não foi possível salvar o presente.'); } finally { setSaving(false); } };
   return <CrudDialog busy={saving} onClose={onClose} title={id ? 'Editar presente' : 'Adicionar presente'}>
     {loading ? <CircularProgress aria-label="Carregando cadastro" /> : loadFailed ? <Alert severity="error">{error}</Alert> : <Box sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr', md: 'minmax(0, 2fr) minmax(200px, 1fr)' }, gap: 3 }}><Paper component="form" onSubmit={submit} elevation={0} sx={{ py: 1 }}><Stack spacing={2}>
       {error && <Alert severity="error">{error}</Alert>}
@@ -39,8 +44,9 @@ export function GiftForm({ id, onClose, onSaved }: { id?: string; onClose: () =>
         </TextField>
         <TextField label="Ordem" type="number" value={form.order} onChange={e => change('order', Number(e.target.value))} slotProps={{ htmlInput: { min: 0, step: 1 } }} />
       </Box>
-      <TextField label="Imagem (URL)" value={form.image.startsWith('/api/images/') ? '' : form.image} onChange={e => change('image', e.target.value)} helperText="Opcional: informe uma URL pública ou envie uma imagem abaixo." />
-      <ImageUpload value={form.image ? [form.image] : []} category="gift" disabled={saving} onBusyChange={setUploading} onChange={images => change('image', images[0] || '')} />
+      <TextField label="Link do produto na loja" type="url" value={form.storeUrl} onChange={e => change('storeUrl', e.target.value)} error={!validStoreUrl(form.storeUrl.trim())} helperText={validStoreUrl(form.storeUrl.trim()) ? 'Opcional: exibe o botão “Ver produto na loja” no presente.' : 'O link deve começar com http:// ou https://.'} placeholder="https://www.loja.com.br/produto" slotProps={{ htmlInput: { maxLength: 2048 } }} />
+      <TextField label="Imagem principal (URL)" value={form.image.startsWith('/api/images/') ? '' : form.image} onChange={e => change('image', e.target.value)} helperText={`Opcional: informe uma URL pública ou envie até ${MAX_IMAGES} imagens abaixo. A primeira é a principal; as outras aparecem na galeria do presente.`} />
+      <ImageUpload value={photos} category="gift" maxImages={MAX_IMAGES} disabled={saving} onBusyChange={setUploading} onChange={setPhotos} />
       <TextField label="Descrição" multiline minRows={3} value={form.description} onChange={e => change('description', e.target.value)} slotProps={{ htmlInput: { maxLength: 1000 } }} />
       <FormControlLabel control={<Switch checked={form.active} onChange={e => change('active', e.target.checked)} />} label="Ativo" />
       <Stack direction="row" spacing={1} sx={{ justifyContent: 'flex-end', pt: 2 }}><Button onClick={onClose} disabled={saving || uploading}>Cancelar</Button><Button type="submit" variant="contained" startIcon={<SaveOutlined />} disabled={saving || uploading}>{saving ? 'Salvando...' : 'Salvar'}</Button></Stack>
