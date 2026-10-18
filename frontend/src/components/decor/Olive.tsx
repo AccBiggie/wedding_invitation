@@ -1,8 +1,9 @@
-import { useLayoutEffect, useMemo, useRef, useState, type CSSProperties } from 'react';
+import { useId, useLayoutEffect, useMemo, useRef, useState, type CSSProperties } from 'react';
+import { Palette, between as pick, createRng as createFloralRng, paintBud, paintCluster, paintFlower, paintStem, quad, type Spot } from './botanica';
 
-// Ramos de oliveira do tema "Nossa historia", gerados de forma procedural: cada
-// carregamento da pagina sorteia uma semente nova, entao os galhos nunca crescem
-// do mesmo jeito. Dentro da mesma visita a forma fica estavel (semente por instancia).
+// Ramos de oliveira do tema "Nossa historia", gerados de forma procedural. Raminhos e
+// guirlandas sorteiam uma semente nova a cada carregamento; os ramos laterais usam
+// semente fixa (com a camada de flores, o desenho e o mesmo a cada visita).
 
 type Point = [number, number];
 type Rng = () => number;
@@ -43,7 +44,10 @@ function smoothCurve(points: Point[]) {
 
 interface Leaf { x: number; y: number; angle: number; size: number; tone: number; delay: number; fade?: number }
 interface Stem { d: string; width: number; delay: number }
-interface Plant { stems: Stem[]; leaves: Leaf[] }
+// Nos de folha e pontas de galho: a camada de flores se apoia nesses mesmos pontos.
+interface Node { x: number; y: number; angle: number; side: number; branch: number; s: number; length: number; delay: number }
+interface Tip { x: number; y: number; angle: number; branch: number; length: number; delay: number }
+interface Plant { stems: Stem[]; leaves: Leaf[]; nodes?: Node[]; tips?: Tip[] }
 // taper 'tip': folhas menores na ponta (ramos soltos); 'inner': crescem ate a ponta (guirlanda junto ao titulo).
 interface BranchOptions { start: Point; angle: number; length: number; wander: number; leafSize: number; leafGap: number; width: number; depth: number; delay: number; timeScale: number; taper?: 'tip' | 'inner'; upward?: boolean }
 
@@ -64,6 +68,7 @@ function growBranch(rng: Rng, plant: Plant, o: BranchOptions) {
   points.push(end);
   const curve = smoothCurve(points);
   plant.stems.push({ d: curve.d, width: o.width, delay: o.delay });
+  const branch = plant.stems.length - 1;
   const timeAt = (s: number) => o.delay + (s / curve.length) * o.timeScale;
   // Folhas alternadas; maiores no meio, menores na ponta.
   let side = rng() < .5 ? 1 : -1;
@@ -73,11 +78,13 @@ function growBranch(rng: Rng, plant: Plant, o: BranchOptions) {
     gap = o.taper === 'inner' ? o.leafGap * (1.25 - .45 * t) : o.leafGap;
     // upward (guirlandas dos titulos): folhas do lado de baixo ficam mais rentes ao caule, sem descer sobre o texto.
     const below = o.upward && side > 0;
+    plant.nodes?.push({ x: point.x, y: point.y, angle: point.angle, side, branch, s, length: curve.length, delay: timeAt(s) });
     plant.leaves.push({ x: point.x, y: point.y, angle: point.angle + side * (below ? between(rng, 18, 30) : between(rng, 32, 58)), size: o.leafSize * taper * between(rng, .85, 1.12) * (below ? .8 : 1), tone: Math.floor(rng() * 3), delay: timeAt(s) + .15, fade: o.taper === 'inner' ? .45 + .55 * Math.min(1, t * 2.2) : undefined });
     side = -side;
   }
   const tip = curve.sample(curve.length);
   plant.leaves.push({ x: tip.x, y: tip.y, angle: tip.angle + between(rng, -12, 12), size: o.leafSize * (o.taper === 'inner' ? 1 : .8), tone: 0, delay: timeAt(curve.length) + .1 });
+  plant.tips?.push({ x: tip.x, y: tip.y, angle: tip.angle, branch, length: curve.length, delay: timeAt(curve.length) });
   // Galhos secundarios saindo do principal.
   if (o.depth > 0) {
     const count = Math.round(between(rng, 1, 2.6) * (o.length > 500 ? 2.4 : 1));
@@ -128,12 +135,70 @@ export const OliveGarland = ({ flip = false }: { flip?: boolean }) => {
   return <svg ref={ref} className={`wed-olive wed-olive-garland${flip ? ' is-flip' : ''}`} viewBox={`0 0 ${Math.max(1, width)} ${Math.max(1, height)}`} aria-hidden="true"><Plant plant={plant} /></svg>;
 };
 
+// ---- Flores de jasmim nos ramos laterais (tema Botanica Aquarela) ----------
+// Cachos nas pontas dos galhos e flores ou botoes isolados nos nos, sempre do lado
+// oposto ao da folha. Usa um rng proprio: a trajetoria e as folhas nao mudam.
+interface Bloom { kind: 'stem' | 'bud' | 'flower'; svg: string; delay: number; r: number }
+const VINE_BOX: [number, number] = [240, 1000]; // area do viewBox que fica visivel na lateral
+const BAND = 240;
+
+function growFlowers(plant: Plant, seed: number, ctx: Palette) {
+  const rng = createFloralRng(seed ^ 0x5bd1e995), blooms: Bloom[] = [], taken: Spot[] = [];
+  const last: Record<number, number> = {}, bands = new Set<number>(), clusters: Spot[] = [];
+  const inView = (x: number, y: number, r: number) => x > 12 + r && x < VINE_BOX[0] - r && y > 12 + r && y < VINE_BOX[1] - 12 - r;
+  const mark = (branch: number, s: number, y: number) => { last[branch] = s; bands.add(Math.floor(y / BAND)); };
+  // 1) cacho na ponta de cada galho visivel (chance 0,85), longe dos outros cachos.
+  plant.tips?.forEach(tip => {
+    if (!inView(tip.x, tip.y, 0) || rng() >= .85 || clusters.some(c => Math.hypot(c.x - tip.x, c.y - tip.y) < 160)) return;
+    const layers = paintCluster(ctx, tip.x, tip.y, tip.angle, rng, { flowers: Math.floor(pick(rng, 2, 5)), buds: Math.floor(pick(rng, 1, 3)), stemColor: 'currentColor', taken, allowed: inView });
+    if (!layers.flowers.length && !layers.buds.length) return;
+    const delay = tip.delay + .3;
+    layers.stems.forEach(svg => blooms.push({ kind: 'stem', svg, delay, r: 0 }));
+    layers.buds.forEach(svg => blooms.push({ kind: 'bud', svg, delay: delay + .1, r: 0 }));
+    layers.flowers.forEach(f => blooms.push({ kind: 'flower', svg: f.svg, delay: delay + .15, r: f.r }));
+    clusters.push({ x: tip.x, y: tip.y, r: 0 });
+    mark(tip.branch, tip.length, tip.y);
+  });
+  // 2) flor (60%) ou botao (40%) isolado num no, num pedicelo curvo de 8 a 14 px.
+  const atNode = (node: Node, force: boolean) => {
+    if (node.length - node.s < 55 || (last[node.branch] != null && Math.abs(node.s - last[node.branch]) < 90)) return false;
+    if (!force && rng() >= .12) return false;
+    const a = node.angle - node.side * pick(rng, 40, 65), length = pick(rng, 8, 14);
+    const x = node.x + Math.cos(a * Math.PI / 180) * length, y = node.y + Math.sin(a * Math.PI / 180) * length;
+    const bud = !force && rng() < .4, r = bud ? 11 * .55 : pick(rng, 18, 28) / 2;
+    if (!inView(x, y, r) || taken.some(t => Math.hypot(t.x - x, t.y - y) < (t.r + r) * .95)) return false;
+    mark(node.branch, node.s, y);
+    taken.push({ x, y, r });
+    const delay = node.delay + .35;
+    blooms.push({ kind: 'stem', svg: paintStem(quad([node.x, node.y], [(node.x + x) / 2 + pick(rng, -2, 2), (node.y + y) / 2 + pick(rng, -2, 2)], [x, y], 6), .9, .55, 'currentColor'), delay, r: 0 });
+    blooms.push(bud ? { kind: 'bud', svg: paintBud(ctx, x, y, a, 11 * pick(rng, .8, 1.2), rng), delay: delay + .1, r: 0 } : { kind: 'flower', svg: paintFlower(ctx, x, y, r, rng, a - 90), delay: delay + .1, r });
+    return true;
+  };
+  const nodes = (plant.nodes || []).filter(node => inView(node.x, node.y, 0));
+  nodes.forEach(node => atNode(node, false));
+  // 3) toda faixa de 240 px de altura com folhas ganha ao menos uma flor.
+  for (let band = 0; band * BAND < VINE_BOX[1]; band++) {
+    const candidates = nodes.filter(node => Math.floor(node.y / BAND) === band);
+    for (let i = 0; i < candidates.length && !bands.has(band); i++) atNode(candidates[Math.floor(rng() * candidates.length)], true);
+  }
+  // Ordem: pedicelos -> botoes -> flores (as maiores por ultimo).
+  const order = { stem: 0, bud: 1, flower: 2 };
+  return blooms.sort((a, b) => order[a.kind] - order[b.kind] || a.r - b.r);
+}
+
+const Blooms = ({ blooms, ctx }: { blooms: Bloom[]; ctx: Palette }) => <>
+  <defs dangerouslySetInnerHTML={{ __html: ctx.defs() }} />
+  <g className="ba-aq wed-olive-blooms" filter={ctx.watercolor ? ctx.url('aq') : undefined}>
+    {blooms.map((bloom, i) => <g key={i} className={`bloom is-${bloom.kind}`} style={{ '--grow-delay': `${bloom.delay.toFixed(2)}s` } as CSSProperties} dangerouslySetInnerHTML={{ __html: bloom.svg }} />)}
+  </g>
+</>;
+
 // Ramo grande que cresce no fundo da landing (altura da tela). O caule e
 // desenhado e as folhas brotam em sequencia (CSS, disparado por .is-paper).
-export const OliveVine = ({ className = '' }: { className?: string }) => {
-  const [seed] = useState(newSeed);
+export const OliveVine = ({ className = '', seed }: { className?: string; seed: number }) => {
+  const id = useId().replace(/[^a-zA-Z0-9]/g, '');
   const plant = useMemo(() => {
-    const rng = createRng(seed); const p: Plant = { stems: [], leaves: [] };
+    const rng = createRng(seed); const p: Plant = { stems: [], leaves: [], nodes: [], tips: [] };
     growBranch(rng, p, { start: [between(rng, 30, 70), 1010], angle: -90 + between(rng, -6, 6), length: 1040, wander: 34, leafSize: 42, leafGap: 27, width: 2.2, depth: 2, delay: 0, timeScale: 2.4 });
     // 1 a 2 galhos longos que avancam para dentro e passam por tras das secoes.
     for (let i = 0, n = rng() < .55 ? 1 : 2; i < n; i++) {
@@ -142,5 +207,7 @@ export const OliveVine = ({ className = '' }: { className?: string }) => {
     }
     return p;
   }, [seed]);
-  return <svg className={`wed-olive wed-olive-vine ${className}`} viewBox="0 0 260 1000" preserveAspectRatio="xMinYMid meet" aria-hidden="true"><Plant plant={plant} animated /></svg>;
+  const ctx = useMemo(() => new Palette(`ba${id}`, true, seed % 997), [id, seed]);
+  const blooms = useMemo(() => growFlowers(plant, seed, ctx), [plant, seed, ctx]);
+  return <svg className={`wed-olive wed-olive-vine ${className}`} viewBox="0 0 260 1000" preserveAspectRatio="xMinYMid meet" aria-hidden="true"><Plant plant={plant} animated /><Blooms blooms={blooms} ctx={ctx} /></svg>;
 };

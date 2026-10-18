@@ -1,5 +1,6 @@
 import type { ReactNode } from 'react';
 import { ScrollReveal } from '../reveal/ScrollReveal';
+import { FloralFrame } from '../decor/FloralFrame';
 
 export interface StoryChapter { title: string; subtitle: string; photo: string; text: string; note?: string; doodle?: Doodle }
 export interface Story { kicker: string; title: string; tagline: string; lead: string; cover: string; chapters: StoryChapter[]; closing: [string, string]; polaroids?: { photo: string; caption: string }[] }
@@ -8,7 +9,7 @@ type Doodle = 'camera' | 'signpost' | 'ring' | 'toast' | 'chapel';
 // ---- Ilustracoes em traco (cores e espessura via CSS) ----------------------
 const Heart = ({ className }: { className?: string }) => <svg className={className} viewBox="0 0 24 22" aria-hidden="true"><path d="M12 21 3.2 12.4a5.3 5.3 0 0 1 7.5-7.5L12 6.2l1.3-1.3a5.3 5.3 0 0 1 7.5 7.5z" /></svg>;
 
-// Raminho de oliveira: caule curvo com folhas alternadas.
+// Raminho de oliveira dos cantos: caule curvo com folhas alternadas.
 const LEAVES: [number, number, number][] = [[18, 60, -20], [30, 48, 200], [44, 42, -40], [56, 32, 190], [70, 27, -50], [82, 18, 175], [95, 14, -60], [106, 7, 160]];
 const Branch = ({ className }: { className?: string }) => <svg className={`wed-story-branch ${className || ''}`} viewBox="0 0 120 80" aria-hidden="true">
   <path className="stem" d="M4 74 C34 62 62 40 116 6" />
@@ -70,7 +71,7 @@ export function OurStory({ story, finalDate }: { story: Story; finalDate: string
             <div className="wed-story-chapter">
               <ScrollReveal className="wed-story-photo" preset="scale-soft">
                 <img src={chapter.photo} alt={chapter.title} loading="lazy" decoding="async" width="260" height="260" />
-                <Branch className="a" /><Branch className="b" />
+                <FloralFrame seed={index * 97 + 31} aside={right && Boolean(chapter.note || chapter.doodle)} />
               </ScrollReveal>
               <ScrollReveal className="wed-story-text" delay={120}>
                 <Heart className="wed-story-pin" />
