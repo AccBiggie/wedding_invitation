@@ -660,3 +660,120 @@ a.wed-shop-badge:hover{border-color:var(--wed-gold);background:#fffcf3}
   [data-reveal]:not([data-revealed]),[data-reveal-group]:not([data-revealed])>*{opacity:1!important;transform:none!important;transition:none!important}
   .wed-lp-hero>*{animation:none}
 }
+
+/* ---- Nossa historia (components/story/OurStory.tsx) -----------------------
+   Album de papel: capa com o casal, borda rasgada, linha do tempo em
+   zigue-zague com fotos circulares, caminho tracejado dourado e notas. */
+.wed-story{--st-green:#24412f;--st-ink:#4c5650;--st-gold:#b8955a;--st-sage:#8fa27f;--st-sage-dark:#62775a;--st-paper:#fbf7ef;position:relative;padding:0;overflow:hidden;background:radial-gradient(ellipse at 20% 30%,rgba(255,255,255,.7),transparent 60%),radial-gradient(ellipse at 80% 75%,rgba(232,220,196,.35),transparent 55%),var(--st-paper);color:var(--st-ink)}
+.wed-story::before{content:'';position:absolute;inset:0;opacity:.35;pointer-events:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 .55 0 0 0 0 .48 0 0 0 0 .36 0 0 0 .08 0'/%3E%3C/filter%3E%3Crect width='160' height='160' filter='url(%23n)'/%3E%3C/svg%3E")}
+/* Capa */
+.wed-story-hero{position:relative;display:flex;justify-content:flex-end;min-height:440px;padding:3.2rem 3rem 4.6rem;background:linear-gradient(100deg,#e9d3b2 0%,#f4e5cc 45%,#faf2e4 100%)}
+.wed-story-cover{position:absolute;left:0;top:0;width:64%;height:100%;object-fit:cover;object-position:42% 30%;-webkit-mask-image:linear-gradient(90deg,#000 58%,transparent 100%);mask-image:linear-gradient(90deg,#000 58%,transparent 100%);filter:saturate(.92) sepia(.12)}
+.wed-story-heading{position:relative;z-index:1;display:flex;flex-direction:column;align-items:center;width:min(42%,380px);text-align:center}
+.wed-story-kicker{font-family:'Cinzel',Georgia,serif;font-size:calc(2.6rem * var(--wed-font-scale, 1));letter-spacing:.32em;line-height:1;color:var(--st-green);margin-right:-.32em}
+.wed-story-title{position:relative;margin:.1rem 0 .4rem;font-family:'Great Vibes','Parisienne',cursive;font-weight:400;font-size:calc(5rem * var(--wed-font-scale, 1));line-height:1;color:var(--st-green)}
+.wed-story-flourish{position:absolute;left:calc(100% - .4rem);bottom:.3rem;width:70px;height:auto;fill:none;stroke:var(--st-green);stroke-width:1.6;stroke-linecap:round}
+.wed-story-tagline{margin:.4rem 0 0;font-size:calc(.86rem * var(--wed-font-scale, 1));letter-spacing:.28em;text-transform:uppercase;line-height:1.7;color:#6c5a3c}
+.wed-story-rule{display:flex;align-items:center;justify-content:center;gap:.6rem;margin:.8rem 0}
+.wed-story-rule i{display:block;width:72px;height:1px;background:linear-gradient(90deg,transparent,var(--st-gold))}
+.wed-story-rule i:last-child{background:linear-gradient(90deg,var(--st-gold),transparent)}
+.wed-story-rule svg{width:15px;height:14px;fill:none;stroke:var(--st-gold);stroke-width:2}
+.wed-story-lead{max-width:22rem;margin:0;font-size:calc(1.12rem * var(--wed-font-scale, 1));line-height:1.5;color:var(--st-ink)}
+.wed-story-tear{position:absolute;left:0;right:0;bottom:-1px;width:100%;height:40px;fill:var(--st-paper);filter:drop-shadow(0 -2px 2px rgba(120,96,60,.18))}
+/* Corpo / linha do tempo */
+.wed-story-body{position:relative;padding:2.2rem 2.5rem 0}
+.wed-story-corner{position:absolute;width:150px;height:auto;opacity:.9;pointer-events:none}
+.wed-story-corner.left{left:-26px;top:10px;transform:rotate(-8deg)}
+.wed-story-corner.right{right:-30px;bottom:150px;transform:scaleX(-1) rotate(-14deg)}
+.wed-story-branch .stem{fill:none;stroke:var(--st-sage-dark);stroke-width:1.4;stroke-linecap:round}
+.wed-story-branch .leaf{fill:var(--st-sage);stroke:var(--st-sage-dark);stroke-width:.7;opacity:.92}
+.wed-story-timeline{position:relative;margin:0;padding:0;list-style:none}
+.wed-story-step{position:relative}
+.wed-story-chapter{position:relative;display:flex;align-items:center;gap:2rem;width:min(660px,72%);margin-left:2%}
+.wed-story-step.is-right .wed-story-chapter{margin-left:auto;margin-right:1%}
+.wed-story-photo{position:relative;flex-shrink:0;width:230px;height:230px}
+.wed-story-photo img{display:block;width:100%;height:100%;padding:7px;object-fit:cover;border-radius:50%;background:#fffdf8;border:1px solid #e3cfa6;box-shadow:0 0 0 5px #fffdf8,0 0 0 6px rgba(184,149,90,.45),0 14px 30px rgba(90,70,40,.18)}
+.wed-story-photo .wed-story-branch{position:absolute;width:96px;height:auto}
+.wed-story-photo .a{right:-30px;bottom:-14px;transform:rotate(-24deg)}
+.wed-story-photo .b{left:-36px;top:6px;transform:scaleX(-1) rotate(-40deg);width:78px}
+.wed-story-text{position:relative;flex:1;min-width:0;padding-left:1.6rem;border-left:1.5px dashed rgba(184,149,90,.6)}
+.wed-story-pin{position:absolute;left:-11px;top:-2px;width:20px;height:19px;padding:3px;border-radius:50%;background:var(--st-paper);fill:var(--st-gold);stroke:none}
+.wed-story-number{display:block;font-family:'Cormorant Garamond',Georgia,serif;font-size:calc(1.5rem * var(--wed-font-scale, 1));line-height:1;color:var(--st-gold)}
+.wed-story-text h3{margin:.15rem 0 .25rem;font-family:'Cormorant Garamond',Georgia,serif;font-weight:500;font-size:calc(1.85rem * var(--wed-font-scale, 1));line-height:1.1;color:var(--st-green)}
+.wed-story-date{margin:0 0 .7rem;font-size:calc(.8rem * var(--wed-font-scale, 1));letter-spacing:.22em;text-transform:uppercase;color:#7a6a4f}
+.wed-story-copy{margin:0;font-size:calc(1.1rem * var(--wed-font-scale, 1));line-height:1.55;color:var(--st-ink)}
+/* Notas manuscritas e desenhos no lado livre */
+.wed-story-aside{position:absolute;top:50%;left:calc(100% + 1.5rem);display:flex;flex-direction:column;align-items:center;gap:.4rem;width:190px;transform:translateY(-50%);pointer-events:none}
+.wed-story-step.is-right .wed-story-aside{left:auto;right:calc(100% + 1.5rem)}
+.wed-story-doodle svg{display:block;width:96px;height:auto;fill:none;stroke:#a8875a;stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round}
+.wed-story-doodle .thin{stroke-width:1}
+.wed-story-doodle .fill,.wed-story-doodle .spark{fill:#c9aa6e;stroke:none}
+.wed-story-doodle .gem{fill:#f3e8cf}
+.wed-story-doodle .wine{fill:#ecd9a8;stroke:none}
+.wed-story-doodle .board{fill:#fbf3e3}
+.wed-story-doodle .tree{fill:#dfe6d4;stroke:var(--st-sage-dark);stroke-width:1}
+.wed-story-doodle text{font-family:'Cormorant Garamond',Georgia,serif;font-size:11px;letter-spacing:.08em;fill:#8a6d43;stroke:none}
+.wed-story-doodle.is-signpost svg{width:120px}
+.wed-story-doodle.is-chapel svg{width:170px}
+.wed-story-note{margin:0;font-family:'Parisienne','Great Vibes',cursive;font-size:calc(1.35rem * var(--wed-font-scale, 1));line-height:1.25;text-align:center;color:#8b7550;transform:rotate(-6deg)}
+/* Caminho tracejado entre capitulos */
+.wed-story-link{position:relative;height:96px;margin:.6rem 0}
+.wed-story-path{display:block;width:100%;height:100%;overflow:visible}
+.wed-story-path path{fill:none;stroke:var(--st-gold);stroke-width:1.6;stroke-dasharray:6 7;stroke-linecap:round;vector-effect:non-scaling-stroke}
+.wed-story-link-heart{position:absolute;bottom:-9px;width:16px;height:15px;fill:var(--st-gold);transform:translateX(-50%)}
+.wed-story-link.to-right .wed-story-link-heart{left:64%}
+.wed-story-link.to-left .wed-story-link-heart{left:30%}
+/* Fechamento */
+.wed-story-end{position:relative;display:flex;align-items:center;justify-content:center;gap:2.5rem;padding:3.2rem 0 1rem}
+.wed-story-closing{display:flex;flex-direction:column;align-items:center;text-align:center}
+.wed-story-closing-top,.wed-story-closing-bottom{margin:0;letter-spacing:.3em;text-transform:uppercase;color:var(--st-green)}
+.wed-story-closing-top{font-size:calc(.95rem * var(--wed-font-scale, 1))}
+.wed-story-closing-bottom{font-size:calc(.82rem * var(--wed-font-scale, 1));color:#7a6a4f}
+.wed-story-polaroid{flex-shrink:0;margin:0;padding:9px 9px 34px;background:#fffefa;box-shadow:0 10px 24px rgba(90,70,40,.2),0 1px 2px rgba(90,70,40,.15)}
+.wed-story-polaroid img{display:block;width:150px;height:177px;object-fit:cover}
+.wed-story-polaroid figcaption{margin-top:6px;font-family:'Parisienne','Great Vibes',cursive;font-size:calc(1.15rem * var(--wed-font-scale, 1));text-align:center;color:#6c5a3c}
+.wed-story-polaroid.is-left{order:0;rotate:-6deg}
+.wed-story-closing{order:1}
+.wed-story-polaroid.is-right{order:2}
+.wed-story-polaroid.is-right{rotate:5deg}
+.wed-story-landscape{display:block;width:calc(100% + 5rem);height:150px;margin:0 -2.5rem}
+.wed-story-landscape .far{fill:#e7e6d6}
+.wed-story-landscape .mid{fill:#d5dcc6}
+.wed-story-landscape .near{fill:#bfcbb0}
+.wed-story-landscape .tree circle{fill:#a9b99a}
+.wed-story-landscape .tree path{stroke:#8a9a7b;stroke-width:2}
+/* Telas medias: as notas ocupam o lado livre menor */
+@media (max-width:1100px){
+  .wed-story-chapter{width:min(600px,74%)}
+  .wed-story-photo{width:200px;height:200px}
+  .wed-story-aside{width:150px}
+  .wed-story-doodle svg{width:80px}
+  .wed-story-note{font-size:calc(1.15rem * var(--wed-font-scale, 1))}
+}
+/* Celular: coluna unica, caminho vertical simples */
+@media (max-width:820px){
+  .wed-story-hero{flex-direction:column;justify-content:flex-end;min-height:0;padding:0 1.2rem 3.6rem}
+  .wed-story-cover{position:relative;left:-1.2rem;width:calc(100% + 2.4rem);max-width:none;height:260px;-webkit-mask-image:linear-gradient(180deg,#000 62%,transparent 100%);mask-image:linear-gradient(180deg,#000 62%,transparent 100%)}
+  .wed-story-heading{width:100%;margin-top:-2.4rem}
+  .wed-story-kicker{font-size:calc(2rem * var(--wed-font-scale, 1))}
+  .wed-story-title{font-size:calc(3.8rem * var(--wed-font-scale, 1))}
+  .wed-story-flourish{width:80px}
+  .wed-story-body{padding:1.6rem 1.1rem 0}
+  .wed-story-corner{width:100px}
+  .wed-story-chapter,.wed-story-step.is-right .wed-story-chapter{flex-direction:column;align-items:stretch;gap:1.2rem;width:100%;margin:0}
+  .wed-story-photo{align-self:center;width:190px;height:190px}
+  .wed-story-aside,.wed-story-step.is-right .wed-story-aside{position:static;flex-direction:row;justify-content:center;width:auto;transform:none}
+  .wed-story-doodle svg,.wed-story-doodle.is-signpost svg{width:62px}
+  .wed-story-doodle.is-chapel svg{width:110px}
+  .wed-story-note{font-size:calc(1.1rem * var(--wed-font-scale, 1));max-width:12rem}
+  .wed-story-link{height:56px;margin:.8rem 0}
+  .wed-story-path{display:none}
+  .wed-story-link::before{content:'';position:absolute;left:50%;top:0;bottom:12px;border-left:1.6px dashed var(--st-gold);opacity:.8}
+  .wed-story-link.to-right .wed-story-link-heart,.wed-story-link.to-left .wed-story-link-heart{left:50%}
+  .wed-story-end{flex-wrap:wrap;gap:1.2rem;padding-top:2.4rem}
+  .wed-story-closing{order:-1;width:100%}
+  .wed-story-polaroid.is-left,.wed-story-polaroid.is-right{order:0}
+  .wed-story-polaroid img{width:118px;height:139px}
+  .wed-story-landscape{width:calc(100% + 2.2rem);margin:0 -1.1rem;height:110px}
+}
+@media (prefers-reduced-motion:reduce){.wed-story *{transition:none!important}}
