@@ -8,6 +8,7 @@
     "test": "node --test"
   },
   "dependencies": {
+    "@aws-sdk/client-s3": "^3.1152.0",
     "@thiagoprazeres/pix-static-brcode": "^1.0.1",
     "bcryptjs": "^3.0.3",
     "cors": "^2.8.5",
@@ -15,7 +16,8 @@
     "express-rate-limit": "^7.5.0",
     "jsonwebtoken": "^9.0.3",
     "mongoose": "^8.9.5",
-    "qrcode": "^1.5.4"
+    "qrcode": "^1.5.4",
+    "sharp": "^0.35.5"
   },
   "devDependencies": {
     "mongodb-memory-server": "^10.1.4",

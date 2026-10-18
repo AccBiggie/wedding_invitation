@@ -14,11 +14,18 @@ services:
     environment:
       MONGODB_URI: mongodb://mongodb:27017/wedding_invitations
       PORT: 3000
-      FRONTEND_URL: http://localhost:3002
+      FRONTEND_URL: ${FRONTEND_URL:-http://localhost:3002}
       JWT_SECRET: "XE/Pdn6un6h05YnDphpKZswobmy3kJvdrqBVg8TFBDgG0ICb050sPRXfh34tNUaI"
       JWT_EXPIRES_IN: 7d
       ADMIN_EMAIL: accbiggie@gmail.com
       ADMIN_PASSWORD: "E&QD=66W2+Mk9y%Mo&dog*&S"
+      R2_ACCOUNT_ID: ${R2_ACCOUNT_ID:-}
+      R2_ACCESS_KEY_ID: ${R2_ACCESS_KEY_ID:-}
+      R2_SECRET_ACCESS_KEY: ${R2_SECRET_ACCESS_KEY:-}
+      R2_BUCKET: ${R2_BUCKET:-}
+      R2_ENDPOINT: ${R2_ENDPOINT:-}
+      R2_PUBLIC_BASE_URL: ${R2_PUBLIC_BASE_URL:-}
+      IMAGE_WEBP_QUALITY: ${IMAGE_WEBP_QUALITY:-80}
     depends_on: [mongodb]
   mongodb:
     image: mongo:8

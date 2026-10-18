@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { NavLink, Outlet, useLocation } from 'react-router-dom';
-import { AppBar, Box, Divider, Drawer, IconButton, List, ListItemButton, ListItemIcon, ListItemText, Toolbar, Tooltip, Typography, useMediaQuery } from '@mui/material';
+import { AppBar, Box, Button, Divider, Drawer, IconButton, List, ListItemButton, ListItemIcon, ListItemText, Toolbar, Tooltip, Typography, useMediaQuery } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
 import DashboardOutlined from '@mui/icons-material/DashboardOutlined';
 import MailOutline from '@mui/icons-material/MailOutlined';
@@ -11,6 +11,7 @@ import MenuIcon from '@mui/icons-material/Menu';
 import ChevronLeft from '@mui/icons-material/ChevronLeft';
 import ChevronRight from '@mui/icons-material/ChevronRight';
 import LogoutOutlined from '@mui/icons-material/LogoutOutlined';
+import BrushOutlined from '@mui/icons-material/BrushOutlined';
 
 const nav = [
   { label: 'Dashboard', path: '/dashboard', icon: <DashboardOutlined /> },
@@ -20,7 +21,7 @@ const nav = [
   { label: 'PIX / Gravata Online', path: '/pix', icon: <QrCode2Outlined /> }
 ];
 
-export function AdminLayout({ email, onLogout }: { email: string; onLogout: () => void }) {
+export function AdminLayout({ email, onLogout, onCustomize }: { email: string; onLogout: () => void; onCustomize: () => void }) {
   const theme = useTheme();
   const mobile = useMediaQuery(theme.breakpoints.down('md'));
   const [mobileOpen, setMobileOpen] = useState(false);
@@ -42,6 +43,7 @@ export function AdminLayout({ email, onLogout }: { email: string; onLogout: () =
     <AppBar position="fixed" elevation={0} color="inherit" sx={{ borderBottom: '1px solid #e6ebe6', width: { md: `calc(100% - ${width}px)` }, ml: { md: `${width}px` }, transition: theme.transitions.create(['width', 'margin']) }}><Toolbar sx={{ gap: 1 }}>
       {mobile && <IconButton aria-label="Abrir menu" onClick={() => setMobileOpen(true)}><MenuIcon /></IconButton>}
       <Typography variant="h6" component="div" sx={{ flexGrow: 1, fontWeight: 600 }}>{current}</Typography>
+      <Button startIcon={<BrushOutlined />} onClick={onCustomize} aria-label="Personalizar site público" sx={{ whiteSpace: 'nowrap' }}><Box component="span" sx={{ display: { xs: 'none', sm: 'inline' } }}>Personalizar site</Box></Button>
       <Typography color="text.secondary" sx={{ display: { xs: 'none', sm: 'block' }, fontSize: 14 }}>{email}</Typography>
       <Tooltip title="Sair"><IconButton aria-label="Sair" onClick={onLogout}><LogoutOutlined /></IconButton></Tooltip>
     </Toolbar></AppBar>

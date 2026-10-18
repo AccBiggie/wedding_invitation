@@ -1,22 +1,16 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { createRoot } from 'react-dom/client';
-import { BrowserRouter, useLocation, useNavigate } from 'react-router-dom';
-import { Button } from '@mui/material';
-import Add from '@mui/icons-material/Add';
-import { PageHeader } from './components/common/PageHeader';
+import { BrowserRouter } from 'react-router-dom';
 import api, { tokenStore } from './services/api';
 import { PublicGodparents, PublicGifts } from './pages/PublicCatalog';
 import { GravataEntry } from './pages/Pix/GravataEntry';
+import { appearanceAccent, baseColors, defaultAppearance, fontSizeScale, landingFont, weddingDisplayFonts } from './theme/appearance';
 import '@tabler/core/dist/css/tabler.min.css';
 import './style.css';
 
 const AdminApp = React.lazy(() => import('./routes/AdminApp').then(module => ({ default: module.AdminApp })));
 
-const statusLabel = status => status === 'confirmed' ? 'Confirmado' : 'N\u00e3o confirmado';
-const typeLabel = type => type === 'virtual' ? 'Virtual' : 'Presencial';
 const slug = value => value.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase().trim().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
-const monthStart = () => { const date = new Date(); return new Date(date.getFullYear(), date.getMonth(), 1).toISOString().slice(0, 10); };
-const monthEnd = () => { const date = new Date(); return new Date(date.getFullYear(), date.getMonth() + 1, 0).toISOString().slice(0, 10); };
 
 function Toast({ notification, onClose }) {
   if (!notification) return null;
@@ -54,113 +48,43 @@ function Login({ onSuccess }) {
   </div></div>;
 }
 
-function InvitationUrlModal({ invitation, onClose, notify }) {
-  if (!invitation) return null;
-  const url = `${location.origin}/invitation/${invitation._id}/${slug(invitation.name)}?token=${invitation.publicToken}`;
-  const copy = async () => {
-    try { await navigator.clipboard.writeText(url); notify('success', 'URL do convite copiada com sucesso.'); }
-    catch { notify('danger', 'N\u00e3o foi poss\u00edvel copiar a URL.'); }
-  };
-  return <div className="modal modal-blur show d-block"><div className="modal-dialog modal-dialog-centered"><div className="modal-content">
-    <div className="modal-header"><h3 className="modal-title">Visualizar convite</h3><button className="btn-close" onClick={onClose} /></div>
-    <div className="modal-body"><p>URL p\u00fablica do convite:</p><input className="form-control" readOnly value={url} /></div>
-    <div className="modal-footer"><button className="btn" onClick={copy}>Copiar URL</button><a className="btn btn-primary" target="_blank" rel="noreferrer" href={url}>Abrir convite</a><button className="btn" onClick={onClose}>Fechar</button></div>
-  </div></div></div>;
-}
-
-function InvitationFormModal({ editing, form, setForm, saving, error, onClose, onSubmit }) {
-  return <div className="modal modal-blur show d-block"><div className="modal-dialog modal-dialog-centered"><div className="modal-content">
-    <div className="modal-header"><h3 className="modal-title">{editing ? 'Editar convite' : 'Novo convite'}</h3><button className="btn-close" onClick={onClose} /></div>
-    <form onSubmit={onSubmit}><div className="modal-body">
-      <label className="form-label">Nome dos convidados</label><input required maxLength="255" className="form-control" value={form.name} onChange={event => setForm({ ...form, name: event.target.value })} />
-      <small className="text-muted d-block mt-1">{'Para informar mais de um convidado, separe os nomes com ponto e vírgula (;). Ex.: Stéfani; André;'}</small>
-      <label className="form-label mt-3">Tipo do convite</label><select className="form-select" value={form.type} onChange={event => setForm({ ...form, type: event.target.value })}><option value="in_person">Presencial</option><option value="virtual">Virtual</option></select>
-      <label className="form-label mt-3">Data limite para confirmação</label><input type="date" className="form-control" value={form.confirmationDeadline} onChange={event => setForm({ ...form, confirmationDeadline: event.target.value })} />
-      <label className="form-label mt-3">{'Descrição'}</label><textarea className="form-control" maxLength="1000" value={form.description} onChange={event => setForm({ ...form, description: event.target.value })} />
-      {error && <div className="alert alert-danger mt-3 mb-0">{error}</div>}
-    </div><div className="modal-footer"><button type="button" className="btn" onClick={onClose}>Cancelar</button><button disabled={saving} className="btn btn-primary">{saving ? 'Salvando...' : editing ? 'Salvar altera\u00e7\u00f5es' : 'Gerar convite'}</button></div></form>
-  </div></div></div>;
-}
-
-function Home() {
-  const route = useLocation(); const navigate = useNavigate();
-  const [items, setItems] = useState([]);
-  const [filters, setFilters] = useState({ startDate: monthStart(), endDate: monthEnd() });
-  const [pagination, setPagination] = useState({ page: 1, limit: 20, total: 0, totalPages: 0 });
-  const [summary, setSummary] = useState({ total: 0, people: 0, confirmed: 0, unconfirmed: 0 });
-  const [loading, setLoading] = useState(true);
-  const [formOpen, setFormOpen] = useState(false);
-  const [editing, setEditing] = useState(null);
-  const [viewing, setViewing] = useState(null);
-  const [expandedId, setExpandedId] = useState(null);
-  const [deleting, setDeleting] = useState(null);
-  const [saving, setSaving] = useState(false);
-  const [formError, setFormError] = useState('');
-  const [form, setForm] = useState({ name: '', description: '', type: 'in_person', confirmationDeadline: '' });
-  const [notification, setNotification] = useState(null);
-  const notify = (type, message) => setNotification({ type, message });
-
-  useEffect(() => { if (!notification) return; const id = setTimeout(() => setNotification(null), 4500); return () => clearTimeout(id); }, [notification]);
-  const load = () => {
-    setLoading(true);
-    api.get('/invitations', { params: { ...filters, page: pagination.page, limit: pagination.limit, sortBy: 'createdAt', sortOrder: 'desc' } })
-      .then(response => { setItems(response.data.data.data); setPagination(current => ({ ...current, ...response.data.data.pagination })); setSummary(response.data.data.summary); })
-      .catch(() => notify('danger', 'N\u00e3o foi poss\u00edvel carregar os convites.'))
-      .finally(() => setLoading(false));
-  };
-  useEffect(load, [filters, pagination.page, pagination.limit]);
-  const applyFilter = values => { setPagination(current => ({ ...current, page: 1 })); setFilters({ ...filters, ...values }); };
-  const openNew = () => { setEditing(null); setForm({ name: '', description: '', type: 'in_person', confirmationDeadline: '' }); setFormError(''); setFormOpen(true); };
-  const openEdit = item => { setEditing(item); setForm({ name: item.name, description: item.description || '', type: item.type || 'in_person', confirmationDeadline: item.confirmationDeadline ? item.confirmationDeadline.slice(0, 10) : '' }); setFormError(''); setFormOpen(true); };
-  useEffect(() => {
-    if (route.pathname === '/convites/novo') openNew();
-    else if (/^\/convites\/[^/]+\/editar$/.test(route.pathname)) {
-      const id = route.pathname.split('/')[2];
-      api.get('/invitations/' + id).then(response => openEdit(response.data.data)).catch(() => notify('danger', 'Não foi possível carregar o convite.'));
-    } else setFormOpen(false);
-  }, [route.pathname]);
-  const submit = async event => {
-    event.preventDefault(); setSaving(true); setFormError('');
-    try {
-      const response = editing ? await api.put('/invitations/' + editing._id, form) : await api.post('/invitations', form);
-      setFormOpen(false); setEditing(null); navigate('/convites'); load();
-      if (editing) notify('success', 'Convite atualizado com sucesso.');
-      else { setViewing(response.data.data); notify('success', 'Convite criado com sucesso.'); }
-    } catch (error) { setFormError(error.response?.data?.message || 'N\u00e3o foi poss\u00edvel salvar o convite.'); }
-    finally { setSaving(false); }
-  };
-  const remove = async () => {
-    setSaving(true);
-    try { await api.delete('/invitations/' + deleting._id); setDeleting(null); load(); notify('success', 'Convite exclu\u00eddo com sucesso.'); }
-    catch { notify('danger', 'N\u00e3o foi poss\u00edvel excluir o convite.'); }
-    finally { setSaving(false); }
-  };
-
-  return <>
-    <Toast notification={notification} onClose={() => setNotification(null)} />
-    <InvitationUrlModal invitation={viewing} onClose={() => setViewing(null)} notify={notify} />
-    <PageHeader title="Convites" subtitle="Gerencie os convites e confirmações de presença." action={<Button variant="contained" startIcon={<Add />} onClick={() => navigate('/convites/novo')}>Novo convite</Button>} />
-    <div className="card mb-3"><div className="card-body row g-2">
-      <div className="col-md-3"><label className="form-label">Nome</label><input className="form-control" onChange={event => applyFilter({ name: event.target.value })} /></div>
-      <div className="col-md-2"><label className="form-label">Status</label><select className="form-select" onChange={event => applyFilter({ status: event.target.value })}><option value="">Todos</option><option value="unconfirmed">{'Não confirmado'}</option><option value="confirmed">Confirmado</option></select></div>
-      <div className="col-md-2"><label className="form-label">Tipo</label><select className="form-select" onChange={event => applyFilter({ type: event.target.value })}><option value="">Todos</option><option value="in_person">Presencial</option><option value="virtual">Virtual</option></select></div>
-      <div className="col-md-2"><label className="form-label">Data inicial</label><input type="date" className="form-control" value={filters.startDate} onChange={event => applyFilter({ startDate: event.target.value })} /></div>
-      <div className="col-md-2"><label className="form-label">Data final</label><input type="date" className="form-control" value={filters.endDate} onChange={event => applyFilter({ endDate: event.target.value })} /></div>
-    </div></div>
-    <div className="card"><div className="table-responsive"><table className="table card-table table-vcenter"><thead><tr><th>{'Código'}</th><th>Nome</th><th>Tipo</th><th>{'Descrição'}</th><th>{'Data Criação'}</th><th>Status</th><th>{'Data Confirmação'}</th><th>{'Ações'}</th></tr></thead><tbody>
-      {loading ? <tr><td colSpan="8">Carregando...</td></tr> : items.length === 0 ? <tr><td colSpan="8" className="text-center py-4">Nenhum convite encontrado.</td></tr> : items.flatMap(item => { const guests = item.guests || []; const expanded = expandedId === item._id; return [<tr key={item._id}><td>{item._id.slice(-6)}</td><td>{item.name}</td><td>{typeLabel(item.type)}</td><td>{item.description || '-'}</td><td>{new Date(item.createdAt).toLocaleDateString()}</td><td>{item.status === 'confirmed' ? <button className="btn btn-sm p-0 border-0 bg-transparent" onClick={() => setExpandedId(expanded ? null : item._id)}><span className="badge bg-success-lt text-success"><span className="status-dot bg-success me-1" />{statusLabel(item.status)}</span></button> : <span className="badge bg-warning-lt text-warning"><span className="status-dot bg-warning me-1" />{statusLabel(item.status)}</span>}</td><td>{item.confirmedAt ? new Date(item.confirmedAt).toLocaleString() : '-'}</td><td><button className="btn btn-sm" onClick={() => setViewing(item)}>Visualizar</button> <button className="btn btn-sm" onClick={() => navigate(`/convites/${item._id}/editar`)}>Editar</button> <button className="btn btn-sm btn-danger" onClick={() => setDeleting(item)}>Excluir</button></td></tr>, expanded && <tr key={`${item._id}-guests`}><td colSpan="8" className="bg-light"><div className="p-3"><strong>Pessoas do convite</strong>{guests.length ? <div className="mt-2"><div className="row text-secondary small fw-bold border-bottom pb-2"><div className="col-5">Pessoa</div><div className="col-4">Confirmado em</div><div className="col-3 text-end">Status</div></div>{guests.map(guest => <div className="row align-items-center py-2 border-bottom" key={guest._id}><div className="col-5">{guest.name}</div><div className="col-4 text-secondary">{guest.confirmedAt ? new Date(guest.confirmedAt).toLocaleString('pt-BR') : '-'}</div><div className={`col-3 text-end ${guest.confirmed ? 'text-success' : 'text-warning'}`}>{guest.confirmed ? 'Confirmado' : 'Não confirmado'}</div></div>)}</div> : <p className="text-secondary mb-0 mt-2">Nenhuma pessoa cadastrada.</p>}</div></td></tr>].filter(Boolean); })}
-    </tbody></table></div>
-    <div className="card-footer d-flex align-items-center"><span>Total Itens: {summary.total} | Total Pessoas: {summary.people} | Confirmados: {summary.confirmed} | Não confirmados: {summary.unconfirmed}</span><label className="ms-3 me-2">{'Por página:'}</label><select className="form-select form-select-sm w-auto" value={pagination.limit} onChange={event => setPagination(current => ({ ...current, limit: Number(event.target.value), page: 1 }))}><option value="10">10</option><option value="20">20</option><option value="50">50</option><option value="100">100</option><option value="200">200</option></select><ul className="pagination ms-auto m-0"><li className={`page-item ${pagination.page <= 1 ? 'disabled' : ''}`}><button className="page-link" disabled={pagination.page <= 1} onClick={() => setPagination(current => ({ ...current, page: current.page - 1 }))}>Anterior</button></li>{Array.from({ length: pagination.totalPages }, (_, index) => index + 1).map(page => <li key={page} className={`page-item ${page === pagination.page ? 'active' : ''}`}><button className="page-link" onClick={() => setPagination(current => ({ ...current, page }))}>{page}</button></li>)}<li className={`page-item ${pagination.page >= pagination.totalPages ? 'disabled' : ''}`}><button className="page-link" disabled={pagination.page >= pagination.totalPages} onClick={() => setPagination(current => ({ ...current, page: current.page + 1 }))}>{'Próxima'}</button></li></ul></div></div>
-    {formOpen && <InvitationFormModal editing={editing} form={form} setForm={setForm} saving={saving} error={formError} onClose={() => { setFormOpen(false); navigate('/convites'); }} onSubmit={submit} />}
-    {deleting && <div className="modal modal-blur show d-block"><div className="modal-dialog modal-dialog-centered"><div className="modal-content"><div className="modal-header"><h3 className="modal-title">Excluir convite</h3><button className="btn-close" onClick={() => setDeleting(null)} /></div><div className="modal-body">Deseja realmente excluir <strong>{deleting.name}</strong>?</div><div className="modal-footer"><button className="btn" onClick={() => setDeleting(null)}>Cancelar</button><button className="btn btn-danger" disabled={saving} onClick={remove}>{saving ? 'Excluindo...' : 'Excluir'}</button></div></div></div></div>}
-  </>;
-}
-
 // Todo o conteudo do casamento vem de /public/wedding (backend/src/config/wedding.js).
 function useWedding() {
   const [wedding, setWedding] = useState(null);
-  useEffect(() => { api.get('/public/wedding').then(response => setWedding(response.data.data)).catch(() => setWedding(false)); }, []);
+  useEffect(() => {
+    Promise.all([api.get('/public/wedding'), api.get('/public/appearance').catch(() => ({ data: { data: defaultAppearance } }))])
+      .then(([details, appearance]) => setWedding({ ...details.data.data, appearance: appearance.data.data }))
+      .catch(() => setWedding(false));
+  }, []);
   return wedding;
+}
+function usePublicAppearance(wedding) {
+  const [systemDark, setSystemDark] = useState(() => window.matchMedia('(prefers-color-scheme: dark)').matches);
+  useEffect(() => {
+    const media = window.matchMedia('(prefers-color-scheme: dark)');
+    const update = () => setSystemDark(media.matches);
+    media.addEventListener('change', update);
+    return () => media.removeEventListener('change', update);
+  }, []);
+  const appearance = { ...defaultAppearance, ...wedding?.appearance };
+  const dark = appearance.scheme === 'dark' || (appearance.scheme === 'auto' && systemDark);
+  const base = baseColors[appearance.base] || baseColors.neutral;
+  const accent = appearanceAccent(appearance) || '#1f4536';
+  const brightAccent = appearance.accent === 'custom'
+    ? (parseInt(accent.slice(1, 3), 16) * .299 + parseInt(accent.slice(3, 5), 16) * .587 + parseInt(accent.slice(5, 7), 16) * .114) > 160
+    : ['azure', 'yellow', 'lime', 'green', 'cyan', 'white'].includes(appearance.accent);
+  const textAccent = dark ? `color-mix(in srgb, ${accent} 65%, white)` : appearance.accent === 'white' ? '#4a544e' : brightAccent ? `color-mix(in srgb, ${accent} 55%, black)` : accent;
+  return {
+    style: { '--wed-green': textAccent, '--wed-accent': accent, '--wed-green-dark': `color-mix(in srgb, ${textAccent} 75%, black)`, '--wed-cream': dark ? base.dark : base.light, '--wed-card': dark ? base.darkPaper : base.paper, '--wed-font': landingFont[appearance.font] || landingFont.serif, '--wed-display-font': weddingDisplayFonts[appearance.font] || landingFont[appearance.font] || landingFont.serif, '--wed-font-scale': fontSizeScale[appearance.fontSize] || 1, '--wed-radius': `${10 * Number(appearance.radius)}px` },
+    'data-wed-scheme': appearance.scheme,
+    'data-wed-dark': dark,
+    'data-wed-bright-accent': brightAccent,
+    'data-wed-navigation': appearance.navigation,
+    'data-wed-container': appearance.container,
+    'data-wed-navbar-behavior': appearance.navbarBehavior,
+    'data-wed-navigation-style': appearance.navigationStyle,
+    'data-wed-offcanvas-style': appearance.offcanvasStyle
+  };
 }
 const mapEmbed = query => `https://www.google.com/maps?q=${encodeURIComponent(query)}&z=16&output=embed`;
 
@@ -487,6 +411,7 @@ function Guestbook() {
 
 function Landing() {
   const wedding = useWedding();
+  const appearanceProps = usePublicAppearance(wedding);
   const [photoFailed, setPhotoFailed] = useState(false);
   const [copied, setCopied] = useState(false);
   // Deep link (/casamento#presentes): a secao so existe depois que os dados chegam.
@@ -500,7 +425,7 @@ function Landing() {
   if (!wedding) return <div className="wed wed-plain"><div className="wed-state">Carregando...</div></div>;
   const target = new Date(wedding.datetime).getTime();
   const copyPix = async () => { try { await navigator.clipboard.writeText(wedding.gifts.pix.value); setCopied(true); setTimeout(() => setCopied(false), 2500); } catch { /* sem clipboard */ } };
-  return <div className="wed wed-lp">
+  return <div className="wed wed-lp" {...appearanceProps}>
     <div className="wed-lp-bg" aria-hidden="true">
       {photoFailed ? <div className="wed-lp-bg-empty" /> : <img src={wedding.photo} alt="" onError={() => setPhotoFailed(true)} />}
     </div>
@@ -524,7 +449,7 @@ function Landing() {
         <section className="wed-sec" id="padrinhos">
           <h2 className="wed-sec-title"><Sprig />{wedding.godparents.title}<Sprig flip /></h2>
           <p className="wed-sec-intro">{wedding.godparents.intro}</p>
-          <PublicGodparents fallback={<Carousel label="Padrinhos">{wedding.godparents.couples.map(couple => <GodparentCard key={couple.names.join()} couple={couple} />)}</Carousel>} />
+          <PublicGodparents Carousel={Carousel} GodparentCard={GodparentCard} fallback={<Carousel label="Padrinhos">{wedding.godparents.couples.map(couple => <GodparentCard key={couple.names.join()} couple={couple} />)}</Carousel>} />
         </section>
 
         <section className="wed-sec" id="cerimonia">
@@ -552,7 +477,7 @@ function Landing() {
         <section className="wed-sec" id="presentes">
           <h2 className="wed-sec-title"><Sprig />{wedding.gifts.title}<Sprig flip /></h2>
           <p className="wed-sec-intro">{wedding.gifts.intro}</p>
-          <PublicGifts />
+          <PublicGifts Carousel={Carousel} />
           <div className="wed-card wed-pix">
             <span className="wed-pad-icon"><IconGift size={24} /></span>
             <div className="wed-pix-body">
@@ -598,7 +523,8 @@ function Landing() {
 }
 
 function WeddingShell({ children, wedding }) {
-  return <div className="wed">
+  const appearanceProps = usePublicAppearance(wedding);
+  return <div className="wed wed-invitation" {...appearanceProps}>
     <header className="wed-topbar"><span className="wed-brand"><IconFlower size={26} />Convites de casamento</span></header>
     {children}
     {wedding ? <SiteFooter wedding={wedding} /> : <footer className="wed-footer"><i /><IconHeart size={15} /><i /></footer>}
@@ -672,7 +598,7 @@ function Admin() {
   const logout = () => { tokenStore.clear(); setUser(null); };
   if (checking) return <div className="page page-center"><div className="text-secondary">Carregando...</div></div>;
   if (!user) return <Login onSuccess={setUser} />;
-  return <React.Suspense fallback={<div className="page page-center">Carregando painel...</div>}><AdminApp user={user} onLogout={logout} InvitationsPage={Home} /></React.Suspense>;
+  return <React.Suspense fallback={<div className="page page-center">Carregando painel...</div>}><AdminApp user={user} onLogout={logout} /></React.Suspense>;
 }
 
 function App() {

@@ -2,11 +2,14 @@ import mongoose from 'mongoose';
 import Godparent from '../models/Godparent.js';
 import GiftProduct from '../models/GiftProduct.js';
 import { escapeRegex, validateGodparent, validateGift } from '../validators/catalogValidator.js';
+import { validateImageReferences, bindImages, releaseImages, removeUnusedImages } from '../services/imageStorageService.js';
 
 const ok = (res, data, message) => res.json({ success: true, ...(message && { message }), data });
 const fail = (res, status, message, errors) => res.status(status).json({ success: false, message, ...(errors && { errors }) });
 
 function resource(Model, validate, fields) {
+  const entityType = Model === Godparent ? 'godparent' : 'gift';
+  const references = item => Model === Godparent ? [item.image, ...(item.images || [])] : [item.image];
   return {
     async list(req, res, next) {
       try {
@@ -44,7 +47,11 @@ function resource(Model, validate, fields) {
       try {
         const { errors, data } = validate(req.body);
         if (Object.keys(errors).length) return fail(res, 422, 'Os dados informados sao invalidos.', errors);
-        ok(res, await Model.create(data), 'Registro criado com sucesso.');
+        if (!await validateImageReferences(references(data), entityType)) return fail(res, 422, 'Imagem inválida ou vinculada a outro cadastro.');
+        const item = await Model.create(data);
+        try { await bindImages(references(item), entityType, item._id); }
+        catch (error) { await Model.deleteOne({ _id: item._id }); await releaseImages(references(item), entityType, item._id); throw error; }
+        ok(res, item, 'Registro criado com sucesso.');
       } catch (error) { next(error); }
     },
     async update(req, res, next) {
@@ -54,15 +61,23 @@ function resource(Model, validate, fields) {
         if (!item) return fail(res, 404, 'Registro nao encontrado.');
         const { errors, data } = validate({ ...item.toObject(), ...req.body });
         if (Object.keys(errors).length) return fail(res, 422, 'Os dados informados sao invalidos.', errors);
+        if (!await validateImageReferences(references(data), entityType, item._id)) return fail(res, 422, 'Imagem inválida ou vinculada a outro cadastro.');
+        const oldImages = references(item);
+        const previous = item.toObject();
         Object.assign(item, data);
         await item.save();
+        try { await bindImages(references(item), entityType, item._id); }
+        catch (error) { Object.assign(item, previous); await item.save(); await releaseImages(references(data).filter(value => !oldImages.includes(value)), entityType, item._id); throw error; }
+        await removeUnusedImages(oldImages.filter(value => !references(item).includes(value)));
         ok(res, item, 'Registro atualizado com sucesso.');
       } catch (error) { next(error); }
     },
     async remove(req, res, next) {
       try {
         if (!mongoose.isValidObjectId(req.params.id)) return fail(res, 400, 'Identificador invalido.');
-        if (!await Model.findByIdAndDelete(req.params.id)) return fail(res, 404, 'Registro nao encontrado.');
+        const item = await Model.findByIdAndDelete(req.params.id);
+        if (!item) return fail(res, 404, 'Registro nao encontrado.');
+        await removeUnusedImages(references(item));
         ok(res, null, 'Registro excluido com sucesso.');
       } catch (error) { next(error); }
     }
@@ -73,7 +88,7 @@ export const godparents = resource(Godparent, validateGodparent, ['order', 'name
 export const gifts = resource(GiftProduct, validateGift, ['order', 'name', 'category', 'price', 'active', 'createdAt']);
 
 export async function publicGodparents(req, res, next) {
-  try { ok(res, await Godparent.find({ active: true }).sort({ order: 1, name: 1 }).limit(200).select('name role description image')); } catch (error) { next(error); }
+  try { ok(res, await Godparent.find({ active: true }).sort({ order: 1, name: 1 }).limit(200).select('name partnerName role cardRole description image')); } catch (error) { next(error); }
 }
 export async function publicGifts(req, res, next) {
   try { ok(res, await GiftProduct.find({ active: true }).sort({ order: 1, name: 1 }).limit(200).select('name description price image category')); } catch (error) { next(error); }
