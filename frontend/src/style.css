@@ -856,7 +856,7 @@ a.wed-shop-badge:hover{border-color:var(--wed-gold);background:#fffcf3}
 .wed-lp-hero .wed-lp-kicker::before,.wed-lp-hero .wed-lp-kicker::after{content:'';width:48px;height:1px;background:#d9b77a}
 .wed-lp-hero .wed-lp-kicker::after{margin-left:-.5em}
 .wed-lp-hero .wed-names{margin:10px 0 0;font-size:calc(clamp(64px,8.6vw,104px) * var(--wed-font-scale, 1));line-height:1;font-weight:400;color:#fffaf0;text-shadow:0 2px 22px rgba(10,20,14,.45);white-space:nowrap}
-.wed-lp-hero .wed-amp{margin:0 10px;font-family:'Cormorant Garamond',Georgia,serif;font-style:italic;font-weight:400;font-size:calc(clamp(40px,5.3vw,64px) * var(--wed-font-scale, 1));color:#e2c287;vertical-align:.17em}
+.wed-lp-hero .wed-amp{margin:0 10px;font-family:inherit;font-style:italic;font-weight:400;font-size:calc(clamp(40px,5.3vw,64px) * var(--wed-font-scale, 1));color:#e2c287;vertical-align:.17em}
 .wed-lp-hero .wed-lp-date{margin:14px 0 0;font-size:calc(18px * var(--wed-font-scale, 1));line-height:24px;letter-spacing:.22em;text-transform:uppercase;color:#fffaf0;text-shadow:0 1px 12px rgba(10,20,14,.5)}
 .wed-lp-hero .wed-lp-date i{margin:0 10px;font-style:normal;color:#e2c287}.wed-lp-hero .wed-lp-time{text-transform:none}
 .wed-sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
@@ -883,3 +883,40 @@ a.wed-shop-badge:hover{border-color:var(--wed-gold);background:#fffcf3}
   .wed-lp-hero .wed-count-box strong{font-size:calc(30px * var(--wed-font-scale, 1));line-height:32px}
   .wed-lp-hero .wed-count-box span{font-size:calc(10px * var(--wed-font-scale, 1));letter-spacing:.2em}
 }
+
+/* Navbar, layout 4 (Botanica Aquarela): faixa marfim com desfoque e sombra, so o monograma
+   numa moldura dourada, ancoras de 20 px em verde pela largura toda, uma florzinha em
+   aquarela embaixo da secao ativa e "Confirme sua presenca" como botao solido. */
+.wed-lp:has(> .wed-nav.is-floral){--nav-h:84px}
+.wed-lp .wed-nav.is-floral,.wed-lp .wed-nav.is-floral.is-scrolled{background:rgba(250,247,240,.94);-webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px);border-bottom:0;box-shadow:0 6px 24px rgba(15,28,20,.18)}
+.wed-lp .wed-nav.is-floral .wed-nav-inner{gap:32px;max-width:1480px;padding:0 40px}
+.wed-lp .wed-nav.is-floral .wed-nav-brand{flex:none;justify-content:center;width:56px;height:56px;border:1px solid #c9ab78;border-radius:50%;text-shadow:none}
+.wed-lp .wed-nav.is-floral .wed-nav-brand .wed-monogram{margin:0;color:#ad8c5c;filter:none}
+.wed-lp .wed-nav.is-floral .wed-nav-brand:focus-visible,.wed-lp .wed-nav.is-floral .wed-nav-links a:focus-visible,.wed-lp .wed-nav.is-floral .wed-nav-toggle:focus-visible{outline:2px solid #24412f;outline-offset:4px}
+.wed-lp .wed-nav.is-floral .wed-nav-links{position:relative;flex:1;justify-content:space-between;gap:12px;margin-left:0}
+.wed-lp .wed-nav.is-floral .wed-nav-links a{position:relative;padding:6px 2px;border-radius:4px;background:none;color:#24412f;font-family:'Cormorant Garamond',Georgia,serif;font-size:calc(20px * var(--wed-font-scale, 1));line-height:24px;font-weight:500;text-shadow:none}
+.wed-lp .wed-nav.is-floral .wed-nav-links a:hover{background:none;color:#24412f;text-decoration:underline;text-decoration-color:#c9ab78;text-decoration-thickness:1px;text-underline-offset:6px}
+.wed-lp .wed-nav.is-floral .wed-nav-links a.is-active{background:none;color:#24412f}
+.wed-lp .wed-nav.is-floral .wed-nav-links a.is-cta{padding:10px 22px;border-radius:999px;background:#24412f;color:#faf8f3}
+.wed-lp .wed-nav.is-floral .wed-nav-links a.is-cta:hover{background:#1a3123;color:#faf8f3;text-decoration:none}
+.wed-lp .wed-nav.is-floral .wed-nav-links a.is-cta:focus-visible{outline-offset:3px}
+.wed-nav-flower{position:absolute;top:calc(50% + 13px);left:0;margin-left:-10px;pointer-events:none;transition:transform .5s cubic-bezier(.22,.61,.36,1)}
+.wed-lp .wed-nav.is-floral .wed-nav-toggle{border:1px solid #c9ab78;background:transparent;color:#24412f}
+/* Abaixo de 1100 px: menu de tres linhas ao lado do monograma, painel marfim. */
+@media (max-width:1100px){
+  .wed-lp:has(> .wed-nav.is-floral){--nav-h:72px}
+  .wed-lp .wed-nav.is-floral .wed-nav-inner{padding:0 1.25rem}
+  .wed-lp .wed-nav.is-floral .wed-nav-toggle{display:flex}
+  .wed-lp .wed-nav.is-floral .wed-nav-links{position:absolute;left:0;right:0;top:var(--nav-h);display:none;flex-direction:column;align-items:stretch;gap:0;margin:0;padding:.5rem;background:#faf7f0;border-top:1px solid rgba(201,171,120,.5);box-shadow:0 14px 28px rgba(15,28,20,.18)}
+  .wed-lp .wed-nav.is-floral .wed-nav-links.is-open{display:flex}
+  .wed-lp .wed-nav.is-floral .wed-nav-links a{padding:.8rem 1rem}
+  .wed-lp .wed-nav.is-floral .wed-nav-links a.is-active{background:rgba(36,65,47,.07);font-weight:600}
+  .wed-lp .wed-nav.is-floral .wed-nav-links a.is-cta{align-self:flex-start;margin:.4rem 1rem .3rem;padding:10px 22px}
+  .wed-lp .wed-nav.is-floral .wed-nav-links a.is-cta.is-active{background:#24412f}
+  .wed-nav-flower{display:none}
+}
+@media (max-width:560px){
+  .wed-lp:has(> .wed-nav.is-floral){--nav-h:64px}
+  .wed-lp .wed-nav.is-floral .wed-nav-brand{width:48px;height:48px}
+}
+@media (prefers-reduced-motion:reduce){.wed-nav-flower{transition:none}}

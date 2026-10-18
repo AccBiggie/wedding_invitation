@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useRef, useState } from 'react';
+import React, { useCallback, useEffect, useLayoutEffect, useRef, useState } from 'react';
 import { createRoot } from 'react-dom/client';
 import { BrowserRouter } from 'react-router-dom';
 import api, { tokenStore } from './services/api';
@@ -8,6 +8,7 @@ import { ScrollReveal } from './components/reveal/ScrollReveal';
 import { OurStory } from './components/story/OurStory';
 import { OliveGarland, OliveSprig, OliveVine } from './components/decor/Olive';
 import { ChurchSketch } from './components/decor/ChurchSketch';
+import { NavFlower } from './components/decor/NavFlower';
 import { appearanceAccent, baseColors, defaultAppearance, fontSizeScale, landingFont, weddingDisplayFonts } from './theme/appearance';
 import monogramSvg from './assets/logo/monograma-sa.svg?raw';
 import '@tabler/core/dist/css/tabler.min.css';
@@ -243,14 +244,29 @@ function LandingNav({ couple, onGravata }) {
     return () => window.removeEventListener('scroll', onScroll);
   }, []);
   const go = (event, id) => { setOpen(false); scrollToSection(event, id); };
-  return <header className={`wed-nav${scrolled ? ' is-scrolled' : ''}`}>
+  // Florzinha embaixo da ancora ativa: mede o centro da ancora e desliza ate ela.
+  const linksRef = useRef(null);
+  const [flowerX, setFlowerX] = useState(null);
+  useLayoutEffect(() => {
+    const place = () => {
+      const link = linksRef.current?.querySelector('a[aria-current="page"]:not(.is-cta)');
+      setFlowerX(link ? link.offsetLeft + link.offsetWidth / 2 : null);
+    };
+    place();
+    document.fonts?.ready.then(place);
+    window.addEventListener('resize', place);
+    return () => window.removeEventListener('resize', place);
+  }, [active, onGravata]);
+  // Layout 4 do design system (faixa marfim com flor): so o monograma e as ancoras pela largura toda.
+  return <header className={`wed-nav is-floral${scrolled ? ' is-scrolled' : ''}`}>
     <div className="wed-nav-inner">
-      <a className="wed-nav-brand" href="#home" onClick={event => go(event, 'home')}><Monogram height={34} />{couple[0]}<span>&amp;</span>{couple[1]}</a>
+      <a className="wed-nav-brand" href="#home" aria-label={`${couple[0]} e ${couple[1]} — início`} onClick={event => go(event, 'home')}><Monogram height={36} /></a>
       <button className="wed-nav-toggle" onClick={() => setOpen(!open)} aria-expanded={open} aria-label={open ? 'Fechar menu' : 'Abrir menu'}>{open ? <IconClose size={24} /> : <IconMenu size={24} />}</button>
-      <nav className={`wed-nav-links${open ? ' is-open' : ''}`}>
+      <nav ref={linksRef} className={`wed-nav-links${open ? ' is-open' : ''}`} aria-label="Principal">
         {NAV.map(item => item.action
           ? onGravata && <a key={item.id} href={`#${item.id}`} role="button" onClick={event => { event.preventDefault(); setOpen(false); onGravata(); }}>{item.label}</a>
-          : <a key={item.id} href={`#${item.id}`} className={active === item.id ? 'is-active' : ''} onClick={event => go(event, item.id)}>{item.label}</a>)}
+          : <a key={item.id} href={`#${item.id}`} className={[active === item.id && 'is-active', item.id === 'confirmar' && 'is-cta'].filter(Boolean).join(' ') || undefined} aria-current={active === item.id ? 'page' : undefined} onClick={event => go(event, item.id)}>{item.label}</a>)}
+        {flowerX != null && <NavFlower x={flowerX} />}
       </nav>
     </div>
   </header>;
