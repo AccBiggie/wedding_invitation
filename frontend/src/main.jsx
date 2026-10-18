@@ -5,6 +5,7 @@ import api, { tokenStore } from './services/api';
 import { PublicGodparents, PublicGifts, PublicStoreCategories } from './pages/PublicCatalog';
 import { GravataDialog, PixQrDialog, usePixStatus } from './pages/Pix/GravataEntry';
 import { ScrollReveal } from './components/reveal/ScrollReveal';
+import { OurStory } from './components/story/OurStory';
 import { appearanceAccent, baseColors, defaultAppearance, fontSizeScale, landingFont, weddingDisplayFonts } from './theme/appearance';
 import monogramSvg from './assets/logo/monograma-sa.svg?raw';
 import '@tabler/core/dist/css/tabler.min.css';
@@ -519,6 +520,8 @@ function Landing() {
             </Tag>;
           })}</ScrollReveal>
         </section>
+
+        {wedding.story && <OurStory story={wedding.story} finalDate={wedding.date.join(' ')} />}
 
         <section className="wed-sec" id="recados">
           <ScrollReveal as="h2" className="wed-sec-title"><Sprig />Recados<Sprig flip /></ScrollReveal>

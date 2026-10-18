@@ -57,6 +57,33 @@ export const wedding = {
       { name: 'Lua de mel', description: 'Ajude a construir a nossa primeira viagem como marido e mulher.', url: '' }
     ]
   },
+  // Secao "Nossa historia" (linha do tempo apos a lista de presentes). Fotos em
+  // frontend/public/historia. O ultimo capitulo usa a data do casamento (date).
+  // TODO(noivos): ajustar os textos e trocar os subtitulos pelas datas reais, se quiserem.
+  story: {
+    kicker: 'Nossa',
+    title: 'História',
+    tagline: 'Cinco capítulos, um só destino: nós.',
+    lead: 'De um encontro despretensioso a uma vida inteira de planos. Aqui está a nossa jornada até o altar.',
+    cover: '/historia/capa.webp',
+    chapters: [
+      { title: 'Onde tudo começou', subtitle: 'O começo de tudo', photo: '/historia/capitulo-1-comeco.webp', doodle: 'camera', note: 'Às vezes, as melhores histórias começam sem planejamento.',
+        text: 'Um olhar, uma conversa que não queria acabar e aquela certeza tímida de que algo diferente estava nascendo. Ninguém planejou — e talvez por isso tenha dado tão certo.' },
+      { title: 'Nossas aventuras', subtitle: 'Trilhas, estradas e selfies', photo: '/historia/capitulo-2-aventuras.webp', doodle: 'signpost', note: 'Dois mundos, o mesmo caminho.',
+        text: 'Cachoeiras, mirantes e muitos quilômetros lado a lado. Descobrimos que qualquer lugar fica mais bonito quando estamos juntos — e que o melhor destino é sempre a companhia.' },
+      { title: 'Casa comigo?', subtitle: 'Um café, panquecas e a pergunta', photo: '/historia/capitulo-3-pedido.webp', doodle: 'ring', note: 'O dia em que o para sempre começou.',
+        text: 'Entre panquecas, morangos e um prato escrito em chocolate, veio a pergunta mais importante das nossas vidas. Até tinha a opção “não”, mas a resposta só podia ser uma: sim!' },
+      { title: 'O primeiro sim', subtitle: 'Casamento civil', photo: '/historia/capitulo-4-civil.webp', doodle: 'toast', note: 'O primeiro “sim” de muitos.',
+        text: 'Alianças trocadas, mãos um pouco trêmulas e sorrisos que não cabiam no rosto. Diante da família, dissemos o nosso primeiro “sim” — o começo oficial de um capítulo que ainda estamos escrevendo.' },
+      { title: 'Rumo ao altar', subtitle: '', photo: '/historia/capitulo-5-altar.webp', doodle: 'chapel', note: 'Mesmo caminho, para sempre.',
+        text: 'Agora seguimos para o capítulo mais esperado: celebrar o nosso amor diante de Deus e de quem mais amamos. E a gente quer você lá, com a gente.' }
+    ],
+    closing: ['Que venham os próximos capítulos', 'Juntos, sempre.'],
+    polaroids: [
+      { photo: '/historia/polaroid-banco.webp', caption: 'nós dois' },
+      { photo: '/historia/polaroid-portao.webp', caption: 'para sempre' }
+    ]
+  },
   contact: {
     phone: '(44) 99883-3731',
     whatsapp: 'https://wa.me/5544998833731',
