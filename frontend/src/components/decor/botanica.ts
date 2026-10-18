@@ -76,7 +76,7 @@ function shape(o: ShapeOptions) {
   };
 }
 
-// Linha suave pelos pontos (para mascaras e trajetos).
+// Linha suave pelos pontos (o caule tracado a mao no jardim).
 export const smoothPath = (pts: Point[]) => m(pts[0]) + catmull(pts);
 
 // Caminhada com curvatura variavel: curvature(s, angulo) devolve graus por px.
@@ -314,7 +314,8 @@ export function paintCluster(ctx: Palette, x: number, y: number, angle: number, 
 }
 
 // ---- galho vestido ----------------------------------------------------------
-export interface Piece { kind: 'leaf' | 'stem' | 'bud' | 'flower'; svg: string; s: number; r: number }
+// s = posicao ao longo do galho; y = altura no desenho (para agrupar por faixa).
+export interface Piece { kind: 'leaf' | 'stem' | 'bud' | 'flower'; svg: string; s: number; r: number; y: number }
 interface DressOptions { step: number; leaf: number; free: number; flowerChance: number; flowerGap?: number; flowerScale?: number; allowed?: (x: number, y: number, r: number) => boolean }
 // Folhas em aquarela alternadas ao longo do galho, diminuindo ate ~55% na ponta;
 // flores e botoes pequenos em alguns nos, do lado oposto ao da folha. A ponta
@@ -326,23 +327,23 @@ export function dressBranch(ctx: Palette, pts: Point[], rng: Rng, o: DressOption
     const q = pointAt(pts, s), t = s / L;
     side = -side;
     const length = o.leaf * between(rng, .8, 1.15) * (1 - .45 * t), angle = q.angle + side * between(rng, 35, 58);
-    if (allowed(q.x + Math.cos(angle * D2R) * length, q.y + Math.sin(angle * D2R) * length, 0)) pieces.push({ kind: 'leaf', svg: paintLeaf(ctx, q.x, q.y, angle, length, rng), s, r: 0 });
+    if (allowed(q.x + Math.cos(angle * D2R) * length, q.y + Math.sin(angle * D2R) * length, 0)) pieces.push({ kind: 'leaf', svg: paintLeaf(ctx, q.x, q.y, angle, length, rng), s, r: 0, y: q.y });
     if (s - last > gap && chance(rng, o.flowerChance)) {
       const a = q.angle - side * between(rng, 35, 60), pc = between(rng, 5, 9);
       const fx = q.x + Math.cos(a * D2R) * pc, fy = q.y + Math.sin(a * D2R) * pc;
       const bud = chance(rng, .3), r = bud ? PARAMS.budLength * .35 : between(rng, 6, 9) * (o.flowerScale || 1);
       if (!allowed(fx, fy, r)) continue;
       last = s;
-      pieces.push({ kind: 'stem', svg: paintStem(quad([q.x, q.y], [(q.x + fx) / 2, (q.y + fy) / 2 + 1], [fx, fy], 5), .8, .5, COLORS.stem), s, r: 0 });
-      pieces.push(bud ? { kind: 'bud', svg: paintBud(ctx, fx, fy, a, PARAMS.budLength * between(rng, .6, .85), rng), s, r: 0 } : { kind: 'flower', svg: paintFlower(ctx, fx, fy, r, rng, a - 90), s, r });
+      pieces.push({ kind: 'stem', svg: paintStem(quad([q.x, q.y], [(q.x + fx) / 2, (q.y + fy) / 2 + 1], [fx, fy], 5), .8, .5, COLORS.stem), s, r: 0, y: fy });
+      pieces.push(bud ? { kind: 'bud', svg: paintBud(ctx, fx, fy, a, PARAMS.budLength * between(rng, .6, .85), rng), s, r: 0, y: fy } : { kind: 'flower', svg: paintFlower(ctx, fx, fy, r, rng, a - 90), s, r, y: fy });
     }
   }
   return pieces;
 }
 // Converte um cacho em pecas posicionadas em 's' (para a ordem e o atraso da animacao).
-export const clusterPieces = (l: Layers, s: number): Piece[] => [
-  ...l.stems.map(svg => ({ kind: 'stem' as const, svg, s, r: 0 })), ...l.leaves.map(svg => ({ kind: 'leaf' as const, svg, s, r: 0 })),
-  ...l.buds.map(svg => ({ kind: 'bud' as const, svg, s, r: 0 })), ...l.flowers.map(f => ({ kind: 'flower' as const, svg: f.svg, s, r: f.r }))
+export const clusterPieces = (l: Layers, s: number, y = 0): Piece[] => [
+  ...l.stems.map(svg => ({ kind: 'stem' as const, svg, s, r: 0, y })), ...l.leaves.map(svg => ({ kind: 'leaf' as const, svg, s, r: 0, y })),
+  ...l.buds.map(svg => ({ kind: 'bud' as const, svg, s, r: 0, y })), ...l.flowers.map(f => ({ kind: 'flower' as const, svg: f.svg, s, r: f.r, y }))
 ];
 // Ordem de pintura das pecas: pedicelos -> folhas -> botoes -> flores (as maiores por ultimo).
 const ORDER = { stem: 0, leaf: 1, bud: 2, flower: 3 };

@@ -465,7 +465,7 @@ function Landing() {
   const target = new Date(wedding.datetime).getTime();
   const copyPix = async () => { try { await navigator.clipboard.writeText(pixKey); setCopied(true); setTimeout(() => setCopied(false), 2500); } catch { /* sem clipboard */ } };
   return <div className={`wed wed-lp${paper ? ' is-paper' : ''}`} {...appearanceProps}>
-    <div className="wed-lp-paper" aria-hidden="true"><ChurchSketch /><OliveVine className="is-left" seed={1709} /><OliveVine className="is-right" seed={2614} /></div>
+    <div className="wed-lp-paper" aria-hidden="true"><ChurchSketch /><OliveVine className="is-left" from="top" /><OliveVine className="is-right" /></div>
     <div className="wed-lp-bg" aria-hidden="true">
       {photoFailed ? <div className="wed-lp-bg-empty" /> : <img src={wedding.photo} alt="" onError={() => setPhotoFailed(true)} />}
     </div>
