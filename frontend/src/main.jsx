@@ -475,11 +475,11 @@ function Landing() {
     <main className="wed-lp-body">
       <section className="wed-lp-hero" id="home">
         <p className="wed-lp-kicker">Vamos nos casar</p>
-        <h1 className="wed-names">{wedding.couple[0]} <span className="wed-amp">&amp;</span> {wedding.couple[1]}</h1>
-        <div className="wed-rule"><i /><IconHeart size={14} /><i /></div>
-        <p className="wed-lp-date">{wedding.date.join(' ')} {'•'} {wedding.time.join('')}</p>
+        {/* No celular os nomes quebram em duas linhas: "Stéfani &" / "André". */}
+        <h1 className="wed-names"><span className="wed-lp-name">{wedding.couple[0]}<span className="wed-amp">&amp;</span></span> <span className="wed-lp-name">{wedding.couple[1]}</span></h1>
+        <p className="wed-lp-date">{wedding.date.join(' ')}<i aria-hidden="true">·</i><span className="wed-sr">, </span><span className="wed-lp-time">{wedding.time.join('')}</span></p>
         <Countdown target={target} />
-        <a className="wed-lp-scroll" href="#sobre" onClick={event => scrollToSection(event, 'sobre')}>conheça nossa história</a>
+        <a className="wed-lp-scroll" href="#sobre" onClick={event => scrollToSection(event, 'sobre')}>Conheça nossa história <span aria-hidden="true">↓</span></a>
       </section>
 
       <div className="wed-lp-sheet">

@@ -846,3 +846,40 @@ a.wed-shop-badge:hover{border-color:var(--wed-gold);background:#fffcf3}
 
 /* Celular: sem o deslocamento da aquarela (o estilo vem dos degrades). */
 @media (max-width:820px){.ba-aq{filter:none}}
+
+/* Abertura, direcao A (Botanica Aquarela): veu escuro so atras do texto, nomes grandes em
+   marfim, "&" em italico dourado, data espacada, contagem em caixas de vidro e botao em pilula. */
+.wed-lp-bg::after{background:linear-gradient(180deg,rgba(18,42,31,.42),rgba(18,42,31,.16) 22%,rgba(18,42,31,.16) 70%,rgba(18,42,31,.3))}
+.wed-lp-hero{position:relative;isolation:isolate}
+.wed-lp-hero::before{content:'';position:absolute;inset:0;z-index:-1;pointer-events:none;background:radial-gradient(ellipse 50% 64% at 50% 52%,rgba(20,36,26,.76) 0%,rgba(20,36,26,.66) 42%,rgba(20,36,26,.34) 72%,rgba(20,36,26,0) 100%),linear-gradient(180deg,rgba(20,36,26,0) 55%,rgba(20,36,26,.45) 100%)}
+.wed-lp-hero .wed-lp-kicker{display:flex;align-items:center;gap:14px;margin:0;font-size:calc(13px * var(--wed-font-scale, 1));line-height:16px;letter-spacing:.5em;text-transform:uppercase;color:#f1e2c2;text-shadow:0 1px 10px rgba(10,20,14,.5)}
+.wed-lp-hero .wed-lp-kicker::before,.wed-lp-hero .wed-lp-kicker::after{content:'';width:48px;height:1px;background:#d9b77a}
+.wed-lp-hero .wed-lp-kicker::after{margin-left:-.5em}
+.wed-lp-hero .wed-names{margin:10px 0 0;font-size:calc(clamp(64px,8.6vw,104px) * var(--wed-font-scale, 1));line-height:1;font-weight:400;color:#fffaf0;text-shadow:0 2px 22px rgba(10,20,14,.45);white-space:nowrap}
+.wed-lp-hero .wed-amp{margin:0 10px;font-family:'Cormorant Garamond',Georgia,serif;font-style:italic;font-weight:400;font-size:calc(clamp(40px,5.3vw,64px) * var(--wed-font-scale, 1));color:#e2c287;vertical-align:.17em}
+.wed-lp-hero .wed-lp-date{margin:14px 0 0;font-size:calc(18px * var(--wed-font-scale, 1));line-height:24px;letter-spacing:.22em;text-transform:uppercase;color:#fffaf0;text-shadow:0 1px 12px rgba(10,20,14,.5)}
+.wed-lp-hero .wed-lp-date i{margin:0 10px;font-style:normal;color:#e2c287}.wed-lp-hero .wed-lp-time{text-transform:none}
+.wed-sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+.wed-lp-hero .wed-count{gap:12px;margin-top:26px}
+.wed-lp-hero .wed-count-box{width:86px;min-width:0;padding:12px 0 10px;border:1px solid rgba(226,194,135,.65);border-radius:14px;background:rgba(20,36,26,.34);box-shadow:inset 0 0 0 1px rgba(252,248,238,.08);-webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px)}
+.wed-lp-hero .wed-count-box strong{font-family:'Cormorant Garamond',Georgia,serif;font-size:calc(38px * var(--wed-font-scale, 1));line-height:40px;font-weight:500;color:#fffaf0}
+.wed-lp-hero .wed-count-box span{margin-top:4px;font-size:calc(11px * var(--wed-font-scale, 1));line-height:14px;letter-spacing:.28em;text-transform:uppercase;color:#f1e2c2}
+.wed-lp-hero .wed-count-done{color:#fffaf0;text-shadow:0 1px 12px rgba(10,20,14,.5)}
+.wed-lp-hero .wed-lp-scroll{display:inline-flex;align-items:center;gap:10px;margin-top:28px;padding:11px 24px;border:1px solid #d9b77a;border-radius:999px;background:rgba(252,248,238,.94);color:#24412f;font-family:'Cormorant Garamond',Georgia,serif;font-size:calc(16px * var(--wed-font-scale, 1));line-height:20px;letter-spacing:.06em;text-decoration:none;transition:background .15s,box-shadow .15s}
+.wed-lp-hero .wed-lp-scroll:hover{background:#fffaf0;color:#24412f;border-color:#d9b77a;box-shadow:0 6px 18px rgba(10,20,14,.25)}
+.wed-lp-hero .wed-lp-scroll:focus-visible{outline:2px solid #fffaf0;outline-offset:3px}
+/* Celular: nomes em duas linhas ("Stefani &" / "Andre"), caixas de 68 px e veu um pouco mais forte. */
+@media (max-width:560px){
+  .wed-lp-hero::before{background:radial-gradient(ellipse 95% 60% at 50% 52%,rgba(20,36,26,.8) 0%,rgba(20,36,26,.68) 48%,rgba(20,36,26,.3) 82%,rgba(20,36,26,.12) 100%),linear-gradient(180deg,rgba(20,36,26,0) 50%,rgba(20,36,26,.5) 100%)}
+  .wed-lp-hero .wed-lp-kicker{gap:10px;font-size:calc(12px * var(--wed-font-scale, 1));letter-spacing:.4em}
+  .wed-lp-hero .wed-lp-kicker::before,.wed-lp-hero .wed-lp-kicker::after{width:32px}
+  .wed-lp-hero .wed-names{font-size:calc(56px * var(--wed-font-scale, 1));line-height:1.08;white-space:normal}
+  .wed-lp-hero .wed-lp-name{display:block;white-space:nowrap}
+  .wed-lp-hero .wed-amp{margin:0 0 0 8px;font-size:calc(36px * var(--wed-font-scale, 1));vertical-align:10px}
+  .wed-lp-hero .wed-lp-date{font-size:calc(14px * var(--wed-font-scale, 1));letter-spacing:.16em}
+  .wed-lp-hero .wed-lp-date i{margin:0 7px}
+  .wed-lp-hero .wed-count{gap:8px;margin-top:22px}
+  .wed-lp-hero .wed-count-box{width:68px;padding:10px 0 8px;border-radius:12px}
+  .wed-lp-hero .wed-count-box strong{font-size:calc(30px * var(--wed-font-scale, 1));line-height:32px}
+  .wed-lp-hero .wed-count-box span{font-size:calc(10px * var(--wed-font-scale, 1));letter-spacing:.2em}
+}
