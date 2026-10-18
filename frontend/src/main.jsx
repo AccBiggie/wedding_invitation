@@ -5,6 +5,7 @@ import api, { tokenStore } from './services/api';
 import { PublicGodparents, PublicGifts, PublicStoreCategories } from './pages/PublicCatalog';
 import { GravataDialog, PixQrDialog, usePixStatus } from './pages/Pix/GravataEntry';
 import { appearanceAccent, baseColors, defaultAppearance, fontSizeScale, landingFont, weddingDisplayFonts } from './theme/appearance';
+import monogramSvg from './assets/logo/monograma-sa.svg?raw';
 import '@tabler/core/dist/css/tabler.min.css';
 import './style.css';
 
@@ -90,6 +91,8 @@ function usePublicAppearance(wedding) {
 const mapEmbed = query => `https://www.google.com/maps?q=${encodeURIComponent(query)}&z=16&output=embed`;
 
 const Svg = ({ children, size = 24, viewBox = '0 0 24 24', ...props }) => <svg width={size} height={size} viewBox={viewBox} fill="none" stroke="currentColor" strokeWidth="1.3" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true" {...props}>{children}</svg>;
+// Monograma S&A do casal (logo da landing). Herda a cor do texto (currentColor).
+const Monogram = ({ height = 28, className = '' }) => <span className={`wed-monogram ${className}`} style={{ height, width: Math.round(height * 1536 / 1926) }} aria-hidden="true" dangerouslySetInnerHTML={{ __html: monogramSvg }} />;
 const IconCalendar = props => <Svg {...props}><path d="M4 7a2 2 0 0 1 2 -2h12a2 2 0 0 1 2 2v12a2 2 0 0 1 -2 2h-12a2 2 0 0 1 -2 -2z" /><path d="M16 3v4M8 3v4M4 11h16M8 15h2v2h-2z" /></Svg>;
 const IconClock = props => <Svg {...props}><path d="M12 12m-9 0a9 9 0 1 0 18 0a9 9 0 1 0 -18 0" /><path d="M12 7v5l3 3" /></Svg>;
 const IconFlower = props => <Svg {...props}><path d="M12 12m-3 0a3 3 0 1 0 6 0a3 3 0 1 0 -6 0" /><path d="M12 6m-3 0a3 3 0 1 0 6 0a3 3 0 1 0 -6 0" /><path d="M12 18m-3 0a3 3 0 1 0 6 0a3 3 0 1 0 -6 0" /><path d="M6 12m-3 0a3 3 0 1 0 6 0a3 3 0 1 0 -6 0" /><path d="M18 12m-3 0a3 3 0 1 0 6 0a3 3 0 1 0 -6 0" /></Svg>;
@@ -239,7 +242,7 @@ function LandingNav({ couple, onGravata }) {
   const go = (event, id) => { setOpen(false); scrollToSection(event, id); };
   return <header className={`wed-nav${scrolled ? ' is-scrolled' : ''}`}>
     <div className="wed-nav-inner">
-      <a className="wed-nav-brand" href="#home" onClick={event => go(event, 'home')}><IconFlower size={22} />{couple[0]}<span>&amp;</span>{couple[1]}</a>
+      <a className="wed-nav-brand" href="#home" onClick={event => go(event, 'home')}><Monogram height={34} />{couple[0]}<span>&amp;</span>{couple[1]}</a>
       <button className="wed-nav-toggle" onClick={() => setOpen(!open)} aria-expanded={open} aria-label={open ? 'Fechar menu' : 'Abrir menu'}>{open ? <IconClose size={24} /> : <IconMenu size={24} />}</button>
       <nav className={`wed-nav-links${open ? ' is-open' : ''}`}>
         {NAV.map(item => item.action
@@ -263,7 +266,7 @@ function SiteFooter({ wedding, onLanding }) {
   return <footer className="wed-foot">
     <div className="wed-foot-top">
       <div className="wed-foot-brand">
-        <span className="wed-foot-logo"><IconFlower size={30} /><em>{wedding.couple[0]} &amp; {wedding.couple[1]}</em></span>
+        <span className="wed-foot-logo"><Monogram height={48} /><em>{wedding.couple[0]} &amp; {wedding.couple[1]}</em></span>
         {socials.length > 0 && <div className="wed-foot-social">{socials.map(social => <a key={social.label} href={social.href} target="_blank" rel="noreferrer" aria-label={social.label}>{social.icon}</a>)}</div>}
       </div>
       <div className="wed-foot-col">
@@ -562,7 +565,7 @@ function StoreCategoryRoute() {
     </div>
     <header className={`wed-nav${scrolled ? ' is-scrolled' : ''}`}>
       <div className="wed-nav-inner">
-        <a className="wed-nav-brand" href="/casamento"><IconFlower size={22} />{wedding.couple[0]}<span>&amp;</span>{wedding.couple[1]}</a>
+        <a className="wed-nav-brand" href="/casamento"><Monogram height={34} />{wedding.couple[0]}<span>&amp;</span>{wedding.couple[1]}</a>
         <a className="wed-nav-back" href="/casamento#lista-na-loja"><IconChevronLeft size={18} />Ver todas as categorias</a>
       </div>
     </header>
@@ -578,7 +581,7 @@ function StoreCategoryRoute() {
 function WeddingShell({ children, wedding }) {
   const appearanceProps = usePublicAppearance(wedding);
   return <div className="wed wed-invitation" {...appearanceProps}>
-    <header className="wed-topbar"><span className="wed-brand"><IconFlower size={26} />Convites de casamento</span></header>
+    <header className="wed-topbar"><span className="wed-brand"><Monogram height={32} />Convites de casamento</span></header>
     {children}
     {wedding ? <SiteFooter wedding={wedding} /> : <footer className="wed-footer"><i /><IconHeart size={15} /><i /></footer>}
   </div>;

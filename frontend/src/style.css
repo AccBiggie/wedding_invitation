@@ -179,6 +179,10 @@ body{background:#f5f7fb}
 .wed-nav-brand{display:flex;align-items:center;gap:.45rem;font-size:calc(1.32rem * var(--wed-font-scale, 1));color:#fff;text-decoration:none;white-space:nowrap;text-shadow:0 1px 12px rgba(0,0,0,.45)}
 .wed-nav-brand span{margin:0 .1rem;color:var(--wed-gold);font-style:italic}
 .wed-nav-brand svg{color:var(--wed-gold)}
+/* Monograma S&A: SVG embutido que herda a cor (dourado nas marcas do site). */
+.wed-monogram{display:inline-flex;flex-shrink:0;color:var(--wed-gold)}
+.wed-monogram svg{display:block;width:100%;height:100%}
+.wed-nav-brand .wed-monogram{margin-right:.25rem;filter:drop-shadow(0 1px 8px rgba(0,0,0,.35))}
 .wed-nav-links{display:flex;align-items:center;gap:.15rem;margin-left:auto}
 .wed-nav-links a{padding:.45rem .7rem;border-radius:6px;color:#f3eee1;font-size:calc(1.02rem * var(--wed-font-scale, 1));text-decoration:none;white-space:nowrap;text-shadow:0 1px 10px rgba(0,0,0,.5);transition:color .15s,background .15s}
 .wed-nav-links a:hover{color:#fff;background:rgba(255,255,255,.13)}
