@@ -364,8 +364,9 @@ function GodparentCard({ couple }) {
   const photos = (couple.photos || (couple.photo ? [couple.photo] : [])).filter(Boolean).slice(0, 2);
   const initials = couple.names.map(name => name.trim().charAt(0)).join('');
   return <div className="wed-card wed-pad">
-    <div className="wed-pad-gallery">
+    <div className={`wed-pad-gallery${photos.length > 1 ? ' is-pair' : ''}`}>
       {(photos.length ? photos : ['']).map((photo, index) => <span className="wed-pad-photo" key={`${photo}-${index}`}>
+        <span className="wed-pad-hanger" aria-hidden="true" />
         {photo && !failed[photo]
           ? <img src={photo} alt={photos.length === 1 ? couple.names.join(' e ') : couple.names[index] || couple.names.join(' e ')} loading="lazy" onError={() => setFailed(current => ({ ...current, [photo]: true }))} />
           : <span className="wed-pad-initials">{photos.length < 2 ? initials : couple.names[index]?.trim().charAt(0) || initials}</span>}
