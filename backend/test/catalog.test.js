@@ -32,11 +32,11 @@ test('CRUD de padrinhos valida, filtra e pagina', { skip: !connection }, async (
   assert.equal(withCouple.status, 200);
   assert.equal(withCouple.body.data.partnerName, 'Ricardo');
   const uploadedImage = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO+jR0sAAAAASUVORK5CYII=';
-  const withImages = await request(app).put(base + '/' + id).set('Authorization', bearer).send({ image: uploadedImage, images: [uploadedImage, '/padrinhos/outra-foto.jpg'] });
+  const withImages = await request(app).put(base + '/' + id).set('Authorization', bearer).send({ image: uploadedImage, images: ['/padrinhos/outra-foto.jpg'] });
   assert.equal(withImages.body.data.image, uploadedImage);
-  assert.deepEqual(withImages.body.data.images, [uploadedImage, '/padrinhos/outra-foto.jpg']);
+  assert.deepEqual(withImages.body.data.images, ['/padrinhos/outra-foto.jpg']);
   assert.equal((await request(app).put(base + '/' + id).set('Authorization', bearer).send({ image: 'data:image/svg+xml;base64,PHN2Zz4=' })).status, 422);
-  assert.equal((await request(app).put(base + '/' + id).set('Authorization', bearer).send({ images: Array(5).fill(uploadedImage) })).status, 422);
+  assert.equal((await request(app).put(base + '/' + id).set('Authorization', bearer).send({ images: [uploadedImage, uploadedImage] })).status, 422);
   assert.equal((await request(app).put(base + '/' + id).set('Authorization', bearer).send({ partnerName: 'a'.repeat(121) })).status, 422);
   const list = await request(app).get(base + '?name=Ana&role=bridesmaid&active=true&page=1&limit=1').set('Authorization', bearer);
   assert.equal(list.body.data.pagination.total, 1); assert.equal(list.body.data.data[0]._id, id);
@@ -44,8 +44,9 @@ test('CRUD de padrinhos valida, filtra e pagina', { skip: !connection }, async (
   assert.equal(publicList.body.data[0].partnerName, 'Ricardo');
   assert.equal(publicList.body.data[0].cardRole, 'Padrinhos da noiva');
   assert.equal(publicList.body.data[0].image, uploadedImage);
+  assert.deepEqual(publicList.body.data[0].images, ['/padrinhos/outra-foto.jpg']);
   assert.equal(list.body.data.data[0].image, uploadedImage);
-  assert.deepEqual(list.body.data.data[0].images, [uploadedImage, '/padrinhos/outra-foto.jpg']);
+  assert.deepEqual(list.body.data.data[0].images, ['/padrinhos/outra-foto.jpg']);
   const promoted = await request(app).put(base + '/' + id).set('Authorization', bearer).send({ image: '', images: [uploadedImage] });
   assert.equal(promoted.body.data.image, uploadedImage);
   assert.deepEqual(promoted.body.data.images, []);

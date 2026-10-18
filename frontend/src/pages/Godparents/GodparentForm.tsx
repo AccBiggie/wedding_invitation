@@ -43,7 +43,8 @@ export function GodparentForm({ id, onClose, onSaved }: { id?: string; onClose: 
         <TextField label="Foto do card (URL)" value={form.image.startsWith('data:') || form.image.startsWith('/api/images/') ? '' : form.image} onChange={e => change('image', e.target.value)} helperText="Opcional: informe uma URL pública ou envie imagens abaixo." />
         <TextField label="Ordem" type="number" value={form.order} onChange={e => change('order', Number(e.target.value))} slotProps={{ htmlInput: { min: 0, step: 1 } }} />
       </Box>
-      <ImageUpload value={photos} category="godparent" maxImages={5} disabled={saving} onBusyChange={setUploading} onChange={setPhotos} />
+      {photos.length > 2 && <Alert severity="warning">Este cadastro tem mais de duas fotos. Remova as excedentes antes de salvar.</Alert>}
+      <ImageUpload value={photos} category="godparent" maxImages={2} disabled={saving} onBusyChange={setUploading} onChange={setPhotos} />
       <TextField label="Descrição" multiline minRows={3} value={form.description} onChange={e => change('description', e.target.value)} slotProps={{ htmlInput: { maxLength: 1000 } }} />
       <FormControlLabel control={<Switch checked={form.active} onChange={e => change('active', e.target.checked)} />} label="Ativo" />
       <Stack direction="row" spacing={1} sx={{ justifyContent: 'flex-end', pt: 2 }}><Button onClick={onClose} disabled={saving || uploading}>Cancelar</Button><Button type="submit" variant="contained" startIcon={<SaveOutlined />} disabled={saving || uploading}>{saving ? 'Salvando...' : 'Salvar'}</Button></Stack>

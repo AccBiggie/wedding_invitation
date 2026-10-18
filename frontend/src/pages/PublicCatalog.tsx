@@ -4,7 +4,7 @@ import { resolveImageUrl } from '../services/images.service';
 import type { ApiResponse, GiftProduct, Godparent } from '../types/api';
 const currency = (value: number) => new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(value);
 const roleName: Record<Godparent['role'], string> = { groomsman: 'Padrinho', bridesmaid: 'Madrinha', mother: 'Mãe', father: 'Pai', other: 'Outro' };
-interface Couple { names: string[]; role: string; photo: string }
+interface Couple { names: string[]; role: string; photos: string[] }
 function GiftDescription({ description }: { description: string }) {
   const [expanded, setExpanded] = useState(false);
   const [overflow, setOverflow] = useState(false);
@@ -28,7 +28,7 @@ export function PublicGodparents({ fallback, Carousel, GodparentCard }: { fallba
   const [items, setItems] = useState<Godparent[] | null>(null);
   useEffect(() => { api.get<ApiResponse<Godparent[]>>('/public/godparents').then(r => setItems(r.data.data)).catch(() => setItems([])); }, []);
   if (!items?.length) return <>{fallback}</>;
-  return <Carousel label="Padrinhos">{items.map(item => <GodparentCard key={item._id} couple={{ names: [item.name, item.partnerName].filter(Boolean), role: item.cardRole || roleName[item.role], photo: resolveImageUrl(item.image) }} />)}</Carousel>;
+  return <Carousel label="Padrinhos">{items.map(item => <GodparentCard key={item._id} couple={{ names: [item.name, item.partnerName].filter(Boolean), role: item.cardRole || roleName[item.role], photos: [item.image, ...(item.images || [])].filter(Boolean).slice(0, 2).map(resolveImageUrl) }} />)}</Carousel>;
 }
 export function PublicGifts({ Carousel }: { Carousel: ({ label, children }: { label: string; children: ReactNode }) => ReactNode }) {
   const [items, setItems] = useState<GiftProduct[]>([]);

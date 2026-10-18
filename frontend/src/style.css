@@ -236,16 +236,20 @@ body{background:#f5f7fb}
 .wed-carousel-dots button.is-active{width:26px;background:var(--wed-gold)}
 @media(prefers-reduced-motion:reduce){.wed-carousel-track{scroll-behavior:auto}}
 
-.wed-pad{position:relative;display:flex;flex-direction:column;align-items:center;gap:.35rem;padding:2rem 1rem 1.4rem;text-align:center}
-/* O icone divide a faixa do topo com a foto (um no centro, outra na direita);
-   o nome comeca abaixo dela para nunca correr por baixo. */
-.wed-pad strong{margin-top:1.6rem;font-weight:500;font-size:calc(1.24rem * var(--wed-font-scale, 1));color:var(--wed-green)}
+.wed-pad{display:flex;flex-direction:column;align-items:center;gap:.35rem;padding:1.35rem 1rem 1.4rem;text-align:center}
+.wed-pad strong{margin-top:.55rem;font-weight:500;font-size:calc(1.24rem * var(--wed-font-scale, 1));color:var(--wed-green)}
 .wed-pad-role{font-size:calc(.98rem * var(--wed-font-scale, 1));color:#8a918b}
-/* Foto no topo, a direita. Fica dentro da borda de proposito: se vazasse, o
-   scroller do carrossel cortaria o circulo do card da ponta. */
-.wed-pad-photo{position:absolute;top:12px;right:12px;display:flex;align-items:center;justify-content:center;width:64px;height:64px;border:3px solid var(--wed-gold);border-radius:50%;background:var(--wed-cream);overflow:hidden;box-shadow:0 5px 15px rgba(31,69,54,.22)}
-.wed-pad-photo img{display:block;width:100%;height:100%;object-fit:cover}
-.wed-pad-initials{font-size:calc(1.15rem * var(--wed-font-scale, 1));color:var(--wed-green)}
+.wed-pad-gallery{position:relative;display:flex;align-items:center;justify-content:center;gap:.8rem;width:100%;height:185px;padding-top:25px}
+.wed-pad-photo{position:relative;z-index:1;display:flex;align-items:center;justify-content:center;width:min(42%,105px);height:132px;padding:5px;border:1px solid var(--wed-gold-soft);border-radius:7px 4px 9px 5px;background:radial-gradient(ellipse at 8% 22%,rgba(191,160,87,.2),transparent 42%),radial-gradient(ellipse at 92% 80%,rgba(82,127,105,.22),transparent 48%),var(--wed-card);box-shadow:0 5px 14px rgba(31,69,54,.15),inset 0 0 0 2px var(--wed-card)}
+.wed-pad-gallery.is-pair .wed-pad-photo:first-child{transform:rotate(-3deg)}
+.wed-pad-gallery.is-pair .wed-pad-photo:nth-child(2){transform:rotate(3deg)}
+.wed-pad-photo:nth-child(2){border-radius:4px 9px 5px 7px}
+.wed-pad-hanger{position:absolute;top:-24px;left:50%;width:6px;height:6px;border:1px solid var(--wed-gold);border-radius:50%;background:var(--wed-card);transform:translateX(-50%)}
+.wed-pad-hanger::before,.wed-pad-hanger::after{position:absolute;top:3px;left:50%;width:45px;height:1.5px;background:var(--wed-gold);content:"";transform-origin:left center}
+.wed-pad-hanger::before{transform:rotate(154deg)}
+.wed-pad-hanger::after{transform:rotate(26deg)}
+.wed-pad-photo img{display:block;width:100%;height:100%;object-fit:cover;border-radius:3px}
+.wed-pad-initials{font-size:calc(1.8rem * var(--wed-font-scale, 1));color:var(--wed-green)}
 .wed-gift{display:flex;flex-direction:column;align-items:center;gap:.35rem;padding:1rem 1rem 1.3rem;text-align:center}
 .wed-gift-image{display:flex;align-items:center;justify-content:center;width:100%;height:150px;margin-bottom:.45rem;border-radius:8px;background:#f4f0e7;overflow:hidden;color:var(--wed-gold);font-size:calc(3rem * var(--wed-font-scale, 1))}
 .wed-gift-image img{width:100%;height:100%;object-fit:contain}

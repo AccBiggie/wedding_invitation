@@ -96,7 +96,6 @@ const IconMapPin = props => <Svg {...props}><path d="M12 11m-3 0a3 3 0 1 0 6 0a3
 const IconHeart = props => <Svg {...props} fill="currentColor" strokeWidth="0"><path d="M19.5 12.572l-7.5 7.428l-7.5 -7.428a5 5 0 1 1 7.5 -6.566a5 5 0 1 1 7.5 6.566z" /></Svg>;
 const IconCheck = props => <Svg {...props} strokeWidth="2.4"><path d="M5 12l5 5l10 -10" /></Svg>;
 const IconPhotoOff = props => <Svg {...props}><path d="M15 8h.01" /><path d="M6 3h12a3 3 0 0 1 3 3v12a3 3 0 0 1 -3 3h-12a3 3 0 0 1 -3 -3v-12a3 3 0 0 1 3 -3z" /><path d="M4 15l4 -4c.9 -.9 2 -.9 2.9 0l5.1 5" /><path d="M14 14l1 -1c.9 -.9 2 -.9 2.9 0l3.1 3" /><path d="M3 3l18 18" /></Svg>;
-const IconUsers = props => <Svg {...props}><path d="M9 7m-4 0a4 4 0 1 0 8 0a4 4 0 1 0 -8 0" /><path d="M3 21v-2a4 4 0 0 1 4 -4h4a4 4 0 0 1 4 4v2" /><path d="M16 3.13a4 4 0 0 1 0 7.75" /><path d="M21 21v-2a4 4 0 0 0 -3 -3.85" /></Svg>;
 const IconGift = props => <Svg {...props}><path d="M3 8m0 1a1 1 0 0 1 1 -1h16a1 1 0 0 1 1 1v2a1 1 0 0 1 -1 1h-16a1 1 0 0 1 -1 -1z" /><path d="M12 8l0 13" /><path d="M19 12v7a2 2 0 0 1 -2 2h-10a2 2 0 0 1 -2 -2v-7" /><path d="M7.5 8a2.5 2.5 0 0 1 0 -5a4.8 8 0 0 1 4.5 5a4.8 8 0 0 1 4.5 -5a2.5 2.5 0 0 1 0 5" /></Svg>;
 const IconMessage = props => <Svg {...props}><path d="M8 9h8" /><path d="M8 13h6" /><path d="M18 4a3 3 0 0 1 3 3v8a3 3 0 0 1 -3 3h-5l-5 3v-3h-2a3 3 0 0 1 -3 -3v-8a3 3 0 0 1 3 -3z" /></Svg>;
 const IconMenu = props => <Svg {...props} strokeWidth="1.8"><path d="M4 6h16M4 12h16M4 18h16" /></Svg>;
@@ -361,15 +360,18 @@ function Carousel({ label, children }) {
 }
 
 function GodparentCard({ couple }) {
-  const [failed, setFailed] = useState(false);
+  const [failed, setFailed] = useState({});
+  const photos = (couple.photos || (couple.photo ? [couple.photo] : [])).filter(Boolean).slice(0, 2);
   const initials = couple.names.map(name => name.trim().charAt(0)).join('');
   return <div className="wed-card wed-pad">
-    <span className="wed-pad-photo">
-      {couple.photo && !failed
-        ? <img src={couple.photo} alt={couple.names.join(' e ')} loading="lazy" onError={() => setFailed(true)} />
-        : <span className="wed-pad-initials">{initials}</span>}
-    </span>
-    <span className="wed-pad-icon"><IconUsers size={24} /></span>
+    <div className={`wed-pad-gallery${photos.length > 1 ? ' is-pair' : ''}`}>
+      {(photos.length ? photos : ['']).map((photo, index) => <span className="wed-pad-photo" key={`${photo}-${index}`}>
+        <span className="wed-pad-hanger" aria-hidden="true" />
+        {photo && !failed[photo]
+          ? <img src={photo} alt={photos.length === 1 ? couple.names.join(' e ') : couple.names[index] || couple.names.join(' e ')} loading="lazy" onError={() => setFailed(current => ({ ...current, [photo]: true }))} />
+          : <span className="wed-pad-initials">{photos.length < 2 ? initials : couple.names[index]?.trim().charAt(0) || initials}</span>}
+      </span>)}
+    </div>
     <strong>{couple.names.join(' & ')}</strong>
     <span className="wed-pad-role">{couple.role}</span>
   </div>;
