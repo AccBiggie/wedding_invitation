@@ -284,8 +284,17 @@ body{background:#f5f7fb}
 a.wed-shop-badge{text-decoration:none;transition:border-color .15s,background .15s}
 a.wed-shop-badge:hover{border-color:var(--wed-gold);background:#fffcf3}
 .wed-shop-desc{margin:.35rem 0 0;font-size:calc(1.05rem * var(--wed-font-scale, 1));line-height:1.4;color:#78817b}
-.wed-shop-cats{display:flex;flex-wrap:wrap;justify-content:center;gap:1.4rem clamp(1rem,3.4vw,2.6rem);margin:1.4rem 0 0;padding:1.3rem 0 0;border-top:1px solid #f2ecdf;list-style:none}
-.wed-shop-cats li{display:flex;flex-direction:column;align-items:center;gap:.6rem;min-width:104px;max-width:160px;text-align:center}
+/* A linha divisoria fica no trilho, fora da mascara de fade da faixa. */
+.wed-shop-rail{margin:1.4rem 0 0;padding-top:.8rem;border-top:1px solid #f2ecdf}
+.wed-shop-marquee{padding:.5rem 0 .2rem;overflow:hidden}
+.wed-shop-marquee.is-marquee{-webkit-mask-image:linear-gradient(90deg,transparent,#000 9%,#000 91%,transparent);mask-image:linear-gradient(90deg,transparent,#000 9%,#000 91%,transparent)}
+.wed-shop-marquee.is-scroll{overflow-x:auto;scrollbar-width:none}
+.wed-shop-marquee.is-scroll::-webkit-scrollbar{display:none}
+.wed-shop-track{display:flex;width:max-content;margin:0 auto;will-change:transform}
+.wed-shop-marquee.is-marquee .wed-shop-track,.wed-shop-marquee.is-scroll .wed-shop-track{margin:0}
+.wed-shop-cats{--shop-gap:clamp(1rem,3.4vw,2.6rem);display:flex;flex-wrap:nowrap;gap:var(--shop-gap);margin:0;padding:0;list-style:none}
+.wed-shop-marquee.is-marquee .wed-shop-cats{padding-right:var(--shop-gap)}
+.wed-shop-cats li{flex:0 0 auto;display:flex;flex-direction:column;align-items:center;gap:.6rem;min-width:104px;max-width:160px;text-align:center}
 .wed-shop-link{display:flex;flex-direction:column;align-items:center;gap:.6rem;width:100%;padding:.35rem .3rem .45rem;border-radius:12px;color:inherit;text-decoration:none;cursor:pointer;-webkit-tap-highlight-color:transparent}
 .wed-shop-link:focus-visible{outline:2px solid var(--wed-gold);outline-offset:2px}
 .wed-shop-thumb img{transition:transform .25s}
@@ -432,9 +441,8 @@ a.wed-shop-badge:hover{border-color:var(--wed-gold);background:#fffcf3}
   .wed-shop{padding:1.1rem 1rem 1.2rem}
   .wed-shop-title{font-size:calc(1.2rem * var(--wed-font-scale, 1))}
   .wed-shop-badge{padding:.18rem .6rem;font-size:calc(.7rem * var(--wed-font-scale, 1))}
-  .wed-shop-cats{flex-wrap:nowrap;justify-content:flex-start;gap:1rem;margin-right:-1rem;padding-right:2.2rem;overflow-x:auto;scroll-snap-type:x proximity;scrollbar-width:none;-webkit-mask-image:linear-gradient(90deg,#000 88%,transparent);mask-image:linear-gradient(90deg,#000 88%,transparent)}
-  .wed-shop-cats::-webkit-scrollbar{display:none}
-  .wed-shop-cats li{flex:0 0 auto;min-width:88px;padding-bottom:.3rem;scroll-snap-align:start}
+  .wed-shop-cats{--shop-gap:1rem}
+  .wed-shop-cats li{min-width:88px;padding-bottom:.3rem}
   .wed-shop-thumb{width:78px;height:78px}
   .wed-shop-name{font-size:calc(.98rem * var(--wed-font-scale, 1))}
   .wed-pix-actions{width:100%;flex-direction:column}
