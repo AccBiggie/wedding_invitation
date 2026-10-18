@@ -23,24 +23,40 @@ export async function saveSettings(req, res, next) {
 }
 
 export async function getPublicStatus(req, res, next) {
-  try { ok(res, { active: Boolean(await PixSettings.exists({ singleton: 'default', active: true })) }); } catch (error) { next(error); }
+  // A chave ja e publica no payload do QR Code; expomos para o card "Chave PIX" da landing.
+  try { const settings = await PixSettings.findOne({ singleton: 'default', active: true }); ok(res, { active: Boolean(settings), pixKey: settings?.pixKey || null }); } catch (error) { next(error); }
+}
+
+// Monta o BR Code a partir da configuracao ativa; sem amount o pagador digita o valor no banco.
+async function buildPix(amount) {
+  const settings = await PixSettings.findOne({ singleton: 'default', active: true });
+  if (!settings || !validPixKey(settings.keyType, settings.pixKey) || !settings.receiverName.trim() || !settings.receiverCity.trim()) return null;
+  const payload = generateStaticBrCode({
+    pixKey: settings.pixKey,
+    receiverName: projectReceiverName(settings.receiverName),
+    receiverCity: projectCity(settings.receiverCity),
+    description: settings.description || undefined,
+    referenceLabel: crypto.randomBytes(10).toString('hex').toUpperCase(),
+    amount
+  });
+  return { payload, qrCode: await QRCode.toDataURL(payload, { errorCorrectionLevel: 'M', width: 320, margin: 2 }) };
 }
 
 export async function generate(req, res, next) {
   try {
     const amount = Number(req.body.amount);
     if (!Number.isFinite(amount) || amount <= 0 || amount > 1000000 || Math.abs(Math.round(amount * 100) - amount * 100) > 1e-7) return fail(res, 422, 'Informe um valor valido entre R$ 0,01 e R$ 1.000.000,00.');
-    const settings = await PixSettings.findOne({ singleton: 'default', active: true });
-    if (!settings || !validPixKey(settings.keyType, settings.pixKey) || !settings.receiverName.trim() || !settings.receiverCity.trim()) return fail(res, 422, 'Configuracao PIX indisponivel.');
-    const payload = generateStaticBrCode({
-      pixKey: settings.pixKey,
-      receiverName: projectReceiverName(settings.receiverName),
-      receiverCity: projectCity(settings.receiverCity),
-      description: settings.description || undefined,
-      referenceLabel: crypto.randomBytes(10).toString('hex').toUpperCase(),
-      amount
-    });
-    const qrCode = await QRCode.toDataURL(payload, { errorCorrectionLevel: 'M', width: 320, margin: 2 });
-    ok(res, { amount, payload, qrCode });
+    const pix = await buildPix(amount);
+    if (!pix) return fail(res, 422, 'Configuracao PIX indisponivel.');
+    ok(res, { amount, ...pix });
+  } catch (error) { next(error); }
+}
+
+// QR Code da chave, sem valor definido: usado no card "Chave PIX" da landing.
+export async function keyQrCode(req, res, next) {
+  try {
+    const pix = await buildPix();
+    if (!pix) return fail(res, 422, 'Configuracao PIX indisponivel.');
+    ok(res, pix);
   } catch (error) { next(error); }
 }

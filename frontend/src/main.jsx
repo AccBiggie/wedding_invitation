@@ -3,7 +3,7 @@ import { createRoot } from 'react-dom/client';
 import { BrowserRouter } from 'react-router-dom';
 import api, { tokenStore } from './services/api';
 import { PublicGodparents, PublicGifts } from './pages/PublicCatalog';
-import { GravataEntry } from './pages/Pix/GravataEntry';
+import { GravataDialog, PixQrDialog, usePixStatus } from './pages/Pix/GravataEntry';
 import { appearanceAccent, baseColors, defaultAppearance, fontSizeScale, landingFont, weddingDisplayFonts } from './theme/appearance';
 import '@tabler/core/dist/css/tabler.min.css';
 import './style.css';
@@ -100,6 +100,7 @@ const IconGift = props => <Svg {...props}><path d="M3 8m0 1a1 1 0 0 1 1 -1h16a1 
 const IconMessage = props => <Svg {...props}><path d="M8 9h8" /><path d="M8 13h6" /><path d="M18 4a3 3 0 0 1 3 3v8a3 3 0 0 1 -3 3h-5l-5 3v-3h-2a3 3 0 0 1 -3 -3v-8a3 3 0 0 1 3 -3z" /></Svg>;
 const IconMenu = props => <Svg {...props} strokeWidth="1.8"><path d="M4 6h16M4 12h16M4 18h16" /></Svg>;
 const IconClose = props => <Svg {...props} strokeWidth="1.8"><path d="M18 6l-12 12M6 6l12 12" /></Svg>;
+const IconQrcode = props => <Svg {...props}><path d="M4 4h6v6h-6z" /><path d="M14 4h6v6h-6z" /><path d="M4 14h6v6h-6z" /><path d="M7 7v.01" /><path d="M17 7v.01" /><path d="M7 17v.01" /><path d="M14 14h3" /><path d="M20 14v.01" /><path d="M14 14v3" /><path d="M14 20h3" /><path d="M17 17h3" /><path d="M20 17v3" /></Svg>;
 const IconCopy = props => <Svg {...props}><path d="M8 8m0 2a2 2 0 0 1 2 -2h8a2 2 0 0 1 2 2v8a2 2 0 0 1 -2 2h-8a2 2 0 0 1 -2 -2z" /><path d="M16 8v-2a2 2 0 0 0 -2 -2h-8a2 2 0 0 0 -2 2v8a2 2 0 0 0 2 2h2" /></Svg>;
 const IconChevronLeft = props => <Svg {...props} strokeWidth="1.8"><path d="M15 6l-6 6l6 6" /></Svg>;
 const IconChevronRight = props => <Svg {...props} strokeWidth="1.8"><path d="M9 6l6 6l-6 6" /></Svg>;
@@ -163,6 +164,8 @@ const NAV = [
   { id: 'cerimonia', label: 'Cerimônia' },
   { id: 'presentes', label: 'Lista de presentes' },
   { id: 'recados', label: 'Recados' },
+  // Action: abre o modal da gravata online em vez de rolar ate uma secao.
+  { id: 'gravata', label: 'Gravata', action: true },
   { id: 'confirmar', label: 'Confirme sua presença' }
 ];
 // O convidado chega na landing pelo link pessoal; guardamos o caminho para que
@@ -223,7 +226,7 @@ function useActiveSection(ready) {
   return active;
 }
 
-function LandingNav({ couple }) {
+function LandingNav({ couple, onGravata }) {
   const [scrolled, setScrolled] = useState(false);
   const [open, setOpen] = useState(false);
   const active = useActiveSection(true);
@@ -238,7 +241,9 @@ function LandingNav({ couple }) {
       <a className="wed-nav-brand" href="#home" onClick={event => go(event, 'home')}><IconFlower size={22} />{couple[0]}<span>&amp;</span>{couple[1]}</a>
       <button className="wed-nav-toggle" onClick={() => setOpen(!open)} aria-expanded={open} aria-label={open ? 'Fechar menu' : 'Abrir menu'}>{open ? <IconClose size={24} /> : <IconMenu size={24} />}</button>
       <nav className={`wed-nav-links${open ? ' is-open' : ''}`}>
-        {NAV.map(item => <a key={item.id} href={`#${item.id}`} className={active === item.id ? 'is-active' : ''} onClick={event => go(event, item.id)}>{item.label}</a>)}
+        {NAV.map(item => item.action
+          ? onGravata && <a key={item.id} href={`#${item.id}`} role="button" onClick={event => { event.preventDefault(); setOpen(false); onGravata(); }}>{item.label}</a>
+          : <a key={item.id} href={`#${item.id}`} className={active === item.id ? 'is-active' : ''} onClick={event => go(event, item.id)}>{item.label}</a>)}
       </nav>
     </div>
   </header>;
@@ -262,7 +267,7 @@ function SiteFooter({ wedding, onLanding }) {
       </div>
       <div className="wed-foot-col">
         <h3>Menu</h3>
-        <ul>{NAV.slice(1).map(item => <li key={item.id}><a href={sectionHref(item.id)} onClick={onLanding ? event => scrollToSection(event, item.id) : undefined}>{item.label}</a></li>)}</ul>
+        <ul>{NAV.slice(1).filter(item => !item.action).map(item => <li key={item.id}><a href={sectionHref(item.id)} onClick={onLanding ? event => scrollToSection(event, item.id) : undefined}>{item.label}</a></li>)}</ul>
       </div>
       <div className="wed-foot-col">
         <h3>Contato</h3>
@@ -416,6 +421,11 @@ function Landing() {
   const appearanceProps = usePublicAppearance(wedding);
   const [photoFailed, setPhotoFailed] = useState(false);
   const [copied, setCopied] = useState(false);
+  const [gravataOpen, setGravataOpen] = useState(false);
+  const [pixQrOpen, setPixQrOpen] = useState(false);
+  const pix = usePixStatus();
+  // Chave do painel PIX; a do config fica de reserva enquanto o PIX nao for configurado.
+  const pixKey = pix.pixKey || wedding?.gifts.pix.value;
   // Deep link (/casamento#presentes): a secao so existe depois que os dados chegam.
   useEffect(() => {
     if (!wedding || !location.hash) return;
@@ -426,12 +436,14 @@ function Landing() {
   if (wedding === false) return <div className="wed wed-plain"><div className="wed-state">Não foi possível carregar os dados do casamento.</div></div>;
   if (!wedding) return <div className="wed wed-plain"><div className="wed-state">Carregando...</div></div>;
   const target = new Date(wedding.datetime).getTime();
-  const copyPix = async () => { try { await navigator.clipboard.writeText(wedding.gifts.pix.value); setCopied(true); setTimeout(() => setCopied(false), 2500); } catch { /* sem clipboard */ } };
+  const copyPix = async () => { try { await navigator.clipboard.writeText(pixKey); setCopied(true); setTimeout(() => setCopied(false), 2500); } catch { /* sem clipboard */ } };
   return <div className="wed wed-lp" {...appearanceProps}>
     <div className="wed-lp-bg" aria-hidden="true">
       {photoFailed ? <div className="wed-lp-bg-empty" /> : <img src={wedding.photo} alt="" onError={() => setPhotoFailed(true)} />}
     </div>
-    <LandingNav couple={wedding.couple} />
+    <LandingNav couple={wedding.couple} onGravata={pix.active ? () => setGravataOpen(true) : null} />
+    <GravataDialog open={gravataOpen} onClose={() => setGravataOpen(false)} />
+    <PixQrDialog open={pixQrOpen} onClose={() => setPixQrOpen(false)} />
     <main className="wed-lp-body">
       <section className="wed-lp-hero" id="home">
         <p className="wed-lp-kicker">Vamos nos casar</p>
@@ -480,16 +492,18 @@ function Landing() {
           <h2 className="wed-sec-title"><Sprig />{wedding.gifts.title}<Sprig flip /></h2>
           <p className="wed-sec-intro">{wedding.gifts.intro}</p>
           <PublicGifts Carousel={Carousel} />
-          <div className="wed-card wed-pix">
+          {pix.loaded && <div className="wed-card wed-pix">
             <span className="wed-pad-icon"><IconGift size={24} /></span>
             <div className="wed-pix-body">
               <strong>{wedding.gifts.pix.label}</strong>
-              <code>{wedding.gifts.pix.value}</code>
+              <code>{pixKey}</code>
               <span>{wedding.gifts.pix.hint}</span>
             </div>
-            <button className="wed-btn wed-btn-ghost" onClick={copyPix}><IconCopy size={18} />{copied ? 'Copiado!' : 'Copiar chave'}</button>
-          </div>
-          <GravataEntry />
+            <div className="wed-pix-actions">
+              <button className="wed-btn wed-btn-ghost" onClick={copyPix}><IconCopy size={18} />{copied ? 'Copiado!' : 'Copiar chave'}</button>
+              {pix.active && <button className="wed-btn wed-btn-ghost" onClick={() => setPixQrOpen(true)}><IconQrcode size={18} />Visualizar QR Code</button>}
+            </div>
+          </div>}
           <div className="wed-grid-2">{wedding.gifts.stores.map(store => {
             const Tag = store.url ? 'a' : 'div';
             const props = store.url ? { href: store.url, target: '_blank', rel: 'noreferrer' } : {};
