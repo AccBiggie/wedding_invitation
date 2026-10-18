@@ -4,6 +4,7 @@ import { BrowserRouter } from 'react-router-dom';
 import api, { tokenStore } from './services/api';
 import { PublicGodparents, PublicGifts, PublicStoreCategories } from './pages/PublicCatalog';
 import { GravataDialog, PixQrDialog, usePixStatus } from './pages/Pix/GravataEntry';
+import { ScrollReveal } from './components/reveal/ScrollReveal';
 import { appearanceAccent, baseColors, defaultAppearance, fontSizeScale, landingFont, weddingDisplayFonts } from './theme/appearance';
 import monogramSvg from './assets/logo/monograma-sa.svg?raw';
 import '@tabler/core/dist/css/tabler.min.css';
@@ -264,7 +265,7 @@ function SiteFooter({ wedding, onLanding }) {
     contact.email && { href: `mailto:${contact.email}`, icon: <IconMail size={18} />, label: 'E-mail' }
   ].filter(Boolean);
   return <footer className="wed-foot">
-    <div className="wed-foot-top">
+    <ScrollReveal stagger className="wed-foot-top">
       <div className="wed-foot-brand">
         <span className="wed-foot-logo"><Monogram height={48} /><em>{wedding.couple[0]} &amp; {wedding.couple[1]}</em></span>
         {socials.length > 0 && <div className="wed-foot-social">{socials.map(social => <a key={social.label} href={social.href} target="_blank" rel="noreferrer" aria-label={social.label}>{social.icon}</a>)}</div>}
@@ -287,7 +288,7 @@ function SiteFooter({ wedding, onLanding }) {
           <li className="wed-foot-plain">{wedding.date.join(' ')} {'•'} {wedding.time.join('')}</li>
         </ul>
       </div>
-    </div>
+    </ScrollReveal>
     <div className="wed-foot-bar"><div className="wed-foot-bar-inner">
       <span>{'©'} {new Date().getFullYear()} Todos os direitos reservados.</span>
       <span className="wed-foot-fetech" role="img" aria-label="Fetech"><FetechLogo height={24} /></span>
@@ -357,13 +358,13 @@ function Carousel({ label, children }) {
   const hold = () => setPaused(true);
   const release = () => setPaused(false);
   return <div className="wed-carousel" onMouseEnter={hold} onMouseLeave={release} onFocusCapture={hold} onBlurCapture={release} onTouchStart={hold} onTouchEnd={release}>
-    <div className="wed-carousel-track" ref={trackRef} tabIndex="0" role="group" aria-label={label}>{children}</div>
+    <ScrollReveal stagger className="wed-carousel-track" ref={trackRef} tabIndex="0" role="group" aria-label={label}>{children}</ScrollReveal>
     {edges.scrollable && <>
       <button type="button" className="wed-carousel-arrow wed-carousel-prev" onClick={() => goTo(index - 1)} disabled={edges.start} aria-label="Anterior"><IconChevronLeft size={22} /></button>
       <button type="button" className="wed-carousel-arrow wed-carousel-next" onClick={() => goTo(edges.end ? 0 : index + 1)} aria-label="Próximo"><IconChevronRight size={22} /></button>
-      <div className="wed-carousel-dots">
+      <ScrollReveal className="wed-carousel-dots" preset="fade" delay={240}>
         {Array.from({ length: total }, (_, position) => <button type="button" key={position} className={position === index ? 'is-active' : ''} onClick={() => goTo(position)} aria-label={`Ir para o item ${position + 1}`} aria-current={position === index} />)}
-      </div>
+      </ScrollReveal>
     </>}
   </div>;
 }
@@ -402,21 +403,21 @@ function Guestbook() {
     finally { setSending(false); }
   };
   return <div className="wed-recados">
-    <form className="wed-card wed-recado-form" onSubmit={submit}>
+    <ScrollReveal as="form" className="wed-card wed-recado-form" onSubmit={submit}>
       <label className="wed-field"><span>Seu nome</span><input required maxLength="120" value={form.name} onChange={event => { setSent(false); setForm({ ...form, name: event.target.value }); }} placeholder="Como podemos te chamar?" /></label>
       <label className="wed-field"><span>Seu recado</span><textarea required rows="4" maxLength="800" value={form.message} onChange={event => { setSent(false); setForm({ ...form, message: event.target.value }); }} placeholder="Escreva um carinho para os noivos..." /></label>
       {error && <p className="wed-form-error">{error}</p>}
       {sent && !error && <p className="wed-form-ok"><IconCheck size={15} />Recado enviado. Obrigado!</p>}
       <button className="wed-btn" disabled={sending}><IconMessage size={20} />{sending ? 'Enviando...' : 'Deixar recado'}</button>
-    </form>
-    <div className="wed-recado-list">
+    </ScrollReveal>
+    <ScrollReveal stagger delay={80} className="wed-recado-list">
       {items.length === 0
         ? <p className="wed-empty">Nenhum recado ainda. Seja o primeiro a escrever!</p>
         : items.map(item => <blockquote className="wed-card wed-recado" key={item._id}>
           <p>{item.message}</p>
           <footer><strong>{item.name}</strong><time>{new Date(item.createdAt).toLocaleDateString('pt-BR')}</time></footer>
         </blockquote>)}
-    </div>
+    </ScrollReveal>
   </div>;
 }
 
@@ -460,25 +461,25 @@ function Landing() {
 
       <div className="wed-lp-sheet">
         <section className="wed-sec" id="sobre">
-          <h2 className="wed-sec-title"><Sprig />{wedding.about.title}<Sprig flip /></h2>
-          <div className="wed-prose">{wedding.about.paragraphs.map(paragraph => <p key={paragraph.slice(0, 24)}>{paragraph}</p>)}</div>
+          <ScrollReveal as="h2" className="wed-sec-title"><Sprig />{wedding.about.title}<Sprig flip /></ScrollReveal>
+          <ScrollReveal stagger preset="fade" delay={80} className="wed-prose">{wedding.about.paragraphs.map(paragraph => <p key={paragraph.slice(0, 24)}>{paragraph}</p>)}</ScrollReveal>
         </section>
 
         <section className="wed-sec" id="padrinhos">
-          <h2 className="wed-sec-title"><Sprig />{wedding.godparents.title}<Sprig flip /></h2>
-          <p className="wed-sec-intro">{wedding.godparents.intro}</p>
+          <ScrollReveal as="h2" className="wed-sec-title"><Sprig />{wedding.godparents.title}<Sprig flip /></ScrollReveal>
+          <ScrollReveal as="p" className="wed-sec-intro" preset="fade" delay={80}>{wedding.godparents.intro}</ScrollReveal>
           <PublicGodparents Carousel={Carousel} GodparentCard={GodparentCard} fallback={<Carousel label="Padrinhos">{wedding.godparents.couples.map(couple => <GodparentCard key={couple.names.join()} couple={couple} />)}</Carousel>} />
         </section>
 
         <section className="wed-sec" id="cerimonia">
-          <h2 className="wed-sec-title"><Sprig />Cerimônia<Sprig flip /></h2>
-          <div className="wed-info-grid">
+          <ScrollReveal as="h2" className="wed-sec-title"><Sprig />Cerimônia<Sprig flip /></ScrollReveal>
+          <ScrollReveal stagger className="wed-info-grid">
             <InfoCard icon={<IconCalendar size={28} />} label="Data" lines={wedding.date} />
             <InfoCard icon={<IconClock size={28} />} label={'Horário'} lines={wedding.time} />
             <InfoCard icon={<IconFlower size={28} />} label={wedding.party.label} lines={wedding.party.lines} href={wedding.party.map} />
             <InfoCard icon={<IconMapPin size={28} />} label={wedding.ceremony.label} lines={wedding.ceremony.lines} href={wedding.ceremony.map} />
-          </div>
-          <div className="wed-card wed-map-card">
+          </ScrollReveal>
+          <ScrollReveal preset="scale-soft" className="wed-card wed-map-card">
             <h3 className="wed-card-title"><Sprig />Como chegar<Sprig flip /></h3>
             <div className="wed-map-frame">
               <div className="wed-map-canvas">
@@ -489,14 +490,14 @@ function Landing() {
                 <IconMapPin size={18} /><div><strong>{wedding.ceremony.name}</strong><span>{wedding.ceremony.fullAddress}</span></div>
               </a>
             </div>
-          </div>
+          </ScrollReveal>
         </section>
 
         <section className="wed-sec" id="presentes">
-          <h2 className="wed-sec-title"><Sprig />{wedding.gifts.title}<Sprig flip /></h2>
-          <p className="wed-sec-intro">{wedding.gifts.intro}</p>
+          <ScrollReveal as="h2" className="wed-sec-title"><Sprig />{wedding.gifts.title}<Sprig flip /></ScrollReveal>
+          <ScrollReveal as="p" className="wed-sec-intro" preset="fade" delay={80}>{wedding.gifts.intro}</ScrollReveal>
           <PublicGifts Carousel={Carousel} />
-          {pix.loaded && <div className="wed-card wed-pix">
+          {pix.loaded && <ScrollReveal className="wed-card wed-pix">
             <span className="wed-pad-icon"><IconGift size={24} /></span>
             <div className="wed-pix-body">
               <strong>{wedding.gifts.pix.label}</strong>
@@ -507,35 +508,35 @@ function Landing() {
               <button className="wed-btn wed-btn-ghost" onClick={copyPix}><IconCopy size={18} />{copied ? 'Copiado!' : 'Copiar chave'}</button>
               {pix.active && <button className="wed-btn wed-btn-ghost" onClick={() => setPixQrOpen(true)}><IconQrcode size={18} />Visualizar QR Code</button>}
             </div>
-          </div>}
+          </ScrollReveal>}
           {wedding.gifts.stores.filter(store => store.categories).map(store => <PublicStoreCategories key={store.name} store={store} icon={<IconGift size={24} />} />)}
-          <div className="wed-grid-2">{wedding.gifts.stores.filter(store => !store.categories).map(store => {
+          <ScrollReveal stagger className="wed-grid-2">{wedding.gifts.stores.filter(store => !store.categories).map(store => {
             const Tag = store.url ? 'a' : 'div';
             const props = store.url ? { href: store.url, target: '_blank', rel: 'noreferrer' } : {};
             return <Tag className={`wed-card wed-store${store.url ? ' wed-info-link' : ''}`} key={store.name} {...props}>
               <strong>{store.name}</strong><span>{store.description}</span>
               {store.url ? <span className="wed-info-hint">abrir lista</span> : <span className="wed-soon">em breve</span>}
             </Tag>;
-          })}</div>
+          })}</ScrollReveal>
         </section>
 
         <section className="wed-sec" id="recados">
-          <h2 className="wed-sec-title"><Sprig />Recados<Sprig flip /></h2>
-          <p className="wed-sec-intro">Deixe uma mensagem para os noivos. Ela aparece aqui no mural para todo mundo ver.</p>
+          <ScrollReveal as="h2" className="wed-sec-title"><Sprig />Recados<Sprig flip /></ScrollReveal>
+          <ScrollReveal as="p" className="wed-sec-intro" preset="fade" delay={80}>Deixe uma mensagem para os noivos. Ela aparece aqui no mural para todo mundo ver.</ScrollReveal>
           <Guestbook />
         </section>
 
         <section className="wed-sec wed-sec-cta" id="confirmar">
-          <h2 className="wed-sec-title"><Sprig />Confirme sua presença<Sprig flip /></h2>
+          <ScrollReveal as="h2" className="wed-sec-title"><Sprig />Confirme sua presença<Sprig flip /></ScrollReveal>
           {invitePath
-            ? <div className="wed-card wed-cta">
+            ? <ScrollReveal className="wed-card wed-cta">
               <p>Seu convite pessoal está a um clique. Lá você marca quem da sua família vai com você.</p>
               <a className="wed-btn" href={invitePath}><IconHeart size={20} />Ir para o meu convite</a>
-            </div>
-            : <div className="wed-card wed-cta">
+            </ScrollReveal>
+            : <ScrollReveal className="wed-card wed-cta">
               <p>A confirmação é feita pelo link pessoal que você recebeu dos noivos — é ele que identifica quem foi convidado.</p>
               <p className="wed-cta-hint">Procure a mensagem com o seu convite e abra o link por ali. Perdeu o link? Fale com os noivos pelo contato no rodapé.</p>
-            </div>}
+            </ScrollReveal>}
         </section>
       </div>
     </main>
