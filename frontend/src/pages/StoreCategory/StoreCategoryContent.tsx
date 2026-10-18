@@ -3,6 +3,7 @@ import axios from 'axios';
 import { resolveImageUrl } from '../../services/images.service';
 import { storeCategoriesService } from '../../services/storeCategories.service';
 import { categoryImageUrl } from '../../utils/categoryIcons';
+import { usePixStatus } from '../Pix/GravataEntry';
 import type { Pagination, PublicGiftProduct, PublicStoreCategory } from '../../types/api';
 const GiftDetailsDialog = lazy(() => import('./GiftDetailsDialog').then(module => ({ default: module.GiftDetailsDialog })));
 const currency = (value: number) => new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(value);
@@ -36,6 +37,7 @@ export function StoreCategoryContent({ slug, icons }: { slug: string; icons: { b
   const [state, setState] = useState<State>({ status: 'loading' });
   const [loadingMore, setLoadingMore] = useState(false); const [moreError, setMoreError] = useState(false);
   const [selected, setSelected] = useState<PublicGiftProduct | null>(null);
+  const pix = usePixStatus();
   const load = () => {
     setState({ status: 'loading' });
     storeCategoriesService.getPublicBySlug(slug, 1, PAGE_SIZE)
@@ -92,6 +94,6 @@ export function StoreCategoryContent({ slug, icons }: { slug: string; icons: { b
         </div>}
       </>}
     <a className="wed-catpage-back" href={STORE_LIST_HREF}>{icons.back}Ver todas as categorias</a>
-    {selected && <Suspense fallback={null}><GiftDetailsDialog product={selected} category={ready?.category.name || ''} onClose={() => setSelected(null)} /></Suspense>}
+    {selected && <Suspense fallback={null}><GiftDetailsDialog product={selected} category={ready?.category.name || ''} pixActive={pix.active} onClose={() => setSelected(null)} /></Suspense>}
   </section>;
 }

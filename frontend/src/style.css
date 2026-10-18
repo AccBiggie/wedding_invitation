@@ -583,7 +583,15 @@ a.wed-shop-badge:hover{border-color:var(--wed-gold);background:#fffcf3}
 .pixqr-code{display:flex;align-items:center;justify-content:center;width:260px;max-width:100%;aspect-ratio:1;padding:10px;border:1px solid var(--g-gold-soft);border-radius:12px;background:#fff;box-shadow:0 4px 14px rgba(150,120,50,.12)}
 .pixqr-code img{display:block;width:100%;height:100%}
 .pixqr-loading{font-size:1.1rem;color:#8a918b}
-.pixqr-text{max-width:300px;margin:0 0 2px;text-align:center;font-size:1.1rem;line-height:1.45;color:#5d6761}
+.pixqr-title{margin:-30px 40px 0;font-family:inherit;font-weight:500;font-size:1.75rem;line-height:1.15;text-align:center;color:var(--g-green)}
+.pixqr-gift{max-width:300px;margin:-8px 0 0;text-align:center;font-size:1.05rem;letter-spacing:.06em;text-transform:uppercase;color:#a8945f;overflow-wrap:anywhere}
+.pixqr-text{max-width:316px;margin:0 0 2px;text-align:center;font-size:1.1rem;line-height:1.45;color:#5d6761}
+.pixqr-paper .gravata-form{max-width:none}
+.pixqr-paper .gravata-btn{margin-top:.2rem}
+.pixqr-paper .gravata-safe{max-width:none;margin-top:.4rem}
+.giftdlg-secondary{display:flex;align-items:center;justify-content:center;gap:.6rem;height:48px;border:1.5px solid var(--g-green);border-radius:8px;background:transparent;font-family:inherit;font-size:1.2rem;color:var(--g-green);text-decoration:none;transition:background .15s,color .15s}
+.giftdlg-secondary:hover{background:var(--g-green);color:#fbf5e6}
+.giftdlg-secondary svg{color:var(--g-gold)}
 .pixqr-text strong{font-weight:600;color:var(--g-green)}
 .pixqr-paper .gravata-btn{width:100%;margin-top:0}
 
