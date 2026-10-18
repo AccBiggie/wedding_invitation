@@ -45,7 +45,7 @@ interface Leaf { x: number; y: number; angle: number; size: number; tone: number
 interface Stem { d: string; width: number; delay: number }
 interface Plant { stems: Stem[]; leaves: Leaf[] }
 // taper 'tip': folhas menores na ponta (ramos soltos); 'inner': crescem ate a ponta (guirlanda junto ao titulo).
-interface BranchOptions { start: Point; angle: number; length: number; wander: number; leafSize: number; leafGap: number; width: number; depth: number; delay: number; timeScale: number; taper?: 'tip' | 'inner' }
+interface BranchOptions { start: Point; angle: number; length: number; wander: number; leafSize: number; leafGap: number; width: number; depth: number; delay: number; timeScale: number; taper?: 'tip' | 'inner'; upward?: boolean }
 
 // Folha de oliveira: lanceolada, estreita, com nervura central.
 const LEAF_BODY = 'M0 0 C5 -3.4 15 -4.2 24 -.7 C25 -.3 25 .3 24 .7 C15 4.2 5 3.4 0 0 Z';
@@ -71,7 +71,9 @@ function growBranch(rng: Rng, plant: Plant, o: BranchOptions) {
     const point = curve.sample(s); const t = s / curve.length;
     const taper = o.taper === 'inner' ? .6 + .5 * t : .7 + .55 * Math.sin(Math.PI * Math.min(1, t * 1.15)) - .25 * t;
     gap = o.taper === 'inner' ? o.leafGap * (1.25 - .45 * t) : o.leafGap;
-    plant.leaves.push({ x: point.x, y: point.y, angle: point.angle + side * between(rng, 32, 58), size: o.leafSize * taper * between(rng, .85, 1.12), tone: Math.floor(rng() * 3), delay: timeAt(s) + .15, fade: o.taper === 'inner' ? .45 + .55 * Math.min(1, t * 2.2) : undefined });
+    // upward (guirlandas dos titulos): folhas do lado de baixo ficam mais rentes ao caule, sem descer sobre o texto.
+    const below = o.upward && side > 0;
+    plant.leaves.push({ x: point.x, y: point.y, angle: point.angle + side * (below ? between(rng, 18, 30) : between(rng, 32, 58)), size: o.leafSize * taper * between(rng, .85, 1.12) * (below ? .8 : 1), tone: Math.floor(rng() * 3), delay: timeAt(s) + .15, fade: o.taper === 'inner' ? .45 + .55 * Math.min(1, t * 2.2) : undefined });
     side = -side;
   }
   const tip = curve.sample(curve.length);
@@ -82,7 +84,7 @@ function growBranch(rng: Rng, plant: Plant, o: BranchOptions) {
     for (let i = 0; i < count; i++) {
       // Na guirlanda os galhos saem longe do titulo para nao invadir o texto.
       const s = curve.length * (o.taper === 'inner' ? between(rng, .12, .55) : between(rng, .18, .82)); const point = curve.sample(s);
-      growBranch(rng, plant, { ...o, start: [point.x, point.y], angle: point.angle + (rng() < .5 ? -1 : 1) * between(rng, 28, 55), length: o.length * between(rng, .22, .42), wander: o.wander * .5, leafSize: o.leafSize * .9, width: o.width * .7, depth: o.depth - 1, delay: timeAt(s), timeScale: o.timeScale * .45, taper: 'tip' });
+      growBranch(rng, plant, { ...o, start: [point.x, point.y], angle: point.angle + (o.upward || rng() < .5 ? -1 : 1) * between(rng, 28, 55), length: o.length * between(rng, .22, .42), wander: o.wander * .5, leafSize: o.leafSize * .9, width: o.width * .7, depth: o.depth - 1, delay: timeAt(s), timeScale: o.timeScale * .45, taper: 'tip' });
     }
   }
 }
@@ -120,7 +122,7 @@ export const OliveGarland = ({ flip = false }: { flip?: boolean }) => {
     if (width < 20) return p;
     const rng = createRng(seed);
     // Nasce na borda externa e termina subindo junto ao titulo.
-    growBranch(rng, p, { start: [-4, height * between(rng, .55, .7)], angle: -between(rng, 2, 6), length: width - Math.min(22, height * .55), wander: Math.min(5, height * .14), leafSize: Math.min(23, height * .6), leafGap: 15, width: 1.3, depth: width > 200 ? 1 : 0, delay: 0, timeScale: 0, taper: 'inner' });
+    growBranch(rng, p, { start: [-4, height * between(rng, .6, .68)], angle: -between(rng, 2, 6), length: width - Math.min(22, height * .55), wander: Math.min(5, height * .14), leafSize: Math.min(23, height * .6), leafGap: 15, width: 1.3, depth: width > 200 ? 1 : 0, delay: 0, timeScale: 0, taper: 'inner', upward: true });
     return p;
   }, [seed, width, height]);
   return <svg ref={ref} className={`wed-olive wed-olive-garland${flip ? ' is-flip' : ''}`} viewBox={`0 0 ${Math.max(1, width)} ${Math.max(1, height)}`} aria-hidden="true"><Plant plant={plant} /></svg>;
