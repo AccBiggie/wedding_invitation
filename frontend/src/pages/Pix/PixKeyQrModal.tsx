@@ -11,8 +11,9 @@ export function PixKeyQrModal({ open, onClose }: { open: boolean; onClose: () =>
   const [pix, setPix] = useState<Omit<PixGenerated, 'amount'> | null>(null); const [error, setError] = useState(''); const [notice, setNotice] = useState('');
   useEffect(() => { if (!open || pix) return; setError(''); pixService.keyQrCode().then(setPix).catch(() => setError('Não foi possível carregar o QR Code PIX. Tente novamente.')); }, [open, pix]);
   const copy = async () => { if (!pix) return; try { await navigator.clipboard.writeText(pix.payload); setNotice('Código PIX copiado com sucesso.'); } catch { setError('Não foi possível copiar o código PIX.'); } };
-  return <><Dialog open={open} onClose={onClose} aria-label="QR Code PIX" slotProps={{ paper: { className: 'pixqr-paper' } }}>
+  return <><Dialog open={open} onClose={onClose} aria-label="QR Code PIX" aria-describedby="pixqr-text" slotProps={{ paper: { className: 'pixqr-paper' } }}>
     <button type="button" className="gravata-close" aria-label="Fechar" onClick={onClose}><IconClose /></button>
+    <p id="pixqr-text" className="pixqr-text">Escaneie o QR Code no app do seu banco e digite o valor que desejar. Se preferir, envie o <strong>valor de um presente da nossa lista</strong>: ele chega para nós como se você o tivesse escolhido.</p>
     <div className="pixqr-code">{pix ? <img src={pix.qrCode} alt="QR Code PIX" /> : !error && <span className="pixqr-loading">Carregando...</span>}</div>
     {error && <p className="gravata-error" role="alert">{error}</p>}
     <button type="button" className="gravata-btn" onClick={copy} disabled={!pix}><IconCopy />Copiar QR Code</button>

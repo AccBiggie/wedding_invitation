@@ -583,6 +583,8 @@ a.wed-shop-badge:hover{border-color:var(--wed-gold);background:#fffcf3}
 .pixqr-code{display:flex;align-items:center;justify-content:center;width:260px;max-width:100%;aspect-ratio:1;padding:10px;border:1px solid var(--g-gold-soft);border-radius:12px;background:#fff;box-shadow:0 4px 14px rgba(150,120,50,.12)}
 .pixqr-code img{display:block;width:100%;height:100%}
 .pixqr-loading{font-size:1.1rem;color:#8a918b}
+.pixqr-text{max-width:300px;margin:0 0 2px;text-align:center;font-size:1.1rem;line-height:1.45;color:#5d6761}
+.pixqr-text strong{font-weight:600;color:var(--g-green)}
 .pixqr-paper .gravata-btn{width:100%;margin-top:0}
 
 /* "Ver presente" na pagina da categoria: galeria + detalhes, no acabamento dos modais da gravata. */
