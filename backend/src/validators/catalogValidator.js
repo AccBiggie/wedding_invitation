@@ -2,6 +2,10 @@ export const text = (value, max) => typeof value === 'string' ? value.trim().sli
 export const escapeRegex = value => value.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
 export const validOrder = value => Number.isSafeInteger(Number(value)) && Number(value) >= 0;
 export const validBoolean = value => typeof value === 'boolean';
+// "Mesa e Banho" -> "mesa-e-banho"; "Eletrodomésticos" -> "eletrodomesticos".
+export const slugify = value => String(value).normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '').slice(0, 80);
+const objectId = value => value === null || value === undefined || value === '' ? null : String(value);
+export const validObjectId = value => /^[a-f\d]{24}$/i.test(value);
 export const validImage = value => !value || /^https?:\/\/[^\s]+$/i.test(value) || /^\/[a-zA-Z0-9/_-]+\.(png|jpe?g|webp)$/i.test(value) || /^\/api\/images\/[a-f\d]{24}$/i.test(value);
 const validGodparentImage = value => {
   if (!value) return true;
@@ -60,11 +64,11 @@ export function validateGift(body) {
   if (!Number.isFinite(price) || price <= 0 || price > 1000000 || Math.abs(Math.round(price * 100) - price * 100) > 1e-7) errors.price = ['Informe um valor entre R$ 0,01 e R$ 1.000.000,00.'];
   const description = text(body.description, 1000);
   if (description.length > 1000) errors.description = ['Descricao muito longa.'];
-  const category = text(body.category, 80);
-  if (category.length > 80) errors.category = ['Categoria muito longa.'];
+  const categoryId = objectId(body.categoryId);
+  if (!categoryId || !validObjectId(categoryId)) errors.categoryId = ['Selecione uma categoria.'];
   const image = text(body.image, 2048);
   if (!validImage(image)) errors.image = ['Informe uma URL de imagem valida.'];
   if (!validOrder(body.order ?? 0)) errors.order = ['A ordem deve ser um inteiro nao negativo.'];
   if (body.active !== undefined && !validBoolean(body.active)) errors.active = ['Status invalido.'];
-  return { errors, data: { name, description, price, category, image, order: Number(body.order ?? 0), active: body.active ?? true } };
+  return { errors, data: { name, description, price, categoryId, image, order: Number(body.order ?? 0), active: body.active ?? true } };
 }

@@ -1,6 +1,8 @@
 import { useEffect, useState, type FormEvent } from 'react';
 import axios from 'axios';
 import { Alert, Box, Button, Card, CardContent, CircularProgress, FormControlLabel, Paper, Stack, Switch, TextField, Typography } from '@mui/material';
+import { useNavigate } from 'react-router-dom';
+import Inventory2Outlined from '@mui/icons-material/Inventory2Outlined';
 import SaveOutlined from '@mui/icons-material/SaveOutlined';
 import { ImageUpload } from '../../components/common/ImageUpload';
 import { resolveImageUrl } from '../../services/images.service';
@@ -20,10 +22,11 @@ export function StoreCategoryForm({ id, onClose, onSaved }: { id?: string; onClo
   const [form, setForm] = useState<StoreCategoryInput>(blank); const [loadFailed, setLoadFailed] = useState(false);
   const [loading, setLoading] = useState(Boolean(id)); const [saving, setSaving] = useState(false); const [uploading, setUploading] = useState(false); const [error, setError] = useState('');
   const [errors, setErrors] = useState<Partial<Record<Field, string>>>({}); const [submitted, setSubmitted] = useState(false);
+  const [details, setDetails] = useState<{ slug: string; productCount: number } | null>(null); const navigate = useNavigate();
   useEffect(() => {
     if (!id) return;
     let active = true;
-    storeCategoriesService.getById(id).then(item => { if (active) setForm({ name: item.name, description: item.description, image: item.image, order: item.order, active: item.active }); }).catch(() => {
+    storeCategoriesService.getById(id).then(item => { if (active) { setForm({ name: item.name, description: item.description, image: item.image, order: item.order, active: item.active }); setDetails({ slug: item.slug, productCount: item.productCount }); } }).catch(() => {
       if (active) { setLoadFailed(true); setError('Não foi possível carregar a categoria.'); }
     }).finally(() => { if (active) setLoading(false); });
     return () => { active = false; };
@@ -59,5 +62,9 @@ export function StoreCategoryForm({ id, onClose, onSaved }: { id?: string; onClo
       <Box sx={{ width: 112, height: 112, p: '5px', borderRadius: '50%', border: '1px solid #e7ddc4', bgcolor: '#fffdf9', boxShadow: '0 4px 14px rgba(150,120,50,.12)' }}>{form.image ? <Box component="img" src={resolveImageUrl(form.image)} alt={form.name || 'Imagem da categoria'} sx={{ width: '100%', height: '100%', objectFit: 'cover', borderRadius: '50%', display: 'block' }} /> : <Box sx={{ width: '100%', height: '100%', borderRadius: '50%', bgcolor: '#f4f0e7' }} />}</Box>
       <Typography sx={{ fontFamily: '"Cormorant Garamond", Georgia, serif', fontSize: 20, color: '#1f4536' }}>{form.name || 'Nome da categoria'}</Typography>
       {!form.active && <Typography variant="caption" color="text.secondary">Inativa: não aparece na landing.</Typography>}
-    </CardContent></Card></Box>}</CrudDialog>;
+    </CardContent>{details && <CardContent sx={{ borderTop: 1, borderColor: 'divider' }}><Stack spacing={1}>
+      <Typography variant="body2">Produtos vinculados: <strong>{details.productCount}</strong></Typography>
+      <Typography variant="caption" color="text.secondary" sx={{ wordBreak: 'break-all' }}>Página pública: /lista-na-loja/{details.slug}</Typography>
+      <Button size="small" variant="outlined" startIcon={<Inventory2Outlined />} disabled={saving} onClick={() => navigate(`/presentes?categoryId=${id}`)}>Ver produtos desta categoria</Button>
+    </Stack></CardContent>}</Card></Box>}</CrudDialog>;
 }

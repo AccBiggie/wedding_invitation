@@ -4,11 +4,15 @@ export interface ListData<T> { data: T[]; pagination: Pagination }
 export interface ListFilters { name?: string; active?: boolean | ''; page?: number; limit?: number; sortBy?: string; sortOrder?: 'asc' | 'desc' }
 export interface Godparent { _id: string; name: string; partnerName: string; role: 'groomsman' | 'bridesmaid' | 'mother' | 'father' | 'other'; cardRole: string; phone: string; email: string; description: string; image: string; images: string[]; order: number; active: boolean; createdAt: string; updatedAt: string }
 export type GodparentInput = Omit<Godparent, '_id' | 'createdAt' | 'updatedAt'>;
-export interface GiftProduct { _id: string; name: string; description: string; price: number; image: string; category: string; active: boolean; order: number; createdAt: string; updatedAt: string }
-export type GiftInput = Omit<GiftProduct, '_id' | 'createdAt' | 'updatedAt'>;
-export interface StoreCategory { _id: string; name: string; description: string; image: string; active: boolean; order: number; createdAt: string; updatedAt: string }
-export type StoreCategoryInput = Omit<StoreCategory, '_id' | 'createdAt' | 'updatedAt'>;
-export type PublicStoreCategory = Pick<StoreCategory, '_id' | 'name' | 'image'>;
+export interface CategoryRef { _id: string; name: string; slug: string; active: boolean }
+// categoryId null so em produtos antigos ainda nao migrados; legacyCategory traz o texto antigo.
+export interface GiftProduct { _id: string; name: string; description: string; price: number; image: string; categoryId: string | null; category: CategoryRef | null; legacyCategory?: string; active: boolean; order: number; createdAt: string; updatedAt: string }
+export interface GiftInput { name: string; description: string; price: number; image: string; categoryId: string; order: number; active: boolean }
+export type PublicGiftProduct = Pick<GiftProduct, '_id' | 'name' | 'description' | 'price' | 'image'>;
+export interface StoreCategory { _id: string; name: string; slug: string; description: string; image: string; active: boolean; order: number; productCount: number; createdAt: string; updatedAt: string }
+export type StoreCategoryInput = Pick<StoreCategory, 'name' | 'description' | 'image' | 'active' | 'order'>;
+export type PublicStoreCategory = Pick<StoreCategory, '_id' | 'name' | 'slug' | 'description' | 'image'>;
+export interface PublicStoreCategoryPage { category: PublicStoreCategory; products: PublicGiftProduct[]; pagination: Pagination }
 export interface PixSettings { _id: string; keyType: 'cpf' | 'cnpj' | 'email' | 'phone' | 'random'; pixKey: string; receiverName: string; receiverCity: string; description: string; active: boolean; createdAt: string; updatedAt: string }
 export type PixInput = Omit<PixSettings, '_id' | 'createdAt' | 'updatedAt'>;
 export interface PixGenerated { amount: number; payload: string; qrCode: string }

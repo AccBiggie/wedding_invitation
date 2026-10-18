@@ -78,16 +78,50 @@ test('aparencia do site publico exige login para salvar e aparece publicamente',
   assert.equal((await request(app).get(url).set('Authorization', bearer)).body.data.scheme, 'dark');
 });
 
-test('CRUD de presentes rejeita preco invalido e preserva filtros', { skip: !connection }, async () => {
+test('CRUD de presentes exige categoria valida, filtra por ela e publica por slug', { skip: !connection }, async () => {
   const base = '/api/gift-products';
-  for (const price of [0, -1, 'NaN', 'Infinity']) assert.equal((await request(app).post(base).set('Authorization', bearer).send({ name: 'Panela', price })).status, 422);
-  const created = await request(app).post(base).set('Authorization', bearer).send({ name: 'Panela', price: 150.29, category: 'Cozinha', order: 1 });
+  const category = body => request(app).post('/api/store-categories').set('Authorization', bearer).send({ description: 'Descricao', image: '/categorias/x.jpg', ...body });
+  const cozinha = (await category({ name: 'Cozinha Gourmet' })).body.data;
+  const mesa = (await category({ name: 'Mesa', active: false })).body.data;
+  assert.equal(cozinha.slug, 'cozinha-gourmet');
+  for (const price of [0, -1, 'NaN', 'Infinity']) assert.equal((await request(app).post(base).set('Authorization', bearer).send({ name: 'Panela', price, categoryId: cozinha._id })).status, 422);
+  const noCategory = await request(app).post(base).set('Authorization', bearer).send({ name: 'Panela', price: 10 });
+  assert.equal(noCategory.status, 422); assert.ok(noCategory.body.errors.categoryId);
+  assert.equal((await request(app).post(base).set('Authorization', bearer).send({ name: 'Panela', price: 10, categoryId: new mongoose.Types.ObjectId() })).status, 422);
+  assert.equal((await request(app).post(base).set('Authorization', bearer).send({ name: 'Panela', price: 10, categoryId: 'abc' })).status, 422);
+  const inactive = await request(app).post(base).set('Authorization', bearer).send({ name: 'Prato', price: 10, categoryId: mesa._id });
+  assert.equal(inactive.status, 422); assert.match(inactive.body.errors.categoryId[0], /inativa/);
+  const created = await request(app).post(base).set('Authorization', bearer).send({ name: 'Panela', price: 150.29, categoryId: cozinha._id, order: 1 });
   assert.equal(created.status, 200); const id = created.body.data._id;
-  const list = await request(app).get(base + '?name=Pan&category=Cozinha&minPrice=100&maxPrice=200&page=1&limit=1').set('Authorization', bearer);
-  assert.equal(list.body.data.pagination.total, 1);
+  assert.equal(created.body.data.categoryId, cozinha._id);
+  assert.deepEqual(created.body.data.category, { _id: cozinha._id, name: 'Cozinha Gourmet', slug: 'cozinha-gourmet', active: true });
+  const hidden = await request(app).post(base).set('Authorization', bearer).send({ name: 'Frigideira', price: 80, categoryId: cozinha._id, active: false });
+  const list = await request(app).get(base + '?name=Pan&categoryId=' + cozinha._id + '&minPrice=100&maxPrice=200&page=1&limit=1').set('Authorization', bearer);
+  assert.equal(list.body.data.pagination.total, 1); assert.equal(list.body.data.data[0].category.name, 'Cozinha Gourmet');
+  assert.equal((await request(app).get(base + '?categoryId=' + mesa._id).set('Authorization', bearer)).body.data.pagination.total, 0);
   assert.equal((await request(app).get(base + '/' + id).set('Authorization', bearer)).status, 200);
   assert.equal((await request(app).put(base + '/' + id).set('Authorization', bearer).send({ price: 200 })).body.data.price, 200);
-  assert.equal((await request(app).delete(base + '/' + id).set('Authorization', bearer)).status, 200);
+  const counted = await request(app).get('/api/store-categories/' + cozinha._id).set('Authorization', bearer);
+  assert.equal(counted.body.data.productCount, 2);
+  const page = await request(app).get('/api/public/store-categories/Cozinha-Gourmet?limit=1');
+  assert.equal(page.status, 200);
+  assert.equal(page.body.data.category.name, 'Cozinha Gourmet');
+  assert.deepEqual(page.body.data.products.map(item => item.name), ['Panela']);
+  assert.deepEqual(Object.keys(page.body.data.products[0]).sort(), ['_id', 'description', 'image', 'name', 'price']);
+  assert.equal(page.body.data.pagination.total, 1);
+  assert.equal((await request(app).get('/api/public/store-categories/mesa')).status, 404);
+  assert.equal((await request(app).get('/api/public/store-categories/nao-existe')).status, 404);
+  assert.deepEqual((await request(app).get('/api/public/gift-products')).body.data.map(item => item.name), ['Panela']);
+  // Categoria desativada: some do publico, mas o produto ja vinculado segue editavel.
+  await request(app).put('/api/store-categories/' + cozinha._id).set('Authorization', bearer).send({ active: false });
+  assert.equal((await request(app).get('/api/public/store-categories/cozinha-gourmet')).status, 404);
+  assert.deepEqual((await request(app).get('/api/public/gift-products')).body.data, []);
+  assert.equal((await request(app).put(base + '/' + id).set('Authorization', bearer).send({ price: 210 })).status, 200);
+  const blocked = await request(app).delete('/api/store-categories/' + cozinha._id).set('Authorization', bearer);
+  assert.equal(blocked.status, 409); assert.equal(blocked.body.data.productCount, 2);
+  assert.equal((await request(app).get('/api/store-categories/' + cozinha._id).set('Authorization', bearer)).status, 200);
+  for (const productId of [id, hidden.body.data._id]) assert.equal((await request(app).delete(base + '/' + productId).set('Authorization', bearer)).status, 200);
+  for (const item of [cozinha, mesa]) assert.equal((await request(app).delete('/api/store-categories/' + item._id).set('Authorization', bearer)).status, 200);
 });
 
 test('PIX gera BR Code com valor, chave e CRC validos', { skip: !connection }, async () => {
@@ -128,6 +162,11 @@ test('CRUD de categorias da loja valida campos e publica so as ativas em ordem',
   const create = body => request(app).post(base).set('Authorization', bearer).send(body);
   const tacas = await create({ name: 'Taças', description: 'Taças de cristal', image: '/categorias/tacas.jpg', order: 2 });
   assert.equal(tacas.status, 200);
+  assert.equal(tacas.body.data.slug, 'tacas');
+  assert.equal(tacas.body.data.productCount, 0);
+  const sameName = await create({ name: 'TAÇAS!', description: 'Outra', image: '/categorias/tacas.jpg' });
+  assert.equal(sameName.body.data.slug, 'tacas-2');
+  assert.equal((await request(app).delete(base + '/' + sameName.body.data._id).set('Authorization', bearer)).status, 200);
   assert.equal(tacas.body.data.active, true);
   const panelas = await create({ name: 'Panelas', description: 'Jogo de panelas', image: 'https://example.com/panelas.jpg', order: 1 });
   const loucas = await create({ name: 'Louças', description: 'Pratos e travessas', image: '/categorias/loucas.jpg', order: 1, active: false });
@@ -136,12 +175,15 @@ test('CRUD de categorias da loja valida campos e publica so as ativas em ordem',
   const updated = await request(app).put(base + '/' + id).set('Authorization', bearer).send({ name: 'Taças e copos', order: 0 });
   assert.equal(updated.status, 200);
   assert.equal(updated.body.data.description, 'Taças de cristal');
+  assert.equal(updated.body.data.slug, 'tacas-e-copos');
+  assert.equal((await request(app).put(base + '/' + id).set('Authorization', bearer).send({ order: 0 })).body.data.slug, 'tacas-e-copos');
   assert.equal((await request(app).put(base + '/' + id).set('Authorization', bearer).send({ image: '' })).status, 422);
   const list = await request(app).get(base + '?active=true&sortBy=order&sortOrder=asc').set('Authorization', bearer);
   assert.equal(list.body.data.pagination.total, 2);
   const publicList = (await request(app).get('/api/public/store-categories')).body.data;
   assert.deepEqual(publicList.map(item => item.name), ['Taças e copos', 'Panelas']);
-  assert.deepEqual(Object.keys(publicList[0]).sort(), ['_id', 'image', 'name']);
+  assert.deepEqual(Object.keys(publicList[0]).sort(), ['_id', 'description', 'image', 'name', 'slug']);
+  assert.equal(list.body.data.data[0].productCount, 0);
   assert.equal((await request(app).get(base + '/invalido').set('Authorization', bearer)).status, 400);
   assert.equal((await request(app).delete(base + '/' + id).set('Authorization', bearer)).status, 200);
   assert.equal((await request(app).get(base + '/' + id).set('Authorization', bearer)).status, 404);

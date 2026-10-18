@@ -71,7 +71,8 @@ test('upload, vínculo, substituição e exclusão preservam banco e objetos', {
     assert.equal((await request(app).get(url)).status, 404);
     const wrongCategory = await request(app).post('/api/godparents').set('Authorization', token).send({ name: 'Ana', role: 'bridesmaid', image: url });
     assert.equal(wrongCategory.status, 422);
-    const gift = await request(app).post('/api/gift-products').set('Authorization', token).send({ name: 'Produto', price: 10, image: url });
+    const category = await request(app).post('/api/store-categories').set('Authorization', token).send({ name: 'Cozinha', description: 'Itens', image: '/categorias/cozinha.jpg' });
+    const gift = await request(app).post('/api/gift-products').set('Authorization', token).send({ name: 'Produto', price: 10, image: url, categoryId: category.body.data._id });
     assert.equal(gift.status, 200);
     assert.equal(String((await StoredImage.findById(id)).entityId), gift.body.data._id);
     const displayed = await request(app).get(url);

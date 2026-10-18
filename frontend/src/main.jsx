@@ -9,6 +9,7 @@ import '@tabler/core/dist/css/tabler.min.css';
 import './style.css';
 
 const AdminApp = React.lazy(() => import('./routes/AdminApp').then(module => ({ default: module.AdminApp })));
+const StoreCategoryContent = React.lazy(() => import('./pages/StoreCategory/StoreCategoryContent').then(module => ({ default: module.StoreCategoryContent })));
 
 const slug = value => value.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase().trim().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
 
@@ -539,6 +540,41 @@ function Landing() {
   </div>;
 }
 
+// /lista-na-loja/:slug: produtos de uma categoria da "Lista na loja", com a mesma
+// moldura da landing (fundo, menu e rodape) e atalho de volta para as categorias.
+function StoreCategoryRoute() {
+  const wedding = useWedding();
+  const appearanceProps = usePublicAppearance(wedding);
+  const [photoFailed, setPhotoFailed] = useState(false);
+  const [scrolled, setScrolled] = useState(false);
+  useEffect(() => {
+    const onScroll = () => setScrolled(window.scrollY > 30);
+    onScroll(); window.addEventListener('scroll', onScroll, { passive: true });
+    return () => window.removeEventListener('scroll', onScroll);
+  }, []);
+  let slug = '';
+  try { slug = decodeURIComponent(location.pathname.split('/')[2] || ''); } catch { /* slug invalido vira "nao encontrada" */ }
+  if (wedding === false) return <div className="wed wed-plain"><div className="wed-state">Não foi possível carregar os dados do casamento.</div></div>;
+  if (!wedding) return <div className="wed wed-plain"><div className="wed-state">Carregando...</div></div>;
+  return <div className="wed wed-lp wed-catpage-shell" {...appearanceProps}>
+    <div className="wed-lp-bg" aria-hidden="true">
+      {photoFailed ? <div className="wed-lp-bg-empty" /> : <img src={wedding.photo} alt="" onError={() => setPhotoFailed(true)} />}
+    </div>
+    <header className={`wed-nav${scrolled ? ' is-scrolled' : ''}`}>
+      <div className="wed-nav-inner">
+        <a className="wed-nav-brand" href="/casamento"><IconFlower size={22} />{wedding.couple[0]}<span>&amp;</span>{wedding.couple[1]}</a>
+        <a className="wed-nav-back" href="/casamento#lista-na-loja"><IconChevronLeft size={18} />Ver todas as categorias</a>
+      </div>
+    </header>
+    <main className="wed-lp-body"><div className="wed-lp-sheet">
+      <React.Suspense fallback={<section className="wed-sec wed-catpage" aria-busy="true" />}>
+        <StoreCategoryContent slug={slug} icons={{ back: <IconChevronLeft size={18} />, gift: <IconGift size={30} /> }} />
+      </React.Suspense>
+    </div></main>
+    <SiteFooter wedding={wedding} />
+  </div>;
+}
+
 function WeddingShell({ children, wedding }) {
   const appearanceProps = usePublicAppearance(wedding);
   return <div className="wed wed-invitation" {...appearanceProps}>
@@ -621,6 +657,7 @@ function Admin() {
 function App() {
   if (location.pathname.startsWith('/invitation/')) return <Public />;
   if (location.pathname.startsWith('/casamento')) return <Landing />;
+  if (location.pathname.startsWith('/lista-na-loja/')) return <StoreCategoryRoute />;
   return <Admin />;
 }
 createRoot(document.getElementById('root')).render(<BrowserRouter><App /></BrowserRouter>);
