@@ -33,7 +33,7 @@ export function validateGodparent(body) {
   const image = typeof body.image === 'string' ? body.image.trim() : '';
   if (!validGodparentImage(image)) errors.image = ['Informe uma URL ou imagem JPG, PNG ou WebP de até 512 KB.'];
   const images = Array.isArray(body.images) ? body.images.map(value => typeof value === 'string' ? value.trim() : value) : [];
-  if (body.images !== undefined && (!Array.isArray(body.images) || images.length > 4 || images.some(value => typeof value !== 'string' || !value || value.length > 200000 || !validGodparentImage(value)))) errors.images = ['Informe até quatro fotos adicionais válidas.'];
+  if (body.images !== undefined && (!Array.isArray(body.images) || images.length > (image ? 1 : 2) || images.some(value => typeof value !== 'string' || !value || value.length > 200000 || !validGodparentImage(value)))) errors.images = ['Informe no máximo duas fotos válidas.'];
   if (!validOrder(body.order ?? 0)) errors.order = ['A ordem deve ser um inteiro nao negativo.'];
   if (body.active !== undefined && !validBoolean(body.active)) errors.active = ['Status invalido.'];
   return { errors, data: { name, partnerName, role: body.role, cardRole, phone, email: email.toLowerCase(), description, image: image || images[0] || '', images: image ? images : images.slice(1), order: Number(body.order ?? 0), active: body.active ?? true } };
