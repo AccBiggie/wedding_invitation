@@ -6,6 +6,7 @@ import DashboardOutlined from '@mui/icons-material/DashboardOutlined';
 import MailOutline from '@mui/icons-material/MailOutlined';
 import PeopleAltOutlined from '@mui/icons-material/PeopleAltOutlined';
 import CardGiftcardOutlined from '@mui/icons-material/CardGiftcardOutlined';
+import CategoryOutlined from '@mui/icons-material/CategoryOutlined';
 import QrCode2Outlined from '@mui/icons-material/QrCode2Outlined';
 import MenuIcon from '@mui/icons-material/Menu';
 import ChevronLeft from '@mui/icons-material/ChevronLeft';
@@ -18,6 +19,7 @@ const nav = [
   { label: 'Convites', path: '/convites', icon: <MailOutline /> },
   { label: 'Padrinhos', path: '/padrinhos', icon: <PeopleAltOutlined /> },
   { label: 'Presentes', path: '/presentes', icon: <CardGiftcardOutlined /> },
+  { label: 'Categorias da loja', path: '/categorias-loja', icon: <CategoryOutlined /> },
   { label: 'PIX / Gravata Online', path: '/pix', icon: <QrCode2Outlined /> }
 ];
 

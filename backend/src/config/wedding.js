@@ -52,7 +52,8 @@ export const wedding = {
     pix: { label: 'Chave PIX', value: 'fetech.ferreira@gmail.com', hint: 'Copie a chave e presenteie do jeito que preferir.' },
     // TODO(noivos): apontar para as listas reais nas lojas.
     stores: [
-      { name: 'Lista na loja', description: 'Cozinha, mesa e utensílios para a nossa casa.', url: '' },
+      // categories: o card exibe as categorias cadastradas em "Categorias da loja".
+      { name: 'Lista na loja', description: 'Cozinha, mesa e utensílios para a nossa casa.', url: '', categories: true },
       { name: 'Lua de mel', description: 'Ajude a construir a nossa primeira viagem como marido e mulher.', url: '' }
     ]
   },

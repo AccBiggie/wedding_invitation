@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 240 240" role="img" aria-label="Louças">
+  <defs><radialGradient id="bg" cx="50%" cy="38%" r="72%"><stop offset="0" stop-color="#fffdf7"/><stop offset="1" stop-color="#efe5cf"/></radialGradient></defs>
+  <rect width="240" height="240" fill="url(#bg)"/>
+  <ellipse cx="120" cy="178" rx="64" ry="7" fill="#e2d4b4" opacity=".55"/>
+  <g fill="none" stroke="#1f4536" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round">
+    <ellipse cx="120" cy="166" rx="68" ry="13" fill="#fffaf0"/>
+    <ellipse cx="120" cy="156" rx="68" ry="13" fill="#fffaf0"/>
+    <ellipse cx="120" cy="146" rx="68" ry="13" fill="#fffaf0"/>
+    <ellipse cx="120" cy="146" rx="54" ry="8.5" stroke="#c0a057" stroke-width="2"/>
+    <path d="M80 100 C82 126 100 138 120 138 C140 138 158 126 160 100" fill="#fffaf0"/>
+    <ellipse cx="120" cy="100" rx="40" ry="9" fill="#f3ead6"/>
+    <path d="M86 115 C102 122 138 122 154 115" stroke="#c0a057" stroke-width="2"/>
+  </g>
+</svg>

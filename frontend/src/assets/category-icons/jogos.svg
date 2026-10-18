@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 240 240" role="img" aria-label="Jogos">
+  <defs><radialGradient id="bg" cx="50%" cy="38%" r="72%"><stop offset="0" stop-color="#fffdf7"/><stop offset="1" stop-color="#efe5cf"/></radialGradient></defs>
+  <rect width="240" height="240" fill="url(#bg)"/>
+  <ellipse cx="120" cy="182" rx="64" ry="7" fill="#e2d4b4" opacity=".55"/>
+  <g fill="none" stroke="#1f4536" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M80 96 C64 96 54 108 50 130 C46 152 52 170 66 170 C78 170 84 158 94 150 L146 150 C156 158 162 170 174 170 C188 170 194 152 190 130 C186 108 176 96 160 96 Z" fill="#fffaf0"/>
+    <g fill="#1f4536" stroke="none"><rect x="81" y="111" width="11" height="29" rx="2.5"/><rect x="72" y="120" width="29" height="11" rx="2.5"/><rect x="107" y="119" width="11" height="5" rx="2.5"/><rect x="122" y="119" width="11" height="5" rx="2.5"/></g>
+    <g fill="#c0a057" stroke="#c0a057" stroke-width="1.4"><circle cx="156" cy="113" r="5"/><circle cx="168" cy="125" r="5"/><circle cx="156" cy="137" r="5"/><circle cx="144" cy="125" r="5"/></g>
+    <path d="M108 96 C108 82 116 76 124 74 C132 72 136 66 134 58" stroke-width="2.4"/>
+  </g>
+</svg>

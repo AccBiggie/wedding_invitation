@@ -9,6 +9,7 @@ import { AppearanceDrawer } from '../components/layout/AppearanceDrawer';
 const DashboardPage = lazy(() => import('../pages/Dashboard/DashboardPage').then(m => ({ default: m.DashboardPage })));
 const GodparentsPage = lazy(() => import('../pages/Godparents/GodparentsPage').then(m => ({ default: m.GodparentsPage })));
 const GiftsPage = lazy(() => import('../pages/Gifts/GiftsPage').then(m => ({ default: m.GiftsPage })));
+const StoreCategoriesPage = lazy(() => import('../pages/StoreCategories/StoreCategoriesPage').then(m => ({ default: m.StoreCategoriesPage })));
 const PixPage = lazy(() => import('../pages/Pix/PixPage').then(m => ({ default: m.PixPage })));
 const InvitationsPage = lazy(() => import('../pages/Invitations/InvitationsPage').then(m => ({ default: m.InvitationsPage })));
 export function AdminApp({ user, onLogout }: { user: { email: string }; onLogout: () => void }) {
@@ -42,6 +43,7 @@ export function AdminApp({ user, onLogout }: { user: { email: string }; onLogout
     <Route element={<InvitationsPage />}><Route path="/convites" /><Route path="/convites/novo" /><Route path="/convites/:id/editar" /></Route>
     <Route element={<GodparentsPage />}><Route path="/padrinhos" /><Route path="/padrinhos/novo" /><Route path="/padrinhos/:id/editar" /></Route>
     <Route element={<GiftsPage />}><Route path="/presentes" /><Route path="/presentes/novo" /><Route path="/presentes/:id/editar" /></Route>
+    <Route element={<StoreCategoriesPage />}><Route path="/categorias-loja" /><Route path="/categorias-loja/nova" /><Route path="/categorias-loja/:id/editar" /></Route>
     <Route path="/pix" element={<PixPage />} /><Route path="*" element={<Navigate to="/dashboard" replace />} />
   </Route></Routes></Suspense><AppearanceDrawer open={customizing} settings={draft} onChange={change} onClose={close} onSave={save} busy={busy} ready={ready} error={error} savedNotice={savedNotice} /></ThemeProvider>;
 }

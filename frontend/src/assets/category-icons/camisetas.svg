@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 240 240" role="img" aria-label="Camisetas">
+  <defs><radialGradient id="bg" cx="50%" cy="38%" r="72%"><stop offset="0" stop-color="#fffdf7"/><stop offset="1" stop-color="#efe5cf"/></radialGradient></defs>
+  <rect width="240" height="240" fill="url(#bg)"/>
+  <ellipse cx="120" cy="184" rx="64" ry="7" fill="#e2d4b4" opacity=".55"/>
+  <g fill="none" stroke="#1f4536" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M92 62 L70 72 L52 102 L74 112 L82 98 L82 176 L158 176 L158 98 L166 112 L188 102 L170 72 L148 62 C144 74 134 80 120 80 C106 80 96 74 92 62 Z" fill="#fffaf0"/>
+    <path d="M99 64 C104 72 112 75 120 75 C128 75 136 72 141 64" stroke="#c0a057" stroke-width="2.2"/>
+    <path d="M58 92 L77 101 M182 92 L163 101" stroke="#c0a057" stroke-width="2.2"/>
+    <path d="M82 124 H158" stroke="#c0a057" stroke-width="5" opacity=".75"/>
+    <path d="M120 146 c-4 -6 -14 -3 -10 5 l10 9 l10 -9 c4 -8 -6 -11 -10 -5 Z" fill="#c0a057" stroke="#c0a057" stroke-width="1.4"/>
+  </g>
+</svg>

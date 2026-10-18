@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 240 240" role="img" aria-label="Panelas">
+  <defs><radialGradient id="bg" cx="50%" cy="38%" r="72%"><stop offset="0" stop-color="#fffdf7"/><stop offset="1" stop-color="#efe5cf"/></radialGradient></defs>
+  <rect width="240" height="240" fill="url(#bg)"/>
+  <ellipse cx="120" cy="184" rx="64" ry="7" fill="#e2d4b4" opacity=".55"/>
+  <g fill="none" stroke="#1f4536" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M96 64 c-7 -7 7 -11 0 -19" stroke="#c0a057" stroke-width="2.2" opacity=".85"/>
+    <path d="M144 64 c-7 -7 7 -11 0 -19" stroke="#c0a057" stroke-width="2.2" opacity=".85"/>
+    <path d="M60 122 h-13 a6 6 0 0 0 0 12 h13" fill="#efe5cf"/>
+    <path d="M180 122 h13 a6 6 0 0 1 0 12 h-13" fill="#efe5cf"/>
+    <path d="M66 112 L66 160 C66 172 76 178 90 178 L150 178 C164 178 174 172 174 160 L174 112 Z" fill="#fffaf0"/>
+    <path d="M66 130 H174" stroke="#c0a057" stroke-width="2"/>
+    <rect x="58" y="103" width="124" height="11" rx="5.5" fill="#efe5cf"/>
+    <path d="M68 103 C72 81 168 81 172 103 Z" fill="#fffaf0"/>
+    <path d="M120 82 v-6"/>
+    <rect x="108" y="68" width="24" height="10" rx="5" fill="#c0a057"/>
+  </g>
+</svg>

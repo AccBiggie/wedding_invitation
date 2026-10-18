@@ -5,12 +5,14 @@ import { env } from '../config/env.js';
 import StoredImage from '../models/StoredImage.js';
 import Godparent from '../models/Godparent.js';
 import GiftProduct from '../models/GiftProduct.js';
+import StoreCategory from '../models/StoreCategory.js';
 
 export const imageCategories = {
   avatar: { prefix: 'outros', width: 400, height: 400, maxBytes: 5 * 1024 * 1024 },
   guest: { prefix: 'convidados', width: 1200, height: 1200, maxBytes: 5 * 1024 * 1024 },
   godparent: { prefix: 'padrinhos', width: 1200, height: 1200, maxBytes: 5 * 1024 * 1024 },
   gift: { prefix: 'produtos', width: 1200, height: 1200, maxBytes: 5 * 1024 * 1024 },
+  storeCategory: { prefix: 'categorias', width: 800, height: 800, maxBytes: 5 * 1024 * 1024 },
   gallery: { prefix: 'galeria', width: 1920, height: 1920, maxBytes: 10 * 1024 * 1024 },
   banner: { prefix: 'banners', width: 1920, height: 1080, maxBytes: 5 * 1024 * 1024 },
   other: { prefix: 'outros', width: 1200, height: 1200, maxBytes: 5 * 1024 * 1024 }
@@ -129,8 +131,8 @@ export async function removeUnusedImages(values) {
     const image = await getImage(id);
     if (!image) continue;
     const url = getImageUrl(image);
-    const [godparent, gift] = await Promise.all([Godparent.exists({ $or: [{ image: url }, { images: url }] }), GiftProduct.exists({ image: url })]);
-    if (!godparent && !gift) {
+    const [godparent, gift, category] = await Promise.all([Godparent.exists({ $or: [{ image: url }, { images: url }] }), GiftProduct.exists({ $or: [{ image: url }, { images: url }] }), StoreCategory.exists({ image: url })]);
+    if (!godparent && !gift && !category) {
       try { await deleteImage(image); } catch (error) {
         console.error('Falha ao remover imagem não utilizada:', error);
         try { await StoredImage.updateOne({ _id: image._id }, { $set: { entityId: null } }); } catch (cleanupError) { console.error('Falha ao marcar imagem para limpeza:', cleanupError); }

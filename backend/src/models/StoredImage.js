@@ -1,7 +1,7 @@
 import mongoose from 'mongoose';
 
 const schema = new mongoose.Schema({
-  entityType: { type: String, required: true, enum: ['godparent', 'gift', 'guest', 'gallery', 'banner', 'avatar', 'other'] },
+  entityType: { type: String, required: true, enum: ['godparent', 'gift', 'storeCategory', 'guest', 'gallery', 'banner', 'avatar', 'other'] },
   entityId: { type: mongoose.Schema.Types.ObjectId, default: null },
   objectKey: { type: String, required: true, unique: true },
   pendingObjectKey: { type: String, default: '' },

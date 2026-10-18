@@ -2,13 +2,15 @@ import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { createRoot } from 'react-dom/client';
 import { BrowserRouter } from 'react-router-dom';
 import api, { tokenStore } from './services/api';
-import { PublicGodparents, PublicGifts } from './pages/PublicCatalog';
+import { PublicGodparents, PublicGifts, PublicStoreCategories } from './pages/PublicCatalog';
 import { GravataDialog, PixQrDialog, usePixStatus } from './pages/Pix/GravataEntry';
 import { appearanceAccent, baseColors, defaultAppearance, fontSizeScale, landingFont, weddingDisplayFonts } from './theme/appearance';
+import monogramSvg from './assets/logo/monograma-sa.svg?raw';
 import '@tabler/core/dist/css/tabler.min.css';
 import './style.css';
 
 const AdminApp = React.lazy(() => import('./routes/AdminApp').then(module => ({ default: module.AdminApp })));
+const StoreCategoryContent = React.lazy(() => import('./pages/StoreCategory/StoreCategoryContent').then(module => ({ default: module.StoreCategoryContent })));
 
 const slug = value => value.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase().trim().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
 
@@ -89,6 +91,8 @@ function usePublicAppearance(wedding) {
 const mapEmbed = query => `https://www.google.com/maps?q=${encodeURIComponent(query)}&z=16&output=embed`;
 
 const Svg = ({ children, size = 24, viewBox = '0 0 24 24', ...props }) => <svg width={size} height={size} viewBox={viewBox} fill="none" stroke="currentColor" strokeWidth="1.3" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true" {...props}>{children}</svg>;
+// Monograma S&A do casal (logo da landing). Herda a cor do texto (currentColor).
+const Monogram = ({ height = 28, className = '' }) => <span className={`wed-monogram ${className}`} style={{ height, width: Math.round(height * 1536 / 1926) }} aria-hidden="true" dangerouslySetInnerHTML={{ __html: monogramSvg }} />;
 const IconCalendar = props => <Svg {...props}><path d="M4 7a2 2 0 0 1 2 -2h12a2 2 0 0 1 2 2v12a2 2 0 0 1 -2 2h-12a2 2 0 0 1 -2 -2z" /><path d="M16 3v4M8 3v4M4 11h16M8 15h2v2h-2z" /></Svg>;
 const IconClock = props => <Svg {...props}><path d="M12 12m-9 0a9 9 0 1 0 18 0a9 9 0 1 0 -18 0" /><path d="M12 7v5l3 3" /></Svg>;
 const IconFlower = props => <Svg {...props}><path d="M12 12m-3 0a3 3 0 1 0 6 0a3 3 0 1 0 -6 0" /><path d="M12 6m-3 0a3 3 0 1 0 6 0a3 3 0 1 0 -6 0" /><path d="M12 18m-3 0a3 3 0 1 0 6 0a3 3 0 1 0 -6 0" /><path d="M6 12m-3 0a3 3 0 1 0 6 0a3 3 0 1 0 -6 0" /><path d="M18 12m-3 0a3 3 0 1 0 6 0a3 3 0 1 0 -6 0" /></Svg>;
@@ -238,7 +242,7 @@ function LandingNav({ couple, onGravata }) {
   const go = (event, id) => { setOpen(false); scrollToSection(event, id); };
   return <header className={`wed-nav${scrolled ? ' is-scrolled' : ''}`}>
     <div className="wed-nav-inner">
-      <a className="wed-nav-brand" href="#home" onClick={event => go(event, 'home')}><IconFlower size={22} />{couple[0]}<span>&amp;</span>{couple[1]}</a>
+      <a className="wed-nav-brand" href="#home" onClick={event => go(event, 'home')}><Monogram height={34} />{couple[0]}<span>&amp;</span>{couple[1]}</a>
       <button className="wed-nav-toggle" onClick={() => setOpen(!open)} aria-expanded={open} aria-label={open ? 'Fechar menu' : 'Abrir menu'}>{open ? <IconClose size={24} /> : <IconMenu size={24} />}</button>
       <nav className={`wed-nav-links${open ? ' is-open' : ''}`}>
         {NAV.map(item => item.action
@@ -262,7 +266,7 @@ function SiteFooter({ wedding, onLanding }) {
   return <footer className="wed-foot">
     <div className="wed-foot-top">
       <div className="wed-foot-brand">
-        <span className="wed-foot-logo"><IconFlower size={30} /><em>{wedding.couple[0]} &amp; {wedding.couple[1]}</em></span>
+        <span className="wed-foot-logo"><Monogram height={48} /><em>{wedding.couple[0]} &amp; {wedding.couple[1]}</em></span>
         {socials.length > 0 && <div className="wed-foot-social">{socials.map(social => <a key={social.label} href={social.href} target="_blank" rel="noreferrer" aria-label={social.label}>{social.icon}</a>)}</div>}
       </div>
       <div className="wed-foot-col">
@@ -504,7 +508,8 @@ function Landing() {
               {pix.active && <button className="wed-btn wed-btn-ghost" onClick={() => setPixQrOpen(true)}><IconQrcode size={18} />Visualizar QR Code</button>}
             </div>
           </div>}
-          <div className="wed-grid-2">{wedding.gifts.stores.map(store => {
+          {wedding.gifts.stores.filter(store => store.categories).map(store => <PublicStoreCategories key={store.name} store={store} icon={<IconGift size={24} />} />)}
+          <div className="wed-grid-2">{wedding.gifts.stores.filter(store => !store.categories).map(store => {
             const Tag = store.url ? 'a' : 'div';
             const props = store.url ? { href: store.url, target: '_blank', rel: 'noreferrer' } : {};
             return <Tag className={`wed-card wed-store${store.url ? ' wed-info-link' : ''}`} key={store.name} {...props}>
@@ -538,10 +543,45 @@ function Landing() {
   </div>;
 }
 
+// /lista-na-loja/:slug: produtos de uma categoria da "Lista na loja", com a mesma
+// moldura da landing (fundo, menu e rodape) e atalho de volta para as categorias.
+function StoreCategoryRoute() {
+  const wedding = useWedding();
+  const appearanceProps = usePublicAppearance(wedding);
+  const [photoFailed, setPhotoFailed] = useState(false);
+  const [scrolled, setScrolled] = useState(false);
+  useEffect(() => {
+    const onScroll = () => setScrolled(window.scrollY > 30);
+    onScroll(); window.addEventListener('scroll', onScroll, { passive: true });
+    return () => window.removeEventListener('scroll', onScroll);
+  }, []);
+  let slug = '';
+  try { slug = decodeURIComponent(location.pathname.split('/')[2] || ''); } catch { /* slug invalido vira "nao encontrada" */ }
+  if (wedding === false) return <div className="wed wed-plain"><div className="wed-state">Não foi possível carregar os dados do casamento.</div></div>;
+  if (!wedding) return <div className="wed wed-plain"><div className="wed-state">Carregando...</div></div>;
+  return <div className="wed wed-lp wed-catpage-shell" {...appearanceProps}>
+    <div className="wed-lp-bg" aria-hidden="true">
+      {photoFailed ? <div className="wed-lp-bg-empty" /> : <img src={wedding.photo} alt="" onError={() => setPhotoFailed(true)} />}
+    </div>
+    <header className={`wed-nav${scrolled ? ' is-scrolled' : ''}`}>
+      <div className="wed-nav-inner">
+        <a className="wed-nav-brand" href="/casamento"><Monogram height={34} />{wedding.couple[0]}<span>&amp;</span>{wedding.couple[1]}</a>
+        <a className="wed-nav-back" href="/casamento#lista-na-loja"><IconChevronLeft size={18} />Ver todas as categorias</a>
+      </div>
+    </header>
+    <main className="wed-lp-body"><div className="wed-lp-sheet">
+      <React.Suspense fallback={<section className="wed-sec wed-catpage" aria-busy="true" />}>
+        <StoreCategoryContent slug={slug} icons={{ back: <IconChevronLeft size={18} />, gift: <IconGift size={30} /> }} />
+      </React.Suspense>
+    </div></main>
+    <SiteFooter wedding={wedding} />
+  </div>;
+}
+
 function WeddingShell({ children, wedding }) {
   const appearanceProps = usePublicAppearance(wedding);
   return <div className="wed wed-invitation" {...appearanceProps}>
-    <header className="wed-topbar"><span className="wed-brand"><IconFlower size={26} />Convites de casamento</span></header>
+    <header className="wed-topbar"><span className="wed-brand"><Monogram height={32} />Convites de casamento</span></header>
     {children}
     {wedding ? <SiteFooter wedding={wedding} /> : <footer className="wed-footer"><i /><IconHeart size={15} /><i /></footer>}
   </div>;
@@ -620,6 +660,7 @@ function Admin() {
 function App() {
   if (location.pathname.startsWith('/invitation/')) return <Public />;
   if (location.pathname.startsWith('/casamento')) return <Landing />;
+  if (location.pathname.startsWith('/lista-na-loja/')) return <StoreCategoryRoute />;
   return <Admin />;
 }
 createRoot(document.getElementById('root')).render(<BrowserRouter><App /></BrowserRouter>);
