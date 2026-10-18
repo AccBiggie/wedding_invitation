@@ -1,14 +1,15 @@
 import mongoose from 'mongoose';
 import Godparent from '../models/Godparent.js';
 import GiftProduct from '../models/GiftProduct.js';
-import { escapeRegex, validateGodparent, validateGift } from '../validators/catalogValidator.js';
+import StoreCategory from '../models/StoreCategory.js';
+import { escapeRegex, validateGodparent, validateGift, validateStoreCategory } from '../validators/catalogValidator.js';
 import { validateImageReferences, bindImages, releaseImages, removeUnusedImages } from '../services/imageStorageService.js';
 
 const ok = (res, data, message) => res.json({ success: true, ...(message && { message }), data });
 const fail = (res, status, message, errors) => res.status(status).json({ success: false, message, ...(errors && { errors }) });
 
-function resource(Model, validate, fields) {
-  const entityType = Model === Godparent ? 'godparent' : 'gift';
+// entityType liga o cadastro a categoria de imagem do R2 (StoredImage.entityType).
+function resource(Model, validate, fields, entityType) {
   const references = item => Model === Godparent ? [item.image, ...(item.images || [])] : [item.image];
   return {
     async list(req, res, next) {
@@ -84,11 +85,15 @@ function resource(Model, validate, fields) {
   };
 }
 
-export const godparents = resource(Godparent, validateGodparent, ['order', 'name', 'role', 'active', 'createdAt']);
-export const gifts = resource(GiftProduct, validateGift, ['order', 'name', 'category', 'price', 'active', 'createdAt']);
+export const godparents = resource(Godparent, validateGodparent, ['order', 'name', 'role', 'active', 'createdAt'], 'godparent');
+export const gifts = resource(GiftProduct, validateGift, ['order', 'name', 'category', 'price', 'active', 'createdAt'], 'gift');
+export const storeCategories = resource(StoreCategory, validateStoreCategory, ['order', 'name', 'active', 'createdAt'], 'storeCategory');
 
 export async function publicGodparents(req, res, next) {
   try { ok(res, await Godparent.find({ active: true }).sort({ order: 1, name: 1 }).limit(200).select('name partnerName role cardRole description image images')); } catch (error) { next(error); }
+}
+export async function publicStoreCategories(req, res, next) {
+  try { ok(res, await StoreCategory.find({ active: true }).sort({ order: 1, name: 1 }).limit(100).select('name image')); } catch (error) { next(error); }
 }
 export async function publicGifts(req, res, next) {
   try { ok(res, await GiftProduct.find({ active: true }).sort({ order: 1, name: 1 }).limit(200).select('name description price image category')); } catch (error) { next(error); }

@@ -2,7 +2,7 @@ import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { createRoot } from 'react-dom/client';
 import { BrowserRouter } from 'react-router-dom';
 import api, { tokenStore } from './services/api';
-import { PublicGodparents, PublicGifts } from './pages/PublicCatalog';
+import { PublicGodparents, PublicGifts, PublicStoreCategories } from './pages/PublicCatalog';
 import { GravataDialog, PixQrDialog, usePixStatus } from './pages/Pix/GravataEntry';
 import { appearanceAccent, baseColors, defaultAppearance, fontSizeScale, landingFont, weddingDisplayFonts } from './theme/appearance';
 import '@tabler/core/dist/css/tabler.min.css';
@@ -504,7 +504,8 @@ function Landing() {
               {pix.active && <button className="wed-btn wed-btn-ghost" onClick={() => setPixQrOpen(true)}><IconQrcode size={18} />Visualizar QR Code</button>}
             </div>
           </div>}
-          <div className="wed-grid-2">{wedding.gifts.stores.map(store => {
+          {wedding.gifts.stores.filter(store => store.categories).map(store => <PublicStoreCategories key={store.name} store={store} icon={<IconGift size={24} />} />)}
+          <div className="wed-grid-2">{wedding.gifts.stores.filter(store => !store.categories).map(store => {
             const Tag = store.url ? 'a' : 'div';
             const props = store.url ? { href: store.url, target: '_blank', rel: 'noreferrer' } : {};
             return <Tag className={`wed-card wed-store${store.url ? ' wed-info-link' : ''}`} key={store.name} {...props}>

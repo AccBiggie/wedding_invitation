@@ -6,6 +6,9 @@ export interface Godparent { _id: string; name: string; partnerName: string; rol
 export type GodparentInput = Omit<Godparent, '_id' | 'createdAt' | 'updatedAt'>;
 export interface GiftProduct { _id: string; name: string; description: string; price: number; image: string; category: string; active: boolean; order: number; createdAt: string; updatedAt: string }
 export type GiftInput = Omit<GiftProduct, '_id' | 'createdAt' | 'updatedAt'>;
+export interface StoreCategory { _id: string; name: string; description: string; image: string; active: boolean; order: number; createdAt: string; updatedAt: string }
+export type StoreCategoryInput = Omit<StoreCategory, '_id' | 'createdAt' | 'updatedAt'>;
+export type PublicStoreCategory = Pick<StoreCategory, '_id' | 'name' | 'image'>;
 export interface PixSettings { _id: string; keyType: 'cpf' | 'cnpj' | 'email' | 'phone' | 'random'; pixKey: string; receiverName: string; receiverCity: string; description: string; active: boolean; createdAt: string; updatedAt: string }
 export type PixInput = Omit<PixSettings, '_id' | 'createdAt' | 'updatedAt'>;
 export interface PixGenerated { amount: number; payload: string; qrCode: string }

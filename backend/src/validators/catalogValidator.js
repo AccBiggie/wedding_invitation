@@ -39,6 +39,19 @@ export function validateGodparent(body) {
   return { errors, data: { name, partnerName, role: body.role, cardRole, phone, email: email.toLowerCase(), description, image: image || images[0] || '', images: image ? images : images.slice(1), order: Number(body.order ?? 0), active: body.active ?? true } };
 }
 
+export function validateStoreCategory(body) {
+  const errors = {};
+  const name = text(body.name, 80);
+  if (!name || name.length > 80) errors.name = ['Informe um nome de ate 80 caracteres.'];
+  const description = text(body.description, 500);
+  if (!description || description.length > 500) errors.description = ['Informe uma descricao de ate 500 caracteres.'];
+  const image = text(body.image, 2048);
+  if (!image || !validImage(image)) errors.image = ['Envie uma imagem ou informe uma URL de imagem valida.'];
+  if (!validOrder(body.order ?? 0)) errors.order = ['A ordem deve ser um inteiro nao negativo.'];
+  if (body.active !== undefined && !validBoolean(body.active)) errors.active = ['Status invalido.'];
+  return { errors, data: { name, description, image, order: Number(body.order ?? 0), active: body.active ?? true } };
+}
+
 export function validateGift(body) {
   const errors = {};
   const name = text(body.name, 120);

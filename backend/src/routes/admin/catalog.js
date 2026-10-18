@@ -1,5 +1,5 @@
 import { Router } from 'express';
-import { godparents, gifts } from '../../controllers/catalogController.js';
+import { godparents, gifts, storeCategories } from '../../controllers/catalogController.js';
 
 export function catalogRouter(controller) {
   const router = Router();
@@ -13,3 +13,4 @@ export function catalogRouter(controller) {
 
 export const godparentsRouter = catalogRouter(godparents);
 export const giftsRouter = catalogRouter(gifts);
+export const storeCategoriesRouter = catalogRouter(storeCategories);

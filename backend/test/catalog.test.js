@@ -117,3 +117,35 @@ test('convite publico continua confirmando convidados individualmente', { skip: 
   assert.equal(confirmed.body.data.guests[1].confirmed, false);
   assert.equal((await request(app).get(`/api/invitations/${item._id}`).set('Authorization', bearer)).body.data.guests[0].confirmedAt !== null, true);
 });
+
+test('CRUD de categorias da loja valida campos e publica so as ativas em ordem', { skip: !connection }, async () => {
+  const base = '/api/store-categories';
+  assert.equal((await request(app).get(base)).status, 401);
+  const invalid = await request(app).post(base).set('Authorization', bearer).send({ name: '', description: '', image: '', order: -1, active: 'sim' });
+  assert.equal(invalid.status, 422);
+  assert.deepEqual(Object.keys(invalid.body.errors).sort(), ['active', 'description', 'image', 'name', 'order']);
+  assert.equal((await request(app).post(base).set('Authorization', bearer).send({ name: 'Taças', description: 'Cristal', image: 'javascript:alert(1)' })).status, 422);
+  const create = body => request(app).post(base).set('Authorization', bearer).send(body);
+  const tacas = await create({ name: 'Taças', description: 'Taças de cristal', image: '/categorias/tacas.jpg', order: 2 });
+  assert.equal(tacas.status, 200);
+  assert.equal(tacas.body.data.active, true);
+  const panelas = await create({ name: 'Panelas', description: 'Jogo de panelas', image: 'https://example.com/panelas.jpg', order: 1 });
+  const loucas = await create({ name: 'Louças', description: 'Pratos e travessas', image: '/categorias/loucas.jpg', order: 1, active: false });
+  const id = tacas.body.data._id;
+  assert.equal((await request(app).get(base + '/' + id).set('Authorization', bearer)).body.data.name, 'Taças');
+  const updated = await request(app).put(base + '/' + id).set('Authorization', bearer).send({ name: 'Taças e copos', order: 0 });
+  assert.equal(updated.status, 200);
+  assert.equal(updated.body.data.description, 'Taças de cristal');
+  assert.equal((await request(app).put(base + '/' + id).set('Authorization', bearer).send({ image: '' })).status, 422);
+  const list = await request(app).get(base + '?active=true&sortBy=order&sortOrder=asc').set('Authorization', bearer);
+  assert.equal(list.body.data.pagination.total, 2);
+  const publicList = (await request(app).get('/api/public/store-categories')).body.data;
+  assert.deepEqual(publicList.map(item => item.name), ['Taças e copos', 'Panelas']);
+  assert.deepEqual(Object.keys(publicList[0]).sort(), ['_id', 'image', 'name']);
+  assert.equal((await request(app).get(base + '/invalido').set('Authorization', bearer)).status, 400);
+  assert.equal((await request(app).delete(base + '/' + id).set('Authorization', bearer)).status, 200);
+  assert.equal((await request(app).get(base + '/' + id).set('Authorization', bearer)).status, 404);
+  assert.equal((await request(app).delete(base + '/' + id).set('Authorization', bearer)).status, 404);
+  for (const item of [panelas, loucas]) await request(app).delete(base + '/' + item.body.data._id).set('Authorization', bearer);
+  assert.deepEqual((await request(app).get('/api/public/store-categories')).body.data, []);
+});
