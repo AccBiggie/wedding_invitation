@@ -7,7 +7,7 @@ import { usePixStatus } from '../Pix/GravataEntry';
 import type { Pagination, PublicGiftProduct, PublicStoreCategory } from '../../types/api';
 const GiftDetailsDialog = lazy(() => import('./GiftDetailsDialog').then(module => ({ default: module.GiftDetailsDialog })));
 const currency = (value: number) => new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(value);
-const PAGE_SIZE = 12;
+export const PAGE_SIZE = 12;
 export const LANDING_PATH = '/casamento';
 export const STORE_LIST_HREF = `${LANDING_PATH}#lista-na-loja`;
 
@@ -30,14 +30,29 @@ function ProductImage({ product }: { product: PublicGiftProduct }) {
   return <div className="wed-gift-image wed-catpage-image">{product.image && !failed ? <img src={resolveImageUrl(product.image)} alt={product.name} loading="lazy" decoding="async" onError={() => setFailed(true)} /> : <span aria-hidden="true">{product.name.trim().charAt(0)}</span>}</div>;
 }
 
+// Grade de presentes de uma categoria com o detalhe de cada um ("Ver presente"). Usada na
+// pagina da categoria e na area de produtos da "Lista na loja" na landing.
+export function ProductCards({ products, category, nameTag: Name = 'h2' }: { products: PublicGiftProduct[]; category: string; nameTag?: 'h2' | 'h5' }) {
+  const [selected, setSelected] = useState<PublicGiftProduct | null>(null);
+  const pix = usePixStatus();
+  return <>
+    <ul className="wed-catpage-grid">{products.map(product => <li key={product._id} className="wed-card wed-catpage-card">
+      <ProductImage product={product} />
+      <Name className="wed-catpage-name">{product.name}</Name>
+      <span className="wed-gift-price">{currency(product.price)}</span>
+      {product.description && <p className="wed-catpage-text">{product.description}</p>}
+      <button type="button" className="wed-btn wed-btn-ghost wed-catpage-cta" onClick={() => setSelected(product)} aria-label={`Ver presente: ${product.name}`}>Ver presente</button>
+    </li>)}</ul>
+    {selected && <Suspense fallback={null}><GiftDetailsDialog product={selected} category={category} pixActive={pix.active} onClose={() => setSelected(null)} /></Suspense>}
+  </>;
+}
+
 type State = { status: 'loading' } | { status: 'notFound' } | { status: 'error' } | { status: 'ready'; category: PublicStoreCategory; products: PublicGiftProduct[]; pagination: Pagination };
 
 // Pagina publica /lista-na-loja/:slug. A moldura (fundo, menu, rodape) vem do main.jsx.
 export function StoreCategoryContent({ slug, icons }: { slug: string; icons: { back: ReactNode; gift: ReactNode } }) {
   const [state, setState] = useState<State>({ status: 'loading' });
   const [loadingMore, setLoadingMore] = useState(false); const [moreError, setMoreError] = useState(false);
-  const [selected, setSelected] = useState<PublicGiftProduct | null>(null);
-  const pix = usePixStatus();
   const load = () => {
     setState({ status: 'loading' });
     storeCategoriesService.getPublicBySlug(slug, 1, PAGE_SIZE)
@@ -81,19 +96,12 @@ export function StoreCategoryContent({ slug, icons }: { slug: string; icons: { b
     {!ready ? <ul className="wed-catpage-grid is-loading" aria-hidden="true">{Array.from({ length: 4 }, (_, index) => <li key={index} className="wed-card wed-catpage-card"><div className="wed-gift-image wed-catpage-image" /><span /><span /></li>)}</ul>
       : ready.products.length === 0 ? <div className="wed-catpage-empty"><span>{icons.gift}</span><p>Ainda não adicionamos presentes nesta categoria.</p><p className="wed-catpage-empty-sub">Novidades em breve.</p></div>
       : <>
-        <ul className="wed-catpage-grid">{ready.products.map(product => <li key={product._id} className="wed-card wed-catpage-card">
-          <ProductImage product={product} />
-          <h2 className="wed-catpage-name">{product.name}</h2>
-          <span className="wed-gift-price">{currency(product.price)}</span>
-          {product.description && <p className="wed-catpage-text">{product.description}</p>}
-          <button type="button" className="wed-btn wed-btn-ghost wed-catpage-cta" onClick={() => setSelected(product)} aria-label={`Ver presente: ${product.name}`}>Ver presente</button>
-        </li>)}</ul>
+        <ProductCards products={ready.products} category={ready.category.name} />
         {ready.pagination.page < ready.pagination.totalPages && <div className="wed-catpage-more">
           {moreError && <p role="alert">Não foi possível carregar mais presentes.</p>}
           <button type="button" className="wed-btn wed-btn-ghost" onClick={loadMore} disabled={loadingMore}>{loadingMore ? 'Carregando...' : 'Ver mais presentes'}</button>
         </div>}
       </>}
     <a className="wed-catpage-back" href={STORE_LIST_HREF}>{icons.back}Ver todas as categorias</a>
-    {selected && <Suspense fallback={null}><GiftDetailsDialog product={selected} category={ready?.category.name || ''} pixActive={pix.active} onClose={() => setSelected(null)} /></Suspense>}
   </section>;
 }
