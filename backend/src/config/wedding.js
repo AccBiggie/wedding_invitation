@@ -53,8 +53,7 @@ export const wedding = {
     // TODO(noivos): apontar para as listas reais nas lojas.
     stores: [
       // categories: o card exibe as categorias cadastradas em "Categorias da loja".
-      { name: 'Lista na loja', description: 'Cozinha, mesa e utensílios para a nossa casa.', url: '', categories: true },
-      { name: 'Lua de mel', description: 'Ajude a construir a nossa primeira viagem como marido e mulher.', url: '' }
+      { name: 'Lista na loja', description: 'Cozinha, mesa e utensílios para a nossa casa.', url: '', categories: true }
     ]
   },
   // Secao "Nossa historia" (linha do tempo apos a lista de presentes). Fotos em

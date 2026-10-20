@@ -290,22 +290,9 @@ a.wed-shop-badge:hover{border-color:var(--wed-gold);background:#fffcf3}
 .wed-shop-desc{margin:.35rem 0 0;font-size:calc(1.05rem * var(--wed-font-scale, 1));line-height:1.4;color:#78817b}
 /* A linha divisoria fica no trilho, fora da mascara de fade da faixa. */
 .wed-shop-rail{margin:1.4rem 0 0;padding-top:.8rem;border-top:1px solid #f2ecdf}
-.wed-shop-marquee{padding:.5rem 0 .2rem;overflow:hidden}
-.wed-shop-marquee.is-marquee{-webkit-mask-image:linear-gradient(90deg,transparent,#000 9%,#000 91%,transparent);mask-image:linear-gradient(90deg,transparent,#000 9%,#000 91%,transparent)}
-.wed-shop-marquee.is-scroll{overflow-x:auto;scrollbar-width:none}
-.wed-shop-marquee.is-scroll::-webkit-scrollbar{display:none}
-.wed-shop-track{display:flex;width:max-content;margin:0 auto;will-change:transform}
-.wed-shop-marquee.is-marquee .wed-shop-track,.wed-shop-marquee.is-scroll .wed-shop-track{margin:0}
 .wed-shop-cats{--shop-gap:clamp(1rem,3.4vw,2.6rem);display:flex;flex-wrap:nowrap;gap:var(--shop-gap);margin:0;padding:0;list-style:none}
-.wed-shop-marquee.is-marquee .wed-shop-cats{padding-right:var(--shop-gap)}
 .wed-shop-cats li{flex:0 0 auto;display:flex;flex-direction:column;align-items:center;gap:.6rem;min-width:104px;max-width:160px;text-align:center}
-.wed-shop-link{display:flex;flex-direction:column;align-items:center;gap:.6rem;width:100%;padding:.35rem .3rem .45rem;border-radius:12px;color:inherit;text-decoration:none;cursor:pointer;-webkit-tap-highlight-color:transparent}
-.wed-shop-link:focus-visible{outline:2px solid var(--wed-gold);outline-offset:2px}
 .wed-shop-thumb img{transition:transform .25s}
-.wed-shop-link:hover .wed-shop-thumb,.wed-shop-link:focus-visible .wed-shop-thumb{transform:translateY(-3px);border-color:var(--wed-gold);box-shadow:0 8px 20px rgba(150,120,50,.2)}
-.wed-shop-link:hover .wed-shop-thumb img,.wed-shop-link:focus-visible .wed-shop-thumb img{transform:scale(1.05)}
-.wed-shop-link:hover .wed-shop-name,.wed-shop-link:focus-visible .wed-shop-name{color:var(--wed-green-dark);text-decoration:underline;text-decoration-color:var(--wed-gold);text-underline-offset:4px}
-.wed-shop-link:active .wed-shop-thumb{transform:translateY(-1px) scale(.98)}
 .wed-shop-thumb{display:flex;align-items:center;justify-content:center;width:96px;height:96px;padding:4px;overflow:hidden;border:1px solid var(--wed-gold-soft);border-radius:50%;background:var(--wed-card);box-shadow:0 4px 14px rgba(150,120,50,.12);transition:transform .2s,box-shadow .2s,border-color .2s}
 .wed-shop-thumb img{display:block;width:100%;height:100%;object-fit:cover;border-radius:50%}
 .wed-shop-initial{display:flex;align-items:center;justify-content:center;width:100%;height:100%;border-radius:50%;background:#f4f0e7;font-size:calc(2rem * var(--wed-font-scale, 1));color:var(--wed-gold)}
@@ -685,17 +672,14 @@ a.wed-shop-badge:hover{border-color:var(--wed-gold);background:#fffcf3}
 .wed-story-corner{position:absolute;width:150px;height:auto;opacity:.9;pointer-events:none}
 .wed-story-corner.left{left:-26px;top:10px;transform:rotate(-8deg)}
 .wed-story-corner.right{right:-30px;bottom:150px;transform:scaleX(-1) rotate(-14deg)}
-.wed-story-branch .stem{fill:none;stroke:var(--st-sage-dark);stroke-width:1.4;stroke-linecap:round}
-.wed-story-branch .leaf{fill:var(--st-sage);stroke:var(--st-sage-dark);stroke-width:.7;opacity:.92}
 .wed-story-timeline{position:relative;margin:0;padding:0;list-style:none}
 .wed-story-step{position:relative}
 .wed-story-chapter{position:relative;display:flex;align-items:center;gap:2rem;width:min(660px,72%);margin-left:2%}
 .wed-story-step.is-right .wed-story-chapter{margin-left:auto;margin-right:1%}
 .wed-story-photo{position:relative;flex-shrink:0;width:230px;height:230px}
 .wed-story-photo img{display:block;width:100%;height:100%;padding:7px;object-fit:cover;border-radius:50%;background:#fffdf8;border:1px solid #e3cfa6;box-shadow:0 0 0 5px #fffdf8,0 0 0 6px rgba(184,149,90,.45),0 14px 30px rgba(90,70,40,.18)}
-.wed-story-photo .wed-story-branch{position:absolute;width:96px;height:auto}
-.wed-story-photo .a{right:-30px;bottom:-14px;transform:rotate(-24deg)}
-.wed-story-photo .b{left:-36px;top:6px;transform:scaleX(-1) rotate(-40deg);width:78px}
+/* Raminhos floridos em volta da foto (FloralFrame.tsx): SVG de 378 unidades para uma foto de 230 */
+.wed-floral-frame{position:absolute;left:-32.174%;top:-32.174%;width:164.348%;height:164.348%;overflow:visible;pointer-events:none}
 .wed-story-text{position:relative;flex:1;min-width:0;padding-left:1.6rem;border-left:1.5px dashed rgba(184,149,90,.6)}
 .wed-story-pin{position:absolute;left:-11px;top:-2px;width:20px;height:19px;padding:3px;border-radius:50%;background:var(--st-paper);fill:var(--st-gold);stroke:none}
 .wed-story-number{display:block;font-family:'Cormorant Garamond',Georgia,serif;font-size:calc(1.5rem * var(--wed-font-scale, 1));line-height:1;color:var(--st-gold)}
@@ -777,3 +761,202 @@ a.wed-shop-badge:hover{border-color:var(--wed-gold);background:#fffcf3}
   .wed-story-landscape{width:calc(100% + 2.2rem);margin:0 -1.1rem;height:110px}
 }
 @media (prefers-reduced-motion:reduce){.wed-story *{transition:none!important}}
+
+/* Ramos de oliveira (components/decor/Olive.tsx): mesmo tema da "Nossa historia". */
+.wed-olive-sprig{flex-shrink:0;overflow:visible}
+
+/* Fundo de papel a partir de "Padrinhos": a foto some e os ramos crescem nas laterais. */
+.wed-lp-paper{position:fixed;inset:0;z-index:0;overflow:hidden;pointer-events:none;background:radial-gradient(ellipse at 15% 20%,rgba(255,255,255,.75),transparent 55%),radial-gradient(ellipse at 85% 80%,rgba(232,220,196,.45),transparent 55%),#f6f0e3}
+.wed-lp-paper::before{content:'';position:absolute;inset:0;opacity:.4;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 .55 0 0 0 0 .48 0 0 0 0 .36 0 0 0 .08 0'/%3E%3C/filter%3E%3Crect width='160' height='160' filter='url(%23n)'/%3E%3C/svg%3E")}
+.wed-lp[data-wed-dark=true] .wed-lp-paper{background:var(--wed-cream)}
+.wed-lp-bg{transition:opacity 1s ease}
+.wed-lp.is-paper .wed-lp-bg{opacity:0}
+.wed-lp .wed-sec{transition:box-shadow 1s ease}
+.wed-lp.is-paper .wed-sec{box-shadow:0 10px 34px rgba(90,70,40,.12)}
+.wed-olive-vine{--vine-o:.92;position:absolute;width:auto;height:100vh;aspect-ratio:390/1000;opacity:var(--vine-o)}
+.wed-olive-vine.is-left{left:-28px;top:12vh}
+.wed-olive-vine.is-right{right:-28px;bottom:-4vh;transform:scaleX(-1) rotate(4deg)}
+/* Desenho a mao (Olive.tsx): ao virar papel, os caules vao sendo tracados (SVG proprio, poucas linhas) e as
+   faixas de folhas e flores aparecem logo depois que o traco passa. Cada faixa e uma camada que o navegador
+   compoe sem redesenhar; ficam a .01 (e nao 0) atras da foto para ja estarem rasterizadas ao carregar. */
+.wed-garden-stems,.wed-garden-band{position:absolute;left:0;width:100%;overflow:visible;will-change:transform}
+.wed-garden-stems{top:0;height:100%}
+.wed-garden-stems path{stroke-dasharray:1;stroke-dashoffset:1;transition:stroke-dashoffset var(--dur,2s) cubic-bezier(.45,.05,.35,1) var(--d,0s)}
+.wed-garden-band{opacity:.01;transition:opacity 1s cubic-bezier(.4,0,.2,1) var(--d,0s)}
+.wed-lp.is-paper .wed-garden-stems path{stroke-dashoffset:0}
+.wed-lp.is-paper .wed-garden-band{opacity:1}
+/* Ao voltar para a foto, os ramos somem rapido e sem atraso. */
+.wed-lp:not(.is-paper) .wed-garden-stems path,.wed-lp:not(.is-paper) .wed-garden-band{transition-duration:.35s;transition-delay:0s}
+@media (max-width:820px){.wed-olive-vine{width:120px;--vine-o:.55}.wed-olive-vine.is-left{left:-40px}.wed-olive-vine.is-right{right:-40px}}
+@media (prefers-reduced-motion:reduce){.wed-lp-bg,.wed-lp .wed-sec,.wed-garden-stems path,.wed-garden-band{transition:none!important}}
+
+/* Guirlanda dos titulos: denso junto ao texto, caule fino ate a borda da secao. */
+.wed-olive-garland{flex:1 1 0;min-width:44px;max-width:225px;height:30px;-webkit-mask-image:linear-gradient(90deg,rgba(0,0,0,.35),#000 45%);mask-image:linear-gradient(90deg,rgba(0,0,0,.35),#000 45%)}
+.wed-olive-garland.is-flip{transform:scaleX(-1)}
+.wed-sec-title:has(.wed-olive-garland){width:100%}
+/* Ramo esquerdo ocupa a altura toda da tela. */
+.wed-olive-vine.is-left{top:0;left:-70px;width:auto;height:100vh}
+/* Igreja em traco como marca d'agua do fundo de papel. */
+.wed-church{position:absolute;left:50%;bottom:2vh;width:min(880px,82vw);height:auto;transform:translateX(-50%);opacity:0;transition:opacity 1.4s ease .3s}
+.wed-lp.is-paper .wed-church{opacity:.55}
+.wed-church path,.wed-church circle{fill:none;stroke:#a8875a;stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round;vector-effect:non-scaling-stroke}
+.wed-church .thin{stroke-width:1;opacity:.85}
+.wed-church .glass{fill:#f1e7d2}
+.wed-church .door{fill:#e9dbbd}
+.wed-church .roof{fill:#efe2c6}
+.wed-church .cross{stroke:#b8955a;stroke-width:2.2}
+.wed-church .tree circle{fill:#e3e8d8;stroke:#8fa27f}
+.wed-church .tree path{stroke:#8fa27f}
+/* Secoes levemente translucidas no meio (a igreja aparece suave por tras) e opacas nas bordas, por onde os ramos do jardim passam por baixo. */
+.wed-lp.is-paper .wed-sec:not(.wed-story){background:linear-gradient(90deg,var(--wed-cream) 0 120px,color-mix(in srgb,var(--wed-cream) 84%,transparent) 190px calc(100% - 190px),var(--wed-cream) calc(100% - 120px))}
+.wed-lp .wed-sec:not(.wed-story){transition:box-shadow 1s ease,background-color 1s ease}
+@media (max-width:820px){.wed-olive-vine.is-left{left:-60px;height:100vh;width:auto}.wed-church{width:120vw;bottom:0}.wed-olive-garland{max-width:70px}}
+
+/* O Tabler desloca o <html> pela largura da barra de rolagem (margin-left:
+   calc(100vw - 100%)), deixando uma faixa vazia a esquerda da navbar no site publico. */
+:root:has(.wed){margin-left:0}
+
+.wed-olive-garland{max-width:none;height:42px;overflow:visible;-webkit-mask-image:linear-gradient(90deg,rgba(0,0,0,.45),#000 30%);mask-image:linear-gradient(90deg,rgba(0,0,0,.45),#000 30%)}
+.wed-sec-title:has(.wed-olive-garland){gap:.5rem}
+.wed-olive-vine{width:auto;max-width:none}
+.wed-olive-vine.is-left{top:0;left:-34px;height:100vh}
+.wed-olive-vine.is-right{top:0;bottom:auto;right:-34px;height:100vh;width:auto;transform:scaleX(-1)}
+@media (max-width:820px){.wed-olive-vine.is-left,.wed-olive-vine.is-right{height:70vh;width:auto;--vine-o:.5}.wed-olive-vine.is-left{left:-60px}.wed-olive-vine.is-right{right:-60px}.wed-olive-garland{max-width:none}}
+
+/* Folhas nao podem ser recortadas: os SVGs desenham fora da propria caixa. */
+.wed-olive{overflow:visible}
+.wed-olive-garland{-webkit-mask-image:none;mask-image:none}
+/* Jardim lateral colado na borda da tela; em telas estreitas o lado de dentro passa por baixo dos cards. */
+.wed-olive-vine.is-left{left:0}
+.wed-olive-vine.is-right{right:0}
+@media (max-width:820px){.wed-olive-vine.is-left{left:0}.wed-olive-vine.is-right{right:0;top:auto;bottom:0}}
+
+/* Celular: sem o deslocamento da aquarela (o estilo vem dos degrades). */
+@media (max-width:820px){.ba-aq{filter:none}}
+
+/* Abertura, direcao A (Botanica Aquarela): veu escuro so atras do texto, nomes grandes em
+   marfim, "&" em italico dourado, data espacada, contagem em caixas de vidro e botao em pilula. */
+.wed-lp-bg::after{background:linear-gradient(180deg,rgba(18,42,31,.42),rgba(18,42,31,.16) 22%,rgba(18,42,31,.16) 70%,rgba(18,42,31,.3))}
+.wed-lp-hero{position:relative;isolation:isolate}
+.wed-lp-hero::before{content:'';position:absolute;inset:0;z-index:-1;pointer-events:none;background:radial-gradient(ellipse 50% 64% at 50% 52%,rgba(20,36,26,.76) 0%,rgba(20,36,26,.66) 42%,rgba(20,36,26,.34) 72%,rgba(20,36,26,0) 100%),linear-gradient(180deg,rgba(20,36,26,0) 55%,rgba(20,36,26,.45) 100%)}
+.wed-lp-hero .wed-lp-kicker{display:flex;align-items:center;gap:14px;margin:0;font-size:calc(13px * var(--wed-font-scale, 1));line-height:16px;letter-spacing:.5em;text-transform:uppercase;color:#f1e2c2;text-shadow:0 1px 10px rgba(10,20,14,.5)}
+.wed-lp-hero .wed-lp-kicker::before,.wed-lp-hero .wed-lp-kicker::after{content:'';width:48px;height:1px;background:#d9b77a}
+.wed-lp-hero .wed-lp-kicker::after{margin-left:-.5em}
+.wed-lp-hero .wed-names{margin:10px 0 0;font-size:calc(clamp(64px,8.6vw,104px) * var(--wed-font-scale, 1));line-height:1;font-weight:400;color:#fffaf0;text-shadow:0 2px 22px rgba(10,20,14,.45);white-space:nowrap}
+.wed-lp-hero .wed-amp{margin:0 10px;font-family:inherit;font-style:italic;font-weight:400;font-size:calc(clamp(40px,5.3vw,64px) * var(--wed-font-scale, 1));color:#e2c287;vertical-align:.17em}
+.wed-lp-hero .wed-lp-date{margin:14px 0 0;font-size:calc(18px * var(--wed-font-scale, 1));line-height:24px;letter-spacing:.22em;text-transform:uppercase;color:#fffaf0;text-shadow:0 1px 12px rgba(10,20,14,.5)}
+.wed-lp-hero .wed-lp-date i{margin:0 10px;font-style:normal;color:#e2c287}.wed-lp-hero .wed-lp-time{text-transform:none}
+.wed-sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+.wed-lp-hero .wed-count{gap:12px;margin-top:26px}
+.wed-lp-hero .wed-count-box{width:86px;min-width:0;padding:12px 0 10px;border:1px solid rgba(226,194,135,.65);border-radius:14px;background:rgba(20,36,26,.34);box-shadow:inset 0 0 0 1px rgba(252,248,238,.08);-webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px)}
+.wed-lp-hero .wed-count-box strong{font-family:'Cormorant Garamond',Georgia,serif;font-size:calc(38px * var(--wed-font-scale, 1));line-height:40px;font-weight:500;color:#fffaf0}
+.wed-lp-hero .wed-count-box span{margin-top:4px;font-size:calc(11px * var(--wed-font-scale, 1));line-height:14px;letter-spacing:.28em;text-transform:uppercase;color:#f1e2c2}
+.wed-lp-hero .wed-count-done{color:#fffaf0;text-shadow:0 1px 12px rgba(10,20,14,.5)}
+.wed-lp-hero .wed-lp-scroll{display:inline-flex;align-items:center;gap:10px;margin-top:28px;padding:11px 24px;border:1px solid #d9b77a;border-radius:999px;background:rgba(252,248,238,.94);color:#24412f;font-family:'Cormorant Garamond',Georgia,serif;font-size:calc(16px * var(--wed-font-scale, 1));line-height:20px;letter-spacing:.06em;text-decoration:none;transition:background .15s,box-shadow .15s}
+.wed-lp-hero .wed-lp-scroll:hover{background:#fffaf0;color:#24412f;border-color:#d9b77a;box-shadow:0 6px 18px rgba(10,20,14,.25)}
+.wed-lp-hero .wed-lp-scroll:focus-visible{outline:2px solid #fffaf0;outline-offset:3px}
+/* Celular: nomes em duas linhas ("Stefani &" / "Andre"), caixas de 68 px e veu um pouco mais forte. */
+@media (max-width:560px){
+  .wed-lp-hero::before{background:radial-gradient(ellipse 95% 60% at 50% 52%,rgba(20,36,26,.8) 0%,rgba(20,36,26,.68) 48%,rgba(20,36,26,.3) 82%,rgba(20,36,26,.12) 100%),linear-gradient(180deg,rgba(20,36,26,0) 50%,rgba(20,36,26,.5) 100%)}
+  .wed-lp-hero .wed-lp-kicker{gap:10px;font-size:calc(12px * var(--wed-font-scale, 1));letter-spacing:.4em}
+  .wed-lp-hero .wed-lp-kicker::before,.wed-lp-hero .wed-lp-kicker::after{width:32px}
+  .wed-lp-hero .wed-names{font-size:calc(56px * var(--wed-font-scale, 1));line-height:1.08;white-space:normal}
+  .wed-lp-hero .wed-lp-name{display:block;white-space:nowrap}
+  .wed-lp-hero .wed-amp{margin:0 0 0 8px;font-size:calc(36px * var(--wed-font-scale, 1));vertical-align:10px}
+  .wed-lp-hero .wed-lp-date{font-size:calc(14px * var(--wed-font-scale, 1));letter-spacing:.16em}
+  .wed-lp-hero .wed-lp-date i{margin:0 7px}
+  .wed-lp-hero .wed-count{gap:8px;margin-top:22px}
+  .wed-lp-hero .wed-count-box{width:68px;padding:10px 0 8px;border-radius:12px}
+  .wed-lp-hero .wed-count-box strong{font-size:calc(30px * var(--wed-font-scale, 1));line-height:32px}
+  .wed-lp-hero .wed-count-box span{font-size:calc(10px * var(--wed-font-scale, 1));letter-spacing:.2em}
+}
+
+/* Navbar, layout 4 (Botanica Aquarela): faixa marfim com desfoque e sombra, so o monograma
+   numa moldura dourada, ancoras de 20 px em verde pela largura toda, uma florzinha em
+   aquarela embaixo da secao ativa e "Confirme sua presenca" como botao solido. */
+.wed-lp:has(> .wed-nav.is-floral){--nav-h:84px}
+.wed-lp .wed-nav.is-floral,.wed-lp .wed-nav.is-floral.is-scrolled{background:rgba(250,247,240,.94);-webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px);border-bottom:0;box-shadow:0 6px 24px rgba(15,28,20,.18)}
+.wed-lp .wed-nav.is-floral .wed-nav-inner{gap:32px;max-width:1480px;padding:0 40px}
+.wed-lp .wed-nav.is-floral .wed-nav-brand{flex:none;justify-content:center;width:56px;height:56px;border:1px solid #c9ab78;border-radius:50%;text-shadow:none}
+.wed-lp .wed-nav.is-floral .wed-nav-brand .wed-monogram{margin:0;color:#ad8c5c;filter:none}
+.wed-lp .wed-nav.is-floral .wed-nav-brand:focus-visible,.wed-lp .wed-nav.is-floral .wed-nav-links a:focus-visible,.wed-lp .wed-nav.is-floral .wed-nav-toggle:focus-visible{outline:2px solid #24412f;outline-offset:4px}
+.wed-lp .wed-nav.is-floral .wed-nav-links{position:relative;flex:1;justify-content:space-between;gap:12px;margin-left:0}
+.wed-lp .wed-nav.is-floral .wed-nav-links a{position:relative;padding:6px 2px;border-radius:4px;background:none;color:#24412f;font-family:'Cormorant Garamond',Georgia,serif;font-size:calc(20px * var(--wed-font-scale, 1));line-height:24px;font-weight:500;text-shadow:none}
+.wed-lp .wed-nav.is-floral .wed-nav-links a:hover{background:none;color:#24412f;text-decoration:underline;text-decoration-color:#c9ab78;text-decoration-thickness:1px;text-underline-offset:6px}
+.wed-lp .wed-nav.is-floral .wed-nav-links a.is-active{background:none;color:#24412f}
+.wed-lp .wed-nav.is-floral .wed-nav-links a.is-cta{padding:10px 22px;border-radius:999px;background:#24412f;color:#faf8f3}
+.wed-lp .wed-nav.is-floral .wed-nav-links a.is-cta:hover{background:#1a3123;color:#faf8f3;text-decoration:none}
+.wed-lp .wed-nav.is-floral .wed-nav-links a.is-cta:focus-visible{outline-offset:3px}
+.wed-nav-flower{position:absolute;top:calc(50% + 13px);left:0;margin-left:-10px;pointer-events:none;transition:transform .5s cubic-bezier(.22,.61,.36,1)}
+.wed-lp .wed-nav.is-floral .wed-nav-toggle{border:1px solid #c9ab78;background:transparent;color:#24412f}
+/* Abaixo de 1100 px: menu de tres linhas ao lado do monograma, painel marfim. */
+@media (max-width:1100px){
+  .wed-lp:has(> .wed-nav.is-floral){--nav-h:72px}
+  .wed-lp .wed-nav.is-floral .wed-nav-inner{padding:0 1.25rem}
+  .wed-lp .wed-nav.is-floral .wed-nav-toggle{display:flex}
+  .wed-lp .wed-nav.is-floral .wed-nav-links{position:absolute;left:0;right:0;top:var(--nav-h);display:none;flex-direction:column;align-items:stretch;gap:0;margin:0;padding:.5rem;background:#faf7f0;border-top:1px solid rgba(201,171,120,.5);box-shadow:0 14px 28px rgba(15,28,20,.18)}
+  .wed-lp .wed-nav.is-floral .wed-nav-links.is-open{display:flex}
+  .wed-lp .wed-nav.is-floral .wed-nav-links a{padding:.8rem 1rem}
+  .wed-lp .wed-nav.is-floral .wed-nav-links a.is-active{background:rgba(36,65,47,.07);font-weight:600}
+  .wed-lp .wed-nav.is-floral .wed-nav-links a.is-cta{align-self:flex-start;margin:.4rem 1rem .3rem;padding:10px 22px}
+  .wed-lp .wed-nav.is-floral .wed-nav-links a.is-cta.is-active{background:#24412f}
+  .wed-nav-flower{display:none}
+}
+@media (max-width:560px){
+  .wed-lp:has(> .wed-nav.is-floral){--nav-h:64px}
+  .wed-lp .wed-nav.is-floral .wed-nav-brand{width:48px;height:48px}
+}
+@media (prefers-reduced-motion:reduce){.wed-nav-flower{transition:none}}
+
+/* Lista na loja (PublicCatalog.tsx): as categorias sao botoes e a escolhida mostra os presentes
+   logo abaixo. Ate a primeira escolha: dica com seta, anel dourado em sequencia, balao no primeiro
+   circulo e quadro vazio com flor; depois so fica a categoria ativa (borda ouro e flor no canto). */
+.wed-shop-hint{display:flex;align-items:center;gap:10px;width:fit-content;max-height:80px;margin:18px 0 0;padding:10px 14px;overflow:hidden;border-radius:999px;background:#f5efe2;color:#24412f;font-size:calc(15px * var(--wed-font-scale, 1));line-height:20px;transition:opacity .4s ease,max-height .35s ease .35s,margin .35s ease .35s,padding .35s ease .35s}
+.wed-shop-hint.is-done{max-height:0;margin-top:0;padding-top:0;padding-bottom:0;opacity:0}
+.wed-shop-hint-arrow{flex:none;color:#ad8c5c;font-size:18px;animation:wed-hint-bob 1.6s ease-in-out infinite}
+.wed-shop-hint.is-done .wed-shop-hint-arrow{animation:none}
+@keyframes wed-hint-bob{0%,100%{transform:translateY(-2px)}50%{transform:translateY(3px)}}
+.wed-shop-hint-touch{display:none}
+@media (hover:none) and (pointer:coarse){.wed-shop-hint-mouse{display:none}.wed-shop-hint-touch{display:inline}}
+.wed-shop-rail{padding-top:46px}
+.wed-shop-rail .wed-shop-cats{display:grid;grid-template-columns:repeat(auto-fit,minmax(112px,1fr));gap:1.2rem .5rem}
+.wed-shop-rail .wed-shop-cats li{min-width:0;max-width:none}
+.wed-shop-pick{position:relative;display:flex;flex-direction:column;align-items:center;gap:.55rem;width:100%;padding:.35rem .3rem .45rem;border:0;border-radius:14px;background:none;color:inherit;font:inherit;cursor:pointer;-webkit-tap-highlight-color:transparent}
+.wed-shop-pick:focus-visible{outline:2px solid #24412f;outline-offset:4px}
+.wed-shop-ring{position:relative;display:block;border-radius:50%;transition:transform .25s ease}
+.wed-shop-ring.is-calling::after{content:'';position:absolute;inset:-7px;border:2px solid #d9b77a;border-radius:50%;pointer-events:none;animation:wed-ring-call 1.1s ease-out both}
+@keyframes wed-ring-call{from{opacity:.9;transform:scale(.92)}to{opacity:0;transform:scale(1.18)}}
+.wed-shop-pick:hover .wed-shop-ring,.wed-shop-pick:focus-visible .wed-shop-ring{transform:translateY(-4px)}
+.wed-shop-pick:hover .wed-shop-thumb,.wed-shop-pick:focus-visible .wed-shop-thumb{border-color:#c9ab78;box-shadow:0 10px 24px rgba(150,120,50,.22)}
+.wed-shop-pick:hover .wed-shop-thumb img,.wed-shop-pick:focus-visible .wed-shop-thumb img{transform:scale(1.05)}
+.wed-shop-more{font-size:calc(13px * var(--wed-font-scale, 1));line-height:16px;letter-spacing:.04em;white-space:nowrap;color:#ad8c5c;opacity:0;transform:translateY(-4px);transition:opacity .2s,transform .2s}
+.wed-shop-pick:hover .wed-shop-more,.wed-shop-pick:focus-visible .wed-shop-more{opacity:1;transform:none}
+.wed-shop-pick[aria-pressed=true] .wed-shop-thumb{border:2px solid #ad8c5c;padding:3px;background:radial-gradient(circle at 50% 40%,#fffaf0,#f3e6c9)}
+.wed-shop-pick[aria-pressed=true] .wed-shop-name{font-weight:600}
+.wed-shop-pick[aria-pressed=true] .wed-shop-more{opacity:1;transform:none;color:#24412f}
+.wed-shop-seal{position:absolute;top:-2px;right:-2px;filter:drop-shadow(0 1px 2px rgba(90,70,40,.25))}
+.wed-shop-balloon{position:absolute;bottom:calc(100% + 4px);left:50%;z-index:2;padding:7px 12px;border-radius:10px;background:#24412f;color:#faf8f3;font-size:calc(13px * var(--wed-font-scale, 1));line-height:16px;white-space:nowrap;box-shadow:0 6px 16px rgba(15,28,20,.2);pointer-events:none;transform:translateX(-50%)}
+.wed-shop-balloon-tip{position:absolute;bottom:calc(100% - 8px);left:50%;z-index:2;margin-left:-6px;border:6px solid transparent;border-top-color:#24412f;pointer-events:none}
+.wed-shop-products{margin-top:20px;padding-top:18px;border-top:1px solid #ece3d1}
+.wed-shop-waiting{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;min-height:130px;padding:18px;border:1px dashed #c9ab78;border-radius:14px;text-align:center;color:#666c66;font-size:calc(15px * var(--wed-font-scale, 1));line-height:22px}
+.wed-shop-waiting b{color:#24412f;font-weight:600}
+.wed-shop-waiting .wed-btn{margin-top:.4rem}
+.wed-shop-products-head{display:flex;align-items:baseline;justify-content:space-between;gap:1rem;margin:0 0 .9rem}
+.wed-shop-products-head h4{margin:0;font-weight:500;font-size:calc(1.2rem * var(--wed-font-scale, 1));color:var(--wed-green)}
+.wed-shop-products-head span{font-size:calc(.95rem * var(--wed-font-scale, 1));color:#78817b}
+.wed-shop-products .wed-shop-empty{margin:0;padding:.4rem 0;border-top:0}
+.wed-shop-all{display:inline-block;margin-top:1rem;color:#24412f;font-size:calc(1rem * var(--wed-font-scale, 1));text-decoration:underline;text-decoration-color:#c9ab78;text-underline-offset:4px}
+.wed-shop-all:focus-visible{outline:2px solid #24412f;outline-offset:3px;border-radius:4px}
+/* Celular: os circulos em grade de tres colunas (todos visiveis de uma vez). */
+@media (max-width:560px){
+  .wed-shop-rail .wed-shop-cats{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:1.1rem .4rem}
+  .wed-shop-more{display:none;font-size:calc(12px * var(--wed-font-scale, 1));letter-spacing:.02em}
+  .wed-shop-pick[aria-pressed=true] .wed-shop-more{display:block}
+  .wed-shop-hint{font-size:calc(14px * var(--wed-font-scale, 1));border-radius:16px}
+  .wed-shop-balloon{left:0;transform:none}
+}
+@media (prefers-reduced-motion:reduce){
+  .wed-shop-hint-arrow,.wed-shop-ring.is-calling::after{animation:none}
+  .wed-shop-ring,.wed-shop-more,.wed-shop-hint{transition:none}
+  .wed-shop-pick:hover .wed-shop-ring,.wed-shop-pick:focus-visible .wed-shop-ring{transform:none}
+}

@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useRef, useState } from 'react';
+import React, { useCallback, useEffect, useLayoutEffect, useRef, useState } from 'react';
 import { createRoot } from 'react-dom/client';
 import { BrowserRouter } from 'react-router-dom';
 import api, { tokenStore } from './services/api';
@@ -6,6 +6,9 @@ import { PublicGodparents, PublicGifts, PublicStoreCategories } from './pages/Pu
 import { GravataDialog, PixQrDialog, usePixStatus } from './pages/Pix/GravataEntry';
 import { ScrollReveal } from './components/reveal/ScrollReveal';
 import { OurStory } from './components/story/OurStory';
+import { OliveGarland, OliveSprig, OliveVine } from './components/decor/Olive';
+import { ChurchSketch } from './components/decor/ChurchSketch';
+import { NavFlower } from './components/decor/NavFlower';
 import { appearanceAccent, baseColors, defaultAppearance, fontSizeScale, landingFont, weddingDisplayFonts } from './theme/appearance';
 import monogramSvg from './assets/logo/monograma-sa.svg?raw';
 import '@tabler/core/dist/css/tabler.min.css';
@@ -128,9 +131,8 @@ const FetechLogo = ({ height = 26 }) => <svg height={height} viewBox="0 0 200 55
 </g></svg>;
 
 const LEAF = 'M0 0c9 -3.6 16.5 -1.2 20.5 7c-9.3 3.6 -16.6 1.2 -20.5 -7z';
-const Sprig = ({ flip }) => <svg width="26" height="16" viewBox="0 0 26 16" fill="none" stroke="currentColor" strokeWidth="1.1" strokeLinecap="round" aria-hidden="true" style={flip ? { transform: 'scaleX(-1)' } : undefined}>
-  <path d="M2 14c5 0 11.5 -3 15.5 -9.5" /><path d="M6.4 12.4c-1 -2 -.3 -3.9 1.9 -4.8c.7 2 0 3.9 -1.9 4.8z" /><path d="M10.6 9.2c-1.1 -1.9 -.6 -3.8 1.4 -5c.9 1.9 .4 3.9 -1.4 5z" /><path d="M14.6 5.6c-1.3 -1.7 -1.1 -3.7 .5 -5.1c1.2 1.7 1 3.7 -.5 5.1z" />
-</svg>;
+// Raminho de oliveira dos titulos (mesmo tema da secao "Nossa historia").
+const Sprig = ({ flip }) => <OliveSprig flip={flip} />;
 const Branch = ({ className }) => <svg className={className} viewBox="0 0 110 320" fill="none" stroke="currentColor" strokeWidth="1.1" strokeLinecap="round" preserveAspectRatio="xMidYMid meet" aria-hidden="true">
   <path d="M12 316c24 -48 40 -102 46 -158c5 -50 0 -102 -14 -152" />
   {[[62, 106, -42], [58, 150, -26], [55, 196, -10], [50, 244, 8], [46, 62, -54]].map(([x, y, angle]) => <g key={`${x}-${y}`}>
@@ -242,14 +244,29 @@ function LandingNav({ couple, onGravata }) {
     return () => window.removeEventListener('scroll', onScroll);
   }, []);
   const go = (event, id) => { setOpen(false); scrollToSection(event, id); };
-  return <header className={`wed-nav${scrolled ? ' is-scrolled' : ''}`}>
+  // Florzinha embaixo da ancora ativa: mede o centro da ancora e desliza ate ela.
+  const linksRef = useRef(null);
+  const [flowerX, setFlowerX] = useState(null);
+  useLayoutEffect(() => {
+    const place = () => {
+      const link = linksRef.current?.querySelector('a[aria-current="page"]:not(.is-cta)');
+      setFlowerX(link ? link.offsetLeft + link.offsetWidth / 2 : null);
+    };
+    place();
+    document.fonts?.ready.then(place);
+    window.addEventListener('resize', place);
+    return () => window.removeEventListener('resize', place);
+  }, [active, onGravata]);
+  // Layout 4 do design system (faixa marfim com flor): so o monograma e as ancoras pela largura toda.
+  return <header className={`wed-nav is-floral${scrolled ? ' is-scrolled' : ''}`}>
     <div className="wed-nav-inner">
-      <a className="wed-nav-brand" href="#home" onClick={event => go(event, 'home')}><Monogram height={34} />{couple[0]}<span>&amp;</span>{couple[1]}</a>
+      <a className="wed-nav-brand" href="#home" aria-label={`${couple[0]} e ${couple[1]} — início`} onClick={event => go(event, 'home')}><Monogram height={36} /></a>
       <button className="wed-nav-toggle" onClick={() => setOpen(!open)} aria-expanded={open} aria-label={open ? 'Fechar menu' : 'Abrir menu'}>{open ? <IconClose size={24} /> : <IconMenu size={24} />}</button>
-      <nav className={`wed-nav-links${open ? ' is-open' : ''}`}>
+      <nav ref={linksRef} className={`wed-nav-links${open ? ' is-open' : ''}`} aria-label="Principal">
         {NAV.map(item => item.action
           ? onGravata && <a key={item.id} href={`#${item.id}`} role="button" onClick={event => { event.preventDefault(); setOpen(false); onGravata(); }}>{item.label}</a>
-          : <a key={item.id} href={`#${item.id}`} className={active === item.id ? 'is-active' : ''} onClick={event => go(event, item.id)}>{item.label}</a>)}
+          : <a key={item.id} href={`#${item.id}`} className={[active === item.id && 'is-active', item.id === 'confirmar' && 'is-cta'].filter(Boolean).join(' ') || undefined} aria-current={active === item.id ? 'page' : undefined} onClick={event => go(event, item.id)}>{item.label}</a>)}
+        {flowerX != null && <NavFlower x={flowerX} />}
       </nav>
     </div>
   </header>;
@@ -422,6 +439,25 @@ function Guestbook() {
   </div>;
 }
 
+// Ao chegar em "Padrinhos" a foto de fundo some e a pagina vira papel, com ramos
+// de oliveira crescendo nas laterais. Volta a foto ao subir de novo.
+function usePaperBackdrop(ready) {
+  const [paper, setPaper] = useState(false);
+  useEffect(() => {
+    const target = ready && document.getElementById('padrinhos');
+    if (!target || typeof IntersectionObserver === 'undefined') return;
+    // Ativa quando o topo de "Padrinhos" passa de 60% da tela. Observa tambem as
+    // outras secoes (sem listener de scroll): qualquer salto de rolagem muda a
+    // intersecao de alguma delas e o estado e recalculado.
+    const update = () => setPaper(target.getBoundingClientRect().top < window.innerHeight * .6);
+    const observer = new IntersectionObserver(update, { rootMargin: '0px 0px -40% 0px', threshold: 0 });
+    document.querySelectorAll('.wed-lp-hero, .wed-lp-sheet > section').forEach(node => observer.observe(node));
+    update();
+    return () => observer.disconnect();
+  }, [ready]);
+  return paper;
+}
+
 function Landing() {
   const wedding = useWedding();
   const appearanceProps = usePublicAppearance(wedding);
@@ -429,6 +465,7 @@ function Landing() {
   const [copied, setCopied] = useState(false);
   const [gravataOpen, setGravataOpen] = useState(false);
   const [pixQrOpen, setPixQrOpen] = useState(false);
+  const paper = usePaperBackdrop(Boolean(wedding));
   const pix = usePixStatus();
   // Chave do painel PIX; a do config fica de reserva enquanto o PIX nao for configurado.
   const pixKey = pix.pixKey || wedding?.gifts.pix.value;
@@ -443,7 +480,8 @@ function Landing() {
   if (!wedding) return <div className="wed wed-plain"><div className="wed-state">Carregando...</div></div>;
   const target = new Date(wedding.datetime).getTime();
   const copyPix = async () => { try { await navigator.clipboard.writeText(pixKey); setCopied(true); setTimeout(() => setCopied(false), 2500); } catch { /* sem clipboard */ } };
-  return <div className="wed wed-lp" {...appearanceProps}>
+  return <div className={`wed wed-lp${paper ? ' is-paper' : ''}`} {...appearanceProps}>
+    <div className="wed-lp-paper" aria-hidden="true"><ChurchSketch /><OliveVine className="is-left" from="top" /><OliveVine className="is-right" /></div>
     <div className="wed-lp-bg" aria-hidden="true">
       {photoFailed ? <div className="wed-lp-bg-empty" /> : <img src={wedding.photo} alt="" onError={() => setPhotoFailed(true)} />}
     </div>
@@ -453,27 +491,27 @@ function Landing() {
     <main className="wed-lp-body">
       <section className="wed-lp-hero" id="home">
         <p className="wed-lp-kicker">Vamos nos casar</p>
-        <h1 className="wed-names">{wedding.couple[0]} <span className="wed-amp">&amp;</span> {wedding.couple[1]}</h1>
-        <div className="wed-rule"><i /><IconHeart size={14} /><i /></div>
-        <p className="wed-lp-date">{wedding.date.join(' ')} {'•'} {wedding.time.join('')}</p>
+        {/* No celular os nomes quebram em duas linhas: "Stéfani &" / "André". */}
+        <h1 className="wed-names"><span className="wed-lp-name">{wedding.couple[0]}<span className="wed-amp">&amp;</span></span> <span className="wed-lp-name">{wedding.couple[1]}</span></h1>
+        <p className="wed-lp-date">{wedding.date.join(' ')}<i aria-hidden="true">·</i><span className="wed-sr">, </span><span className="wed-lp-time">{wedding.time.join('')}</span></p>
         <Countdown target={target} />
-        <a className="wed-lp-scroll" href="#sobre" onClick={event => scrollToSection(event, 'sobre')}>conheça nossa história</a>
+        <a className="wed-lp-scroll" href="#sobre" onClick={event => scrollToSection(event, 'sobre')}>Conheça nossa história <span aria-hidden="true">↓</span></a>
       </section>
 
       <div className="wed-lp-sheet">
         <section className="wed-sec" id="sobre">
-          <ScrollReveal as="h2" className="wed-sec-title"><Sprig />{wedding.about.title}<Sprig flip /></ScrollReveal>
+          <ScrollReveal as="h2" className="wed-sec-title"><OliveGarland seed={53} />{wedding.about.title}<OliveGarland seed={53} flip /></ScrollReveal>
           <ScrollReveal stagger preset="fade" delay={80} className="wed-prose">{wedding.about.paragraphs.map(paragraph => <p key={paragraph.slice(0, 24)}>{paragraph}</p>)}</ScrollReveal>
         </section>
 
         <section className="wed-sec" id="padrinhos">
-          <ScrollReveal as="h2" className="wed-sec-title"><Sprig />{wedding.godparents.title}<Sprig flip /></ScrollReveal>
+          <ScrollReveal as="h2" className="wed-sec-title"><OliveGarland seed={66} />{wedding.godparents.title}<OliveGarland seed={66} flip /></ScrollReveal>
           <ScrollReveal as="p" className="wed-sec-intro" preset="fade" delay={80}>{wedding.godparents.intro}</ScrollReveal>
           <PublicGodparents Carousel={Carousel} GodparentCard={GodparentCard} fallback={<Carousel label="Padrinhos">{wedding.godparents.couples.map(couple => <GodparentCard key={couple.names.join()} couple={couple} />)}</Carousel>} />
         </section>
 
         <section className="wed-sec" id="cerimonia">
-          <ScrollReveal as="h2" className="wed-sec-title"><Sprig />Cerimônia<Sprig flip /></ScrollReveal>
+          <ScrollReveal as="h2" className="wed-sec-title"><OliveGarland seed={79} />Cerimônia<OliveGarland seed={79} flip /></ScrollReveal>
           <ScrollReveal stagger className="wed-info-grid">
             <InfoCard icon={<IconCalendar size={28} />} label="Data" lines={wedding.date} />
             <InfoCard icon={<IconClock size={28} />} label={'Horário'} lines={wedding.time} />
@@ -495,7 +533,7 @@ function Landing() {
         </section>
 
         <section className="wed-sec" id="presentes">
-          <ScrollReveal as="h2" className="wed-sec-title"><Sprig />{wedding.gifts.title}<Sprig flip /></ScrollReveal>
+          <ScrollReveal as="h2" className="wed-sec-title"><OliveGarland seed={92} />{wedding.gifts.title}<OliveGarland seed={92} flip /></ScrollReveal>
           <ScrollReveal as="p" className="wed-sec-intro" preset="fade" delay={80}>{wedding.gifts.intro}</ScrollReveal>
           <PublicGifts Carousel={Carousel} />
           {pix.loaded && <ScrollReveal className="wed-card wed-pix">
@@ -511,26 +549,26 @@ function Landing() {
             </div>
           </ScrollReveal>}
           {wedding.gifts.stores.filter(store => store.categories).map(store => <PublicStoreCategories key={store.name} store={store} icon={<IconGift size={24} />} />)}
-          <ScrollReveal stagger className="wed-grid-2">{wedding.gifts.stores.filter(store => !store.categories).map(store => {
+          {wedding.gifts.stores.some(store => !store.categories) && <ScrollReveal stagger className="wed-grid-2">{wedding.gifts.stores.filter(store => !store.categories).map(store => {
             const Tag = store.url ? 'a' : 'div';
             const props = store.url ? { href: store.url, target: '_blank', rel: 'noreferrer' } : {};
             return <Tag className={`wed-card wed-store${store.url ? ' wed-info-link' : ''}`} key={store.name} {...props}>
               <strong>{store.name}</strong><span>{store.description}</span>
               {store.url ? <span className="wed-info-hint">abrir lista</span> : <span className="wed-soon">em breve</span>}
             </Tag>;
-          })}</ScrollReveal>
+          })}</ScrollReveal>}
         </section>
 
         {wedding.story && <OurStory story={wedding.story} finalDate={wedding.date.join(' ')} />}
 
         <section className="wed-sec" id="recados">
-          <ScrollReveal as="h2" className="wed-sec-title"><Sprig />Recados<Sprig flip /></ScrollReveal>
+          <ScrollReveal as="h2" className="wed-sec-title"><OliveGarland seed={105} />Recados<OliveGarland seed={105} flip /></ScrollReveal>
           <ScrollReveal as="p" className="wed-sec-intro" preset="fade" delay={80}>Deixe uma mensagem para os noivos. Ela aparece aqui no mural para todo mundo ver.</ScrollReveal>
           <Guestbook />
         </section>
 
         <section className="wed-sec wed-sec-cta" id="confirmar">
-          <ScrollReveal as="h2" className="wed-sec-title"><Sprig />Confirme sua presença<Sprig flip /></ScrollReveal>
+          <ScrollReveal as="h2" className="wed-sec-title"><OliveGarland seed={118} />Confirme sua presença<OliveGarland seed={118} flip /></ScrollReveal>
           {invitePath
             ? <ScrollReveal className="wed-card wed-cta">
               <p>Seu convite pessoal está a um clique. Lá você marca quem da sua família vai com você.</p>

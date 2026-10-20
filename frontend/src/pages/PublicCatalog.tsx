@@ -1,10 +1,11 @@
-import { useEffect, useId, useLayoutEffect, useRef, useState, type ReactNode } from 'react';
+import { Suspense, lazy, useEffect, useId, useRef, useState, type ReactNode } from 'react';
 import api from '../services/api';
 import { resolveImageUrl } from '../services/images.service';
 import { storeCategoriesService } from '../services/storeCategories.service';
 import { categoryImageUrl } from '../utils/categoryIcons';
 import { ScrollReveal } from '../components/reveal/ScrollReveal';
-import type { ApiResponse, GiftProduct, Godparent, PublicStoreCategory } from '../types/api';
+import { Blossom } from '../components/decor/Blossom';
+import type { ApiResponse, GiftProduct, Godparent, Pagination, PublicGiftProduct, PublicStoreCategory } from '../types/api';
 const currency = (value: number) => new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(value);
 const roleName: Record<Godparent['role'], string> = { groomsman: 'Padrinho', bridesmaid: 'Madrinha', mother: 'Mãe', father: 'Pai', other: 'Outro' };
 interface Couple { names: string[]; role: string; photos: string[] }
@@ -37,65 +38,84 @@ function CategoryThumb({ category }: { category: PublicStoreCategory }) {
   const [failed, setFailed] = useState(false); const src = categoryImageUrl(category);
   return <span className="wed-shop-thumb">{failed || !src ? <span className="wed-shop-initial" aria-hidden="true">{category.name.trim().charAt(0)}</span> : <img src={src} alt="" loading="lazy" onError={() => setFailed(true)} />}</span>;
 }
-const MARQUEE_SPEED = 45; // px por segundo
-const CategoryItems = ({ items, hidden }: { items: PublicStoreCategory[]; hidden?: boolean }) => <>{items.map(item => <li key={item._id}><a className="wed-shop-link" href={`/lista-na-loja/${item.slug}`} aria-label={hidden ? undefined : `Ver presentes de ${item.name}`} tabIndex={hidden ? -1 : undefined}><CategoryThumb category={item} /><span className="wed-shop-name">{item.name}</span></a></li>)}</>;
-// Categorias numa linha so. Se nao couberem, rolam em laco continuo (a lista e
-// duplicada so visualmente); o mouse, o foco ou o toque desaceleram ate parar e,
-// ao sair, a faixa acelera de volta. A velocidade e trocada aos poucos pela Web
-// Animations API, sem o "tranco" de um animation-play-state. Com movimento
-// reduzido no sistema, vira uma faixa com rolagem manual.
-function CategoryMarquee({ items, label }: { items: PublicStoreCategory[]; label: string }) {
-  const viewport = useRef<HTMLDivElement>(null); const track = useRef<HTMLDivElement>(null); const set = useRef<HTMLUListElement>(null);
-  const animation = useRef<Animation | null>(null); const frame = useRef(0); const target = useRef(1); const resume = useRef(0);
-  const [loopWidth, setLoopWidth] = useState(0);
-  const [reduced] = useState(() => window.matchMedia('(prefers-reduced-motion: reduce)').matches);
-  // Largura de um ciclo (lista + espaco ate a copia). 0 = cabe na linha, sem animacao.
-  useLayoutEffect(() => {
-    const measure = () => {
-      if (!viewport.current || !set.current) return;
-      const gap = parseFloat(getComputedStyle(set.current).columnGap) || 0;
-      const content = set.current.scrollWidth - (loopWidth ? gap : 0);
-      setLoopWidth(content > viewport.current.clientWidth + 1 ? content + gap : 0);
-    };
-    measure();
-    const observer = new ResizeObserver(measure);
-    if (viewport.current) observer.observe(viewport.current);
-    if (set.current) observer.observe(set.current); // nomes mudam de largura quando a fonte carrega
-    return () => observer.disconnect();
-  }, [items, loopWidth]);
+// Mesmos presentes e mesmo carregamento da pagina da categoria (/lista-na-loja/:slug).
+const ProductCards = lazy(() => import('./StoreCategory/StoreCategoryContent').then(module => ({ default: module.ProductCards })));
+const PAGE_SIZE = 12;
+type Pick = { status: 'idle' } | { status: 'loading' } | { status: 'error' } | { status: 'ready'; products: PublicGiftProduct[]; pagination: Pagination };
+
+// Categorias da "Lista na loja" como botoes: a escolhida mostra os presentes logo abaixo.
+// Enquanto nada foi escolhido, cinco sinais convidam a clicar: a dica com seta, um anel
+// dourado que percorre os circulos quando a secao aparece (e repete a cada 6 s), o balao
+// no primeiro circulo, o "ver presentes" no hover/foco e o quadro vazio com uma flor.
+// Depois da escolha tudo isso some e nenhuma animacao continua rodando.
+function StoreCategoryPicker({ items, label }: { items: PublicStoreCategory[]; label: string }) {
+  const [chosen, setChosen] = useState<PublicStoreCategory | null>(null);
+  const [pick, setPick] = useState<Pick>({ status: 'idle' });
+  const list = useRef<HTMLUListElement>(null);
+  const request = useRef(0);
   useEffect(() => {
-    if (!loopWidth || reduced || !track.current) return;
-    const running = track.current.animate([{ transform: 'translateX(0)' }, { transform: `translateX(-${loopWidth}px)` }], { duration: loopWidth / MARQUEE_SPEED * 1000, iterations: Infinity });
-    running.playbackRate = target.current; animation.current = running;
-    return () => { running.cancel(); animation.current = null; };
-  }, [loopWidth, reduced]);
-  useEffect(() => () => { cancelAnimationFrame(frame.current); clearTimeout(resume.current); }, []);
-  const easeTo = (rate: number) => {
-    target.current = rate; clearTimeout(resume.current); cancelAnimationFrame(frame.current);
-    const step = () => {
-      const running = animation.current; if (!running) return;
-      const next = running.playbackRate + (target.current - running.playbackRate) * .1;
-      running.playbackRate = Math.abs(target.current - next) < .01 ? target.current : next;
-      if (running.playbackRate !== target.current) frame.current = requestAnimationFrame(step);
+    const node = list.current;
+    if (!node || chosen || window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+    let interval = 0, timers: number[] = [];
+    const call = () => {
+      timers.forEach(clearTimeout); timers = [];
+      node.querySelectorAll<HTMLElement>('.wed-shop-ring').forEach((ring, index) => {
+        timers.push(window.setTimeout(() => { ring.classList.add('is-calling'); timers.push(window.setTimeout(() => ring.classList.remove('is-calling'), 1100)); }, index * 180));
+      });
     };
-    frame.current = requestAnimationFrame(step);
+    const stop = () => { clearInterval(interval); interval = 0; };
+    const observer = new IntersectionObserver(([entry]) => {
+      if (!entry.isIntersecting) return stop();
+      if (!interval) { call(); interval = window.setInterval(call, 6000); }
+    }, { threshold: .5 });
+    observer.observe(node);
+    return () => { observer.disconnect(); stop(); timers.forEach(clearTimeout); node.querySelectorAll('.is-calling').forEach(ring => ring.classList.remove('is-calling')); };
+  }, [chosen]);
+  const load = (category: PublicStoreCategory) => {
+    const id = ++request.current;
+    setPick({ status: 'loading' });
+    storeCategoriesService.getPublicBySlug(category.slug, 1, PAGE_SIZE)
+      .then(data => { if (id === request.current) setPick({ status: 'ready', products: data.products, pagination: data.pagination }); })
+      .catch(() => { if (id === request.current) setPick({ status: 'error' }); });
   };
-  const marquee = loopWidth > 0;
-  return <div ref={viewport} className={`wed-shop-marquee${marquee ? (reduced ? ' is-scroll' : ' is-marquee') : ''}`}
-    onMouseEnter={() => easeTo(0)} onMouseLeave={() => easeTo(1)}
-    onFocus={() => easeTo(0)} onBlur={event => { if (!event.currentTarget.contains(event.relatedTarget)) easeTo(1); }}
-    onTouchStart={() => easeTo(0)} onTouchEnd={() => { clearTimeout(resume.current); resume.current = window.setTimeout(() => easeTo(1), 1800); }}>
-    <div ref={track} className="wed-shop-track">
-      <ScrollReveal as="ul" stagger delay={200} ref={set} className="wed-shop-cats" aria-label={label}><CategoryItems items={items} /></ScrollReveal>
-      {/* A copia so fecha o laco e nasce fora da tela: sem reveal proprio, senao os itens
-          surgiriam em fade bem na emenda da faixa. */}
-      {marquee && !reduced && <ul className="wed-shop-cats" aria-hidden="true"><CategoryItems items={items} hidden /></ul>}
+  const choose = (category: PublicStoreCategory) => { if (chosen?._id === category._id) return; setChosen(category); load(category); };
+  return <>
+    <p className={`wed-shop-hint${chosen ? ' is-done' : ''}`} aria-hidden={chosen ? true : undefined}>
+      <span className="wed-shop-hint-arrow" aria-hidden="true">↓</span>
+      <span className="wed-shop-hint-mouse">Escolha uma categoria para ver os presentes dela</span>
+      <span className="wed-shop-hint-touch">Toque em uma categoria para ver os presentes dela</span>
+    </p>
+    <div className="wed-shop-rail">
+      <ScrollReveal as="ul" stagger delay={200} ref={list} className="wed-shop-cats" aria-label={label}>{items.map((item, index) => {
+        const active = chosen?._id === item._id;
+        return <li key={item._id}><button type="button" className="wed-shop-pick" aria-pressed={active} onClick={() => choose(item)}>
+          {index === 0 && !chosen && <span className="wed-shop-balloon" aria-hidden="true"><span className="wed-shop-hint-mouse">Clique para ver os presentes</span><span className="wed-shop-hint-touch">Toque para ver os presentes</span></span>}
+          {index === 0 && !chosen && <span className="wed-shop-balloon-tip" aria-hidden="true" />}
+          <span className="wed-shop-ring"><CategoryThumb category={item} />{active && <Blossom size={18} seed={5 + index} className="wed-shop-seal" />}</span>
+          <span className="wed-shop-name">{item.name}</span>
+          <span className="wed-shop-more" aria-hidden="true">ver presentes →</span>
+        </button></li>;
+      })}</ScrollReveal>
     </div>
-  </div>;
+    <div className="wed-shop-products" aria-live="polite" aria-busy={pick.status === 'loading'}>
+      {!chosen ? <div className="wed-shop-waiting"><Blossom size={22} seed={3} /><b>Nenhuma categoria escolhida ainda</b><span>Toque em um dos círculos acima e os presentes aparecem aqui.</span></div>
+        : pick.status === 'loading' || pick.status === 'idle' ? <><span className="wed-sr">Carregando presentes de {chosen.name}</span><ul className="wed-catpage-grid is-loading" aria-hidden="true">{[0, 1, 2, 3].map(index => <li key={index} className="wed-card wed-catpage-card"><div className="wed-gift-image wed-catpage-image" /><span /><span /></li>)}</ul></>
+        : pick.status === 'error' ? <div className="wed-shop-waiting"><b>Não foi possível carregar os presentes de {chosen.name}.</b><button type="button" className="wed-btn wed-btn-ghost" onClick={() => load(chosen)}>Tentar novamente</button></div>
+        : <>
+          <header className="wed-shop-products-head">
+            <h4>Presentes de {chosen.name}</h4>
+            {pick.pagination.total > 0 && <span>{pick.pagination.total} {pick.pagination.total === 1 ? 'presente' : 'presentes'}</span>}
+          </header>
+          {pick.products.length ? <Suspense fallback={null}><ProductCards products={pick.products} category={chosen.name} nameTag="h5" /></Suspense>
+            : <p className="wed-shop-empty">Ainda não adicionamos presentes nesta categoria. Novidades em breve.</p>}
+          {pick.pagination.totalPages > 1 && <a className="wed-shop-all" href={`/lista-na-loja/${chosen.slug}`}>Ver todos os {pick.pagination.total} presentes de {chosen.name} →</a>}
+        </>}
+    </div>
+  </>;
 }
 interface Store { name: string; description: string; url?: string }
 // Layout 3 da "Lista na loja": card horizontal com as categorias ativas em circulos;
-// cada uma leva a /lista-na-loja/:slug. "Em breve" so enquanto nao ha categorias.
+// escolher uma mostra os presentes dela logo abaixo. "Em breve" so enquanto nao ha categorias.
 // O id e o alvo do "Ver todas as categorias" da pagina da categoria.
 export function PublicStoreCategories({ store, icon }: { store: Store; icon: ReactNode }) {
   const [items, setItems] = useState<PublicStoreCategory[] | null>(null);
@@ -109,8 +129,8 @@ export function PublicStoreCategories({ store, icon }: { store: Store; icon: Rea
       {store.url ? <a className="wed-shop-badge is-link" href={store.url} target="_blank" rel="noreferrer">Abrir lista</a> : comingSoon && <span className="wed-shop-badge">Em breve</span>}
     </ScrollReveal>
     <ScrollReveal as="p" preset="fade" delay={160} className="wed-shop-desc">{store.description}</ScrollReveal>
-    {items === null ? <div className="wed-shop-rail"><div className="wed-shop-marquee"><ul className="wed-shop-cats is-loading" aria-hidden="true">{[0, 1, 2, 3, 4].map(index => <li key={index}><span className="wed-shop-thumb" /><span className="wed-shop-name" /></li>)}</ul></div></div>
-      : items.length ? <div className="wed-shop-rail"><CategoryMarquee items={items} label={`Categorias da ${store.name.toLowerCase()}`} /></div>
+    {items === null ? <div className="wed-shop-rail"><ul className="wed-shop-cats is-loading" aria-hidden="true">{[0, 1, 2, 3, 4].map(index => <li key={index}><span className="wed-shop-thumb" /><span className="wed-shop-name" /></li>)}</ul></div>
+      : items.length ? <StoreCategoryPicker items={items} label={`Categorias da ${store.name.toLowerCase()}`} />
       : <p className="wed-shop-empty">Novas categorias serão disponibilizadas em breve.</p>}
   </ScrollReveal>;
 }
