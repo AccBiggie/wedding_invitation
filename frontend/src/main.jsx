@@ -549,14 +549,14 @@ function Landing() {
             </div>
           </ScrollReveal>}
           {wedding.gifts.stores.filter(store => store.categories).map(store => <PublicStoreCategories key={store.name} store={store} icon={<IconGift size={24} />} />)}
-          <ScrollReveal stagger className="wed-grid-2">{wedding.gifts.stores.filter(store => !store.categories).map(store => {
+          {wedding.gifts.stores.some(store => !store.categories) && <ScrollReveal stagger className="wed-grid-2">{wedding.gifts.stores.filter(store => !store.categories).map(store => {
             const Tag = store.url ? 'a' : 'div';
             const props = store.url ? { href: store.url, target: '_blank', rel: 'noreferrer' } : {};
             return <Tag className={`wed-card wed-store${store.url ? ' wed-info-link' : ''}`} key={store.name} {...props}>
               <strong>{store.name}</strong><span>{store.description}</span>
               {store.url ? <span className="wed-info-hint">abrir lista</span> : <span className="wed-soon">em breve</span>}
             </Tag>;
-          })}</ScrollReveal>
+          })}</ScrollReveal>}
         </section>
 
         {wedding.story && <OurStory story={wedding.story} finalDate={wedding.date.join(' ')} />}
