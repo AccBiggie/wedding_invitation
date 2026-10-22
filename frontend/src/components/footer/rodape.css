@@ -17,8 +17,6 @@
 .rd .contato .ic, .rd .endereco .ic { color: var(--rd-ac); margin-top: 3px; }
 .rd .endereco li + li { font-size: 16px; opacity: .85; }
 .rd .marca { display: inline-flex; align-items: center; gap: 12px; }
-.rd .nomes { font-size: 26px; font-style: italic; color: var(--rd-tit); white-space: nowrap; }
-.rd .nomes em { color: var(--rd-ac); }
 .rd .redes { display: flex; gap: 10px; margin-top: 20px; }
 .rd .redes a { display: grid; place-items: center; width: 40px; height: 40px; border-radius: 50%; background: var(--rd-chip); color: var(--rd-tx); }
 .rd .redes a:hover { background: var(--rd-ac); color: var(--rd-bg); }

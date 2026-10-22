@@ -285,7 +285,7 @@ function SiteFooter({ wedding, onLanding }) {
   return <footer className="rd wed-foot">
       <div className="lim grade">
         <div className="col sobre">
-          <a className="marca" href={sectionHref('home')} onClick={go('home')} aria-label={`${couple}, voltar ao início`}><Monogram height={52} /><span className="nomes">{wedding.couple[0]} <em>&amp;</em> {wedding.couple[1]}</span></a>
+          <a className="marca" href={sectionHref('home')} onClick={go('home')} aria-label={`${couple}, voltar ao início`}><Monogram height={64} /></a>
           <div className="redes">
             {contact.whatsapp && <a href={contact.whatsapp} target="_blank" rel="noopener noreferrer" aria-label="WhatsApp"><FooterIcon name="whats" /></a>}
             {contact.email && <a href={`mailto:${contact.email}`} aria-label="E-mail"><FooterIcon name="mail" /></a>}
