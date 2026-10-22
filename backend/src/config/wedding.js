@@ -35,7 +35,13 @@ export const wedding = {
   party: {
     label: 'Local da Festa',
     lines: ['Igreja Luterana', 'de Sussuí'],
-    map: 'https://maps.app.goo.gl/PjsrKNU3og4HTd738'
+    map: 'https://maps.app.goo.gl/PjsrKNU3og4HTd738',
+    // Bloco "Cerimônia": nome, endereço curto, busca do mapa incorporado e horário.
+    // TODO(noivos): conferir o endereço e o horário da festa.
+    name: 'Igreja Luterana de Sussuí',
+    address: 'Sussuí · Eng. Beltrão/PR',
+    query: 'Igreja Luterana de Sussuí, Engenheiro Beltrão - PR',
+    time: 'Logo após a cerimônia'
   },
   ceremony: {
     label: 'Local da Celebração',

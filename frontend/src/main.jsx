@@ -9,6 +9,7 @@ import { OurStory } from './components/story/OurStory';
 import { OliveGarland, OliveSprig, OliveVine } from './components/decor/Olive';
 import { ChurchSketch } from './components/decor/ChurchSketch';
 import { NavFlower } from './components/decor/NavFlower';
+import { Ceremony } from './components/ceremony/Ceremony';
 import { appearanceAccent, baseColors, defaultAppearance, fontSizeScale, landingFont, weddingDisplayFonts } from './theme/appearance';
 import monogramSvg from './assets/logo/monograma-sa.svg?raw';
 import '@tabler/core/dist/css/tabler.min.css';
@@ -93,14 +94,11 @@ function usePublicAppearance(wedding) {
     'data-wed-offcanvas-style': appearance.offcanvasStyle
   };
 }
-const mapEmbed = query => `https://www.google.com/maps?q=${encodeURIComponent(query)}&z=16&output=embed`;
 
 const Svg = ({ children, size = 24, viewBox = '0 0 24 24', ...props }) => <svg width={size} height={size} viewBox={viewBox} fill="none" stroke="currentColor" strokeWidth="1.3" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true" {...props}>{children}</svg>;
 // Monograma S&A do casal (logo da landing). Herda a cor do texto (currentColor).
 const Monogram = ({ height = 28, className = '' }) => <span className={`wed-monogram ${className}`} style={{ height, width: Math.round(height * 1536 / 1926) }} aria-hidden="true" dangerouslySetInnerHTML={{ __html: monogramSvg }} />;
 const IconCalendar = props => <Svg {...props}><path d="M4 7a2 2 0 0 1 2 -2h12a2 2 0 0 1 2 2v12a2 2 0 0 1 -2 2h-12a2 2 0 0 1 -2 -2z" /><path d="M16 3v4M8 3v4M4 11h16M8 15h2v2h-2z" /></Svg>;
-const IconClock = props => <Svg {...props}><path d="M12 12m-9 0a9 9 0 1 0 18 0a9 9 0 1 0 -18 0" /><path d="M12 7v5l3 3" /></Svg>;
-const IconFlower = props => <Svg {...props}><path d="M12 12m-3 0a3 3 0 1 0 6 0a3 3 0 1 0 -6 0" /><path d="M12 6m-3 0a3 3 0 1 0 6 0a3 3 0 1 0 -6 0" /><path d="M12 18m-3 0a3 3 0 1 0 6 0a3 3 0 1 0 -6 0" /><path d="M6 12m-3 0a3 3 0 1 0 6 0a3 3 0 1 0 -6 0" /><path d="M18 12m-3 0a3 3 0 1 0 6 0a3 3 0 1 0 -6 0" /></Svg>;
 const IconMapPin = props => <Svg {...props}><path d="M12 11m-3 0a3 3 0 1 0 6 0a3 3 0 1 0 -6 0" /><path d="M17.657 16.657l-4.243 4.243a2 2 0 0 1 -2.827 0l-4.244 -4.243a8 8 0 1 1 11.314 0z" /></Svg>;
 const IconHeart = props => <Svg {...props} fill="currentColor" strokeWidth="0"><path d="M19.5 12.572l-7.5 7.428l-7.5 -7.428a5 5 0 1 1 7.5 -6.566a5 5 0 1 1 7.5 6.566z" /></Svg>;
 const IconCheck = props => <Svg {...props} strokeWidth="2.4"><path d="M5 12l5 5l10 -10" /></Svg>;
@@ -154,16 +152,6 @@ const MapArt = () => <svg className="wed-map-art" viewBox="0 0 400 190" preserve
   <g fill="none" stroke="#fff" strokeWidth="9" strokeLinecap="round"><path d="M0 80h400M0 152h400M118 0v190M262 0v190M338 0l-130 190" /></g>
   <g transform="translate(178 34) scale(1.9)"><path d="M12 2a7.4 7.4 0 0 0 -7.4 7.4c0 5 6.5 11.6 7.4 11.6s7.4 -6.6 7.4 -11.6a7.4 7.4 0 0 0 -7.4 -7.4z" fill="#1f4536" /><g fill="none" stroke="#fdfaf2" strokeWidth="1.1"><path d="M12 9m-1.6 0a1.6 1.6 0 1 0 3.2 0a1.6 1.6 0 1 0 -3.2 0" /><path d="M12 5.8m-1.6 0a1.6 1.6 0 1 0 3.2 0a1.6 1.6 0 1 0 -3.2 0" /><path d="M12 12.2m-1.6 0a1.6 1.6 0 1 0 3.2 0a1.6 1.6 0 1 0 -3.2 0" /><path d="M8.8 9m-1.6 0a1.6 1.6 0 1 0 3.2 0a1.6 1.6 0 1 0 -3.2 0" /><path d="M15.2 9m-1.6 0a1.6 1.6 0 1 0 3.2 0a1.6 1.6 0 1 0 -3.2 0" /></g></g>
 </svg>;
-
-const InfoCard = ({ icon, label, lines, href }) => {
-  const Tag = href ? 'a' : 'div';
-  const linkProps = href ? { href, target: '_blank', rel: 'noreferrer' } : {};
-  return <Tag className={`wed-info${href ? ' wed-info-link' : ''}`} {...linkProps}>
-    <span className="wed-info-icon">{icon}</span><span className="wed-info-label">{label}</span>
-    <span className="wed-info-value">{lines.map(line => <span key={line}>{line}</span>)}</span>
-    {href && <span className="wed-info-hint">ver no mapa</span>}
-  </Tag>;
-};
 
 const NAV = [
   { id: 'home', label: 'Home' },
@@ -524,27 +512,11 @@ function Landing() {
           <PublicGodparents Carousel={Carousel} GodparentCard={GodparentCard} fallback={<Carousel label="Padrinhos">{wedding.godparents.couples.map(couple => <GodparentCard key={couple.names.join()} couple={couple} />)}</Carousel>} />
         </section>
 
-        <section className="wed-sec" id="cerimonia">
-          <ScrollReveal as="h2" className="wed-sec-title"><OliveGarland seed={79} />Cerimônia<OliveGarland seed={79} flip /></ScrollReveal>
-          <ScrollReveal stagger className="wed-info-grid">
-            <InfoCard icon={<IconCalendar size={28} />} label="Data" lines={wedding.date} />
-            <InfoCard icon={<IconClock size={28} />} label={'Horário'} lines={wedding.time} />
-            <InfoCard icon={<IconFlower size={28} />} label={wedding.party.label} lines={wedding.party.lines} href={wedding.party.map} />
-            <InfoCard icon={<IconMapPin size={28} />} label={wedding.ceremony.label} lines={wedding.ceremony.lines} href={wedding.ceremony.map} />
-          </ScrollReveal>
-          <ScrollReveal preset="scale-soft" className="wed-card wed-map-card">
-            <h3 className="wed-card-title"><Sprig />Como chegar<Sprig flip /></h3>
-            <div className="wed-map-frame">
-              <div className="wed-map-canvas">
-                <MapArt /><iframe title="Local da cerimônia" src={mapEmbed(wedding.ceremony.query)} loading="lazy" referrerPolicy="no-referrer-when-downgrade" allowFullScreen />
-                <a className="wed-map-tap" href={wedding.ceremony.map} target="_blank" rel="noreferrer" aria-label="Abrir no Google Maps" />
-              </div>
-              <a className="wed-map-foot" href={wedding.ceremony.map} target="_blank" rel="noreferrer">
-                <IconMapPin size={18} /><div><strong>{wedding.ceremony.name}</strong><span>{wedding.ceremony.fullAddress}</span></div>
-              </a>
-            </div>
-          </ScrollReveal>
-        </section>
+        <Ceremony MapArt={MapArt} title={<ScrollReveal as="h2" className="wed-sec-title"><OliveGarland seed={79} />Cerimônia<OliveGarland seed={79} flip /></ScrollReveal>} data={{
+          datetime: wedding.datetime, time: wedding.time[0],
+          celebration: { name: wedding.ceremony.name, address: wedding.ceremony.lines.join(' · '), query: wedding.ceremony.query, time: wedding.time[0] },
+          party: { name: wedding.party.name, address: wedding.party.address, query: wedding.party.query, time: wedding.party.time }
+        }} />
 
         <section className="wed-sec" id="presentes">
           <ScrollReveal as="h2" className="wed-sec-title"><OliveGarland seed={92} />{wedding.gifts.title}<OliveGarland seed={92} flip /></ScrollReveal>
