@@ -233,7 +233,7 @@ body{background:#f5f7fb}
 .wed-carousel-arrow{position:absolute;top:50%;z-index:2;display:flex;align-items:center;justify-content:center;width:42px;height:42px;margin-top:-1.4rem;transform:translateY(-50%);border:1px solid var(--wed-gold-soft);border-radius:50%;background:var(--wed-card);color:var(--wed-green);cursor:pointer;box-shadow:0 4px 14px rgba(0,0,0,.14);transition:background .15s,color .15s,border-color .15s,opacity .15s}
 .wed-carousel-arrow:hover:not(:disabled){background:var(--wed-green);border-color:var(--wed-green);color:#fdfaf2}
 .wed-carousel-arrow:disabled{opacity:.3;cursor:default}
-.wed-to-top{position:fixed;right:max(1.5rem,env(safe-area-inset-right));bottom:calc(1.5rem + env(safe-area-inset-bottom));z-index:40;display:flex;align-items:center;justify-content:center;width:42px;height:42px;padding:0;border:1px solid var(--wed-gold-soft);border-radius:50%;background:var(--wed-card);color:var(--wed-green);cursor:pointer;box-shadow:0 4px 14px rgba(0,0,0,.14);opacity:0;visibility:hidden;transform:translateY(12px);transition:opacity .25s,transform .25s,visibility 0s .25s,background .15s,color .15s,border-color .15s}
+.wed-to-top{position:fixed;right:max(1.5rem,env(safe-area-inset-right));bottom:calc(1.5rem + env(safe-area-inset-bottom));z-index:25;display:flex;align-items:center;justify-content:center;width:42px;height:42px;padding:0;border:1px solid var(--wed-gold-soft);border-radius:50%;background:var(--wed-card);color:var(--wed-green);cursor:pointer;box-shadow:0 4px 14px rgba(0,0,0,.14);opacity:0;visibility:hidden;transform:translateY(12px);transition:opacity .25s,transform .25s,visibility 0s .25s,background .15s,color .15s,border-color .15s}
 .wed-to-top.is-visible{opacity:1;visibility:visible;transform:none;transition:opacity .25s,transform .25s,visibility 0s,background .15s,color .15s,border-color .15s}
 .wed-to-top:hover{background:var(--wed-green);border-color:var(--wed-green);color:#fdfaf2}
 /* Correcao optica: o "^" tem o vao embaixo e, centrado pela caixa, parece baixo. */
@@ -339,22 +339,6 @@ a.wed-shop-badge:hover{border-color:var(--wed-gold);background:#fffcf3}
    Rodape do site publico
    ========================================================================== */
 .wed-foot{position:relative;z-index:1;background:#2e2e2e;color:#b0b0b0}
-.wed-foot-top{display:grid;grid-template-columns:1.25fr 1fr 1.15fr 1.35fr;gap:2rem;max-width:1180px;margin:0 auto;padding:3rem 1.5rem 2.7rem}
-.wed-foot-logo{display:flex;align-items:center;gap:.6rem;color:#fff;font-size:calc(1.62rem * var(--wed-font-scale, 1))}
-.wed-foot-logo svg{color:var(--wed-gold)}
-.wed-foot-logo em{font-style:italic}
-.wed-foot-social{display:flex;flex-wrap:wrap;gap:.7rem;margin-top:1.4rem}
-.wed-foot-social a{display:flex;align-items:center;justify-content:center;width:40px;height:40px;border-radius:50%;background:#3d3d3d;color:#c9c9c9;transition:background .15s,color .15s}
-.wed-foot-social a:hover{background:var(--wed-gold);color:#2e2e2e}
-.wed-foot-col h3{margin:0 0 1.05rem;font-size:calc(1.02rem * var(--wed-font-scale, 1));font-weight:500;letter-spacing:.09em;text-transform:uppercase;color:#fff}
-.wed-foot-col ul{display:flex;flex-direction:column;gap:.55rem;margin:0;padding:0;list-style:none}
-.wed-foot-col a{display:flex;align-items:flex-start;gap:.5rem;color:#a5a5a5;font-size:calc(1.05rem * var(--wed-font-scale, 1));line-height:1.35;text-decoration:none;transition:color .15s}
-.wed-foot-col a:hover{color:var(--wed-gold)}
-.wed-foot-col svg{flex-shrink:0;margin-top:3px;color:var(--wed-gold)}
-.wed-foot-plain{color:#8c8c8c;font-size:calc(1.02rem * var(--wed-font-scale, 1))}
-.wed-foot-bar{background:#1f1f1f}
-.wed-foot-bar-inner{display:flex;align-items:center;justify-content:space-between;gap:1rem;max-width:1180px;margin:0 auto;padding:1rem 1.5rem;font-size:calc(.98rem * var(--wed-font-scale, 1));color:#8c8c8c}
-.wed-foot-fetech{display:flex;color:#e6e6e6}
 
 @media(max-width:980px){
   .wed-nav-toggle{display:flex}
@@ -363,7 +347,6 @@ a.wed-shop-badge:hover{border-color:var(--wed-gold);background:#fffcf3}
   .wed-nav-links a{padding:.85rem 1rem;text-shadow:none}
 }
 @media(max-width:1180px){.wed-carousel-track>*{flex-basis:calc((100% - 1.2rem) / 2)}}
-@media(max-width:900px){.wed-foot-top{grid-template-columns:repeat(2,minmax(0,1fr));gap:1.9rem}}
 /* Pagina /lista-na-loja/:slug */
 .wed-nav-back{display:inline-flex;align-items:center;gap:.35rem;margin-left:auto;padding:.45rem .8rem;border:1px solid rgba(231,221,196,.45);border-radius:999px;color:#f3eee1;font-size:calc(1rem * var(--wed-font-scale, 1));text-decoration:none;white-space:nowrap;text-shadow:0 1px 10px rgba(0,0,0,.5);transition:background .15s,border-color .15s}
 .wed-nav-back:hover{background:rgba(255,255,255,.13);border-color:var(--wed-gold-soft);color:#fff}
@@ -445,8 +428,6 @@ a.wed-shop-badge:hover{border-color:var(--wed-gold);background:#fffcf3}
   .wed-shop-thumb{width:78px;height:78px}
   .wed-shop-name{font-size:calc(.98rem * var(--wed-font-scale, 1))}
   .wed-pix-actions{width:100%;flex-direction:column}
-  .wed-foot-top{grid-template-columns:minmax(0,1fr);padding:2.3rem 1.25rem 2rem}
-  .wed-foot-bar-inner{flex-direction:column;align-items:flex-start;gap:.85rem}
   .wed-details{flex-wrap:wrap}
 }
 
@@ -458,8 +439,10 @@ a.wed-shop-badge:hover{border-color:var(--wed-gold);background:#fffcf3}
 .wed[data-wed-dark=true]{color:#e2e2df}
 .wed[data-wed-dark=true] .wed-card,.wed[data-wed-dark=true] .wed-info{border-color:#ffffff30}
 .wed[data-wed-dark=true] .wed-foot{background:#111}
-.wed[data-wed-dark=true] .wed-foot-bar{background:#090909}
 .wed-invitation .wed-topbar{background:var(--wed-card)}
+/* Pagina do convite: o cabecalho e o da landing (.wed-lp so para as regras dele); o wrapper nao gera caixa, e o sticky vale para a pagina toda (clip, e nao hidden, para nao virar container de rolagem). */
+.wed-invitation{overflow:visible;overflow-x:clip}.wed-invitation .wed-nav-host{display:contents}
+.wed-invitation .wed-panel-confirm{scroll-margin-top:6rem}
 .wed-invitation .wed-hero{background:var(--wed-cream)}
 .wed-invitation .wed-hero::after{background:linear-gradient(180deg,transparent,var(--wed-cream) 68%)}
 .wed-invitation[data-wed-dark=true] .wed-hero-photo::after{background:linear-gradient(180deg,rgba(0,0,0,.28),transparent)}

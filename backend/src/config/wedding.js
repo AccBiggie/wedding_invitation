@@ -89,10 +89,14 @@ export const wedding = {
       { photo: '/historia/polaroid-portao.webp', caption: 'para sempre' }
     ]
   },
+  // Crédito da barra final do rodapé (logo da FETECH). TODO: link do site da FETECH.
+  credit: { name: 'FETECH', url: '' },
   contact: {
     phone: '(44) 99883-3731',
     whatsapp: 'https://wa.me/5544998833731',
     email: 'fetech.ferreira@gmail.com',
+    // Endereço do rodapé, em linhas.
+    address: { street: 'R. Minas Gerais, 762-862 · Ivailândia', city: 'Eng. Beltrão - PR', zip: '87306-800' },
     // TODO(noivos): preencher para os icones aparecerem no rodape.
     instagram: '',
     facebook: ''

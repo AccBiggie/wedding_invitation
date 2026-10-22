@@ -10,6 +10,7 @@ import { OliveGarland, OliveSprig, OliveVine } from './components/decor/Olive';
 import { ChurchSketch } from './components/decor/ChurchSketch';
 import { NavFlower } from './components/decor/NavFlower';
 import { Ceremony } from './components/ceremony/Ceremony';
+import './components/footer/rodape.css';
 import { appearanceAccent, baseColors, defaultAppearance, fontSizeScale, landingFont, weddingDisplayFonts } from './theme/appearance';
 import monogramSvg from './assets/logo/monograma-sa.svg?raw';
 import '@tabler/core/dist/css/tabler.min.css';
@@ -112,10 +113,6 @@ const IconCopy = props => <Svg {...props}><path d="M8 8m0 2a2 2 0 0 1 2 -2h8a2 2
 const IconChevronLeft = props => <Svg {...props} strokeWidth="1.8"><path d="M15 6l-6 6l6 6" /></Svg>;
 const IconChevronRight = props => <Svg {...props} strokeWidth="1.8"><path d="M9 6l6 6l-6 6" /></Svg>;
 const IconChevronUp = props => <Svg {...props} strokeWidth="1.8"><path d="M6 15l6 -6l6 6" /></Svg>;
-const IconInstagram = props => <Svg {...props}><path d="M4 4m0 4a4 4 0 0 1 4 -4h8a4 4 0 0 1 4 4v8a4 4 0 0 1 -4 4h-8a4 4 0 0 1 -4 -4z" /><path d="M12 12m-3 0a3 3 0 1 0 6 0a3 3 0 1 0 -6 0" /><path d="M16.5 7.5v.01" /></Svg>;
-const IconFacebook = props => <Svg {...props}><path d="M7 10v4h3v7h4v-7h3l1 -4h-4v-2a1 1 0 0 1 1 -1h3v-4h-3a5 5 0 0 0 -5 5v2h-3" /></Svg>;
-const IconWhatsapp = props => <Svg {...props}><path d="M3 21l1.65 -3.8a9 9 0 1 1 3.4 2.9l-5.05 .9" /><path d="M9 10a.5 .5 0 0 0 1 0v-1a.5 .5 0 0 0 -1 0v1a5 5 0 0 0 5 5h1a.5 .5 0 0 0 0 -1h-1a.5 .5 0 0 0 0 1" /></Svg>;
-const IconMail = props => <Svg {...props}><path d="M3 7a2 2 0 0 1 2 -2h14a2 2 0 0 1 2 2v10a2 2 0 0 1 -2 2h-14a2 2 0 0 1 -2 -2z" /><path d="M3 7l9 6l9 -6" /></Svg>;
 
 // Logo da Fetech (ProjetoLogoFetech2.svg) inline para herdar a cor do rodape.
 const FetechLogo = ({ height = 26 }) => <svg height={height} viewBox="0 0 200 55" fill="currentColor" role="img" aria-label="Fetech"><g transform="translate(0,55) scale(0.1,-0.1)" stroke="none">
@@ -223,16 +220,21 @@ function useActiveSection(ready) {
   return active;
 }
 
-function LandingNav({ couple, onGravata }) {
+// offsite: fora da landing (pagina do convite) as ancoras levam a /casamento#secao;
+// so "Confirme sua presenca" fica na pagina, rolando ate o painel de confirmacao.
+function LandingNav({ couple, onGravata, offsite = false }) {
   const [scrolled, setScrolled] = useState(false);
   const [open, setOpen] = useState(false);
-  const active = useActiveSection(true);
+  const landingActive = useActiveSection(!offsite);
+  const active = offsite ? null : landingActive;
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 30);
     onScroll(); window.addEventListener('scroll', onScroll, { passive: true });
     return () => window.removeEventListener('scroll', onScroll);
   }, []);
   const go = (event, id) => { setOpen(false); scrollToSection(event, id); };
+  const local = id => !offsite || id === 'confirmar';
+  const hrefOf = id => local(id) ? `#${id}` : `/casamento#${id}`;
   // Florzinha embaixo da ancora ativa: mede o centro da ancora e desliza ate ela.
   const linksRef = useRef(null);
   const [flowerX, setFlowerX] = useState(null);
@@ -249,58 +251,73 @@ function LandingNav({ couple, onGravata }) {
   // Layout 4 do design system (faixa marfim com flor): so o monograma e as ancoras pela largura toda.
   return <header className={`wed-nav is-floral${scrolled ? ' is-scrolled' : ''}`}>
     <div className="wed-nav-inner">
-      <a className="wed-nav-brand" href="#home" aria-label={`${couple[0]} e ${couple[1]} — início`} onClick={event => go(event, 'home')}><Monogram height={36} /></a>
+      <a className="wed-nav-brand" href={offsite ? '/casamento' : '#home'} aria-label={`${couple[0]} e ${couple[1]} — início`} onClick={offsite ? undefined : event => go(event, 'home')}><Monogram height={36} /></a>
       <button className="wed-nav-toggle" onClick={() => setOpen(!open)} aria-expanded={open} aria-label={open ? 'Fechar menu' : 'Abrir menu'}>{open ? <IconClose size={24} /> : <IconMenu size={24} />}</button>
       <nav ref={linksRef} className={`wed-nav-links${open ? ' is-open' : ''}`} aria-label="Principal">
         {NAV.map(item => item.action
           ? onGravata && <a key={item.id} href={`#${item.id}`} role="button" onClick={event => { event.preventDefault(); setOpen(false); onGravata(); }}>{item.label}</a>
-          : <a key={item.id} href={`#${item.id}`} className={[active === item.id && 'is-active', item.id === 'confirmar' && 'is-cta'].filter(Boolean).join(' ') || undefined} aria-current={active === item.id ? 'page' : undefined} onClick={event => go(event, item.id)}>{item.label}</a>)}
+          : <a key={item.id} href={hrefOf(item.id)} className={[active === item.id && 'is-active', item.id === 'confirmar' && 'is-cta'].filter(Boolean).join(' ') || undefined} aria-current={active === item.id ? 'page' : undefined} onClick={local(item.id) ? event => go(event, item.id) : () => setOpen(false)}>{item.label}</a>)}
         {flowerX != null && <NavFlower x={flowerX} />}
       </nav>
     </div>
   </header>;
 }
 
+// Rodape do componente Rodape do design system (layout 5 sem a faixa "Voce vem?"):
+// marca e redes, Menu, Contato, Endereco e a barra final com a logo da FETECH. O botao flutuante do WhatsApp fica fora do <footer> (o
+// container-type do rodape prenderia o position:fixed) e aparece em toda pagina com rodape.
+const FOOTER_ICONS = {
+  whats: <><path d="M4.5 19.5l1.1-3.9A8 8 0 1 1 8.6 18.6z" /><path d="M9.2 8.6c.2-.5.5-.5.8-.5h.5c.2 0 .4.1.5.4l.7 1.6c.1.2 0 .4-.1.6l-.5.6c-.1.1-.1.3 0 .5.6 1 1.4 1.8 2.4 2.3.2.1.4.1.5 0l.6-.6c.2-.2.4-.2.6-.1l1.5.7c.3.1.4.3.4.5v.5c0 .4-.2.7-.6.9-.5.3-1.3.5-2.2.2-1.6-.5-3.3-2-4.3-3.6-.6-1-.9-2.1-.5-3z" /></>,
+  mail: <><rect x="3.5" y="5.5" width="17" height="13" rx="2" /><path d="M4 7l8 6 8-6" /></>,
+  pin: <><path d="M12 21s-6-5.5-6-10a6 6 0 0 1 12 0c0 4.5-6 10-6 10z" /><circle cx="12" cy="11" r="2" /></>,
+  cal: <path d="M5 7h14v12H5zM5 11h14M9 4v4M15 4v4" />
+};
+const FooterIcon = ({ name }) => <svg className="ic" viewBox="0 0 24 24" aria-hidden="true">{FOOTER_ICONS[name]}</svg>;
+
 function SiteFooter({ wedding, onLanding }) {
   const contact = wedding.contact || {};
-  // Fora da landing as secoes nao existem: o menu vira link para /casamento.
+  const address = contact.address || {};
+  const credit = wedding.credit || {};
+  // Fora da landing as secoes nao existem: os links vao para /casamento.
   const sectionHref = id => onLanding ? `#${id}` : `/casamento#${id}`;
-  const socials = [
-    contact.facebook && { href: contact.facebook, icon: <IconFacebook size={18} />, label: 'Facebook' },
-    contact.instagram && { href: contact.instagram, icon: <IconInstagram size={18} />, label: 'Instagram' },
-    contact.whatsapp && { href: contact.whatsapp, icon: <IconWhatsapp size={18} />, label: 'WhatsApp' },
-    contact.email && { href: `mailto:${contact.email}`, icon: <IconMail size={18} />, label: 'E-mail' }
-  ].filter(Boolean);
-  return <footer className="wed-foot">
-    <ScrollReveal stagger className="wed-foot-top">
-      <div className="wed-foot-brand">
-        <span className="wed-foot-logo"><Monogram height={48} /><em>{wedding.couple[0]} &amp; {wedding.couple[1]}</em></span>
-        {socials.length > 0 && <div className="wed-foot-social">{socials.map(social => <a key={social.label} href={social.href} target="_blank" rel="noreferrer" aria-label={social.label}>{social.icon}</a>)}</div>}
+  const go = id => onLanding ? event => scrollToSection(event, id) : undefined;
+  const couple = `${wedding.couple[0]} & ${wedding.couple[1]}`;
+  const FetechMark = <FetechLogo height={22} />;
+  return <>
+    <footer className="rd wed-foot">
+      <div className="lim grade">
+        <div className="col sobre">
+          <a className="marca" href={sectionHref('home')} onClick={go('home')} aria-label={`${couple}, voltar ao início`}><Monogram height={52} /><span className="nomes">{wedding.couple[0]} <em>&amp;</em> {wedding.couple[1]}</span></a>
+          <div className="redes">
+            {contact.whatsapp && <a href={contact.whatsapp} target="_blank" rel="noopener noreferrer" aria-label="WhatsApp"><FooterIcon name="whats" /></a>}
+            {contact.email && <a href={`mailto:${contact.email}`} aria-label="E-mail"><FooterIcon name="mail" /></a>}
+          </div>
+        </div>
+        <nav className="col menu" aria-label="Rodapé"><h3>Menu</h3>
+          <ul>{NAV.slice(1).filter(item => !item.action).map(item => <li key={item.id}><a href={sectionHref(item.id)} onClick={go(item.id)}>{item.label}</a></li>)}</ul>
+        </nav>
+        <div className="col contato"><h3>Contato</h3>
+          <ul>
+            {contact.phone && <li><FooterIcon name="whats" /><a href={contact.whatsapp || `tel:${contact.phone.replace(/\D/g, '')}`} target={contact.whatsapp ? '_blank' : undefined} rel="noopener noreferrer">{contact.phone}</a></li>}
+            {contact.email && <li><FooterIcon name="mail" /><a href={`mailto:${contact.email}`}>{contact.email}</a></li>}
+          </ul>
+        </div>
+        <div className="col endereco"><h3>Endereço</h3>
+          <ul>
+            <li><FooterIcon name="pin" /><span>{address.street}<br />{address.city}{address.zip && <><br />CEP {address.zip}</>}</span></li>
+            <li><FooterIcon name="cal" /><span>{wedding.date.join(' ')} · {wedding.time.join('')}</span></li>
+          </ul>
+        </div>
       </div>
-      <div className="wed-foot-col">
-        <h3>Menu</h3>
-        <ul>{NAV.slice(1).filter(item => !item.action).map(item => <li key={item.id}><a href={sectionHref(item.id)} onClick={onLanding ? event => scrollToSection(event, item.id) : undefined}>{item.label}</a></li>)}</ul>
-      </div>
-      <div className="wed-foot-col">
-        <h3>Contato</h3>
-        <ul>
-          {contact.phone && <li><a href={contact.whatsapp || `tel:${contact.phone.replace(/\D/g, '')}`}><IconWhatsapp size={16} />{contact.phone}</a></li>}
-          {contact.email && <li><a href={`mailto:${contact.email}`}><IconMail size={16} />{contact.email}</a></li>}
-        </ul>
-      </div>
-      <div className="wed-foot-col">
-        <h3>Endereço</h3>
-        <ul>
-          <li><a href={wedding.ceremony.map} target="_blank" rel="noreferrer"><IconMapPin size={16} />{wedding.ceremony.fullAddress}</a></li>
-          <li className="wed-foot-plain">{wedding.date.join(' ')} {'•'} {wedding.time.join('')}</li>
-        </ul>
-      </div>
-    </ScrollReveal>
-    <div className="wed-foot-bar"><div className="wed-foot-bar-inner">
-      <span>{'©'} {new Date().getFullYear()} Todos os direitos reservados.</span>
-      <span className="wed-foot-fetech" role="img" aria-label="Fetech"><FetechLogo height={24} /></span>
-    </div></div>
-  </footer>;
+      <div className="barra-final"><div className="lim">
+        <span>© {new Date().getFullYear()} {couple}. Todos os direitos reservados.</span>
+        {credit.url
+          ? <a className="credito" href={credit.url} target="_blank" rel="noopener noreferrer" aria-label={`Desenvolvido por ${credit.name}`}>desenvolvido por {FetechMark}</a>
+          : <span className="credito">desenvolvido por {FetechMark}</span>}
+      </div></div>
+    </footer>
+    {contact.whatsapp && <a className="rd-whats" href={contact.whatsapp} target="_blank" rel="noopener noreferrer" aria-label="Falar no WhatsApp"><FooterIcon name="whats" /></a>}
+  </>;
 }
 
 // Carrossel sobre scroll-snap nativo: o swipe no celular e a rolagem por
@@ -642,7 +659,9 @@ function StoreCategoryRoute() {
 function WeddingShell({ children, wedding }) {
   const appearanceProps = usePublicAppearance(wedding);
   return <div className="wed wed-invitation" {...appearanceProps}>
-    <header className="wed-topbar"><span className="wed-brand"><Monogram height={32} />Convites de casamento</span></header>
+    {wedding
+      ? <div className="wed-lp wed-nav-host"><LandingNav couple={wedding.couple} offsite /></div>
+      : <header className="wed-topbar"><span className="wed-brand"><Monogram height={32} />Convites de casamento</span></header>}
     {children}
     {wedding ? <SiteFooter wedding={wedding} /> : <footer className="wed-footer"><i /><IconHeart size={15} /><i /></footer>}
   </div>;
@@ -692,7 +711,7 @@ function Public() {
           <p className="wed-verse">{wedding.verse}</p>
         </div>
       </section>
-      <section className="wed-panel wed-panel-confirm">
+      <section className="wed-panel wed-panel-confirm" id="confirmar">
         <div className="wed-card">
           <h2 className="wed-card-title wed-card-title-start"><Sprig />{'Selecione as pessoas que confirmam presença:'}</h2>
           <div className="wed-guests">{guests.map(guest => <label className="wed-guest" key={guest._id}>
