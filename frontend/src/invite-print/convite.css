@@ -1,0 +1,71 @@
+/* Convites de casamento — deitados, 210 × 148 mm (A5 paisagem), um por convidado, com QR code do link pessoal.
+   Dois por folha A4 em pé (folha-a4.js). Estrutura comum: texto à esquerda (.miolo), QR à direita (.lateral). */
+.cv { position: relative; width: 210mm; height: 148mm; overflow: hidden; box-sizing: border-box; background: #fbf8f0; color: #24412f; font-family: "Cormorant Garamond", Georgia, serif; text-align: center; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+.cv * { box-sizing: border-box; }
+.cv p, .cv h1, .cv h2 { margin: 0; font-weight: 400; }
+.cv .script { font-family: "Great Vibes", "Pinyon Script", cursive; }
+.cv .art svg.ba { width: 100%; height: 100%; }
+.cv .miolo { position: absolute; left: 0; top: 0; bottom: 0; width: 142mm; padding: 0 16mm; display: flex; flex-direction: column; align-items: center; justify-content: center; }
+.cv .lateral { position: absolute; right: 0; top: 0; bottom: 0; width: 68mm; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 5mm; }
+.cv .qr { display: inline-flex; flex-direction: column; align-items: center; gap: 2mm; }
+.cv .qr .cod { width: 30mm; height: 30mm; padding: 2mm; background: #fff; border-radius: 1.8mm; }
+.cv .qr .cod svg { display: block; width: 100%; height: 100%; }
+.cv .qr small { font-size: 8pt; line-height: 1.3; letter-spacing: .03em; max-width: 44mm; }
+.cv .pessoal { font-size: 12pt; font-style: italic; }
+.cv .pessoal b { font-style: normal; font-weight: 600; }
+.cv .intro { font-size: 10.5pt; line-height: 1.45; max-width: 104mm; }
+.cv .divisor { position: absolute; left: 142mm; top: 18mm; bottom: 18mm; width: .3mm; }
+
+/* 5 · Monograma clássico */
+.cv-5 { background: #fffdf8; }
+.cv-5 .moldura { position: absolute; inset: 7mm; border: .25mm solid #24412f; }
+.cv-5 .moldura::after { content: ''; position: absolute; inset: 1.2mm; border: .6mm solid #24412f; }
+.cv-5 .divisor { background: #24412f; width: .25mm; }
+.cv-5 .mono { width: 26mm; height: 26mm; border-radius: 50%; border: .3mm solid #ad8c5c; display: flex; align-items: center; justify-content: center; font-family: "Cinzel", serif; font-size: 18pt; color: #24412f; }
+.cv-5 .mono i { font-family: "Great Vibes", cursive; font-style: normal; font-size: 16pt; color: #ad8c5c; margin: 0 .5mm; }
+.cv-5 .pessoal { color: #5e635a; }
+.cv-5 .intro { margin-top: 3mm; color: #4b5348; }
+.cv-5 .nomes { margin-top: 4mm; font-family: "Cinzel", serif; font-size: 19pt; letter-spacing: .14em; line-height: 1.3; }
+.cv-5 .e { font-family: "Great Vibes", cursive; font-size: 22pt; letter-spacing: 0; color: #ad8c5c; margin: 0 2mm; }
+.cv-5 .data { margin-top: 4mm; font-size: 10.5pt; letter-spacing: .26em; text-transform: uppercase; }
+.cv-5 .local { margin-top: 1.4mm; font-size: 10.5pt; color: #4b5348; }
+.cv-5 .qr { color: #5e635a; }
+.cv-5 .qr .cod { width: 26mm; height: 26mm; }
+
+/* 9 · Foto do casal */
+.cv-9 .foto { position: absolute; left: 0; top: 0; bottom: 0; width: 92mm; background: #8d9b7d center 30% / cover no-repeat; }
+.cv-9 .foto::after { content: ''; position: absolute; top: 0; bottom: 0; right: 0; width: 26mm; background: linear-gradient(90deg, rgba(251,248,240,0), #fbf8f0); }
+.cv-9 .foto.sem-foto { background: linear-gradient(135deg, #a9b49a, #7f8f72); }
+.cv-9 .foto.sem-foto::before { content: 'foto do casal'; position: absolute; left: 0; right: 20mm; top: 70mm; font-family: "Jost", sans-serif; font-size: 9pt; letter-spacing: .4em; text-transform: uppercase; color: rgba(255,255,255,.85); }
+.cv-9 .miolo { left: 82mm; width: 128mm; padding: 10mm 12mm 10mm 8mm; }
+.cv-9 .nomes { font-size: 40pt; line-height: 1.05; }
+.cv-9 .e { color: #ad8c5c; }
+.cv-9 .pessoal { margin-top: 2mm; color: #5e635a; font-size: 11pt; }
+.cv-9 .intro { margin-top: 2mm; font-size: 9.5pt; color: #4b5348; max-width: 96mm; }
+.cv-9 .data { margin-top: 2.6mm; font-size: 9.5pt; letter-spacing: .3em; text-transform: uppercase; }
+.cv-9 .local { margin-top: 1.2mm; font-size: 9.5pt; color: #4b5348; }
+.cv-9 .qr { margin-top: 4mm; flex-direction: row; gap: 3mm; color: #5e635a; text-align: left; }
+.cv-9 .qr .cod { width: 24mm; height: 24mm; }
+.cv-9 .qr small { max-width: 34mm; }
+
+/* 10 · Calendário */
+.cv-10 .divisor { background: #e3d3b4; left: 128mm; }
+.cv-10 .miolo { width: 128mm; padding: 0 12mm; }
+.cv-10 .pessoal { color: #5e635a; font-size: 11pt; }
+.cv-10 .nomes { margin-top: 2mm; font-size: 38pt; line-height: 1.05; }
+.cv-10 .e { color: #ad8c5c; }
+.cv-10 .intro { margin-top: 2mm; font-size: 9.5pt; color: #4b5348; max-width: 100mm; }
+.cv-10 .local { margin-top: 2mm; font-size: 9.5pt; line-height: 1.35; color: #4b5348; }
+.cv-10 .qr { margin-top: 4mm; flex-direction: row; gap: 3mm; color: #5e635a; text-align: left; }
+.cv-10 .qr .cod { width: 22mm; height: 22mm; }
+.cv-10 .qr small { max-width: 36mm; }
+.cv-10 .lateral { width: 82mm; }
+.cv-10 .cal { width: 64mm; }
+.cv-10 .cal .mes { font-family: "Jost", sans-serif; font-size: 8.5pt; letter-spacing: .4em; text-transform: uppercase; color: #24412f; padding-bottom: 2mm; border-bottom: .3mm solid #c9ab78; }
+.cv-10 .cal table { width: 100%; border-collapse: collapse; margin-top: 1.6mm; font-family: "Jost", sans-serif; }
+.cv-10 .cal th { font-size: 6.5pt; font-weight: 500; letter-spacing: .1em; color: #8a6d45; padding: 1mm 0; }
+.cv-10 .cal td { font-size: 8.5pt; font-weight: 300; color: #3b4339; height: 6.6mm; position: relative; text-align: center; }
+.cv-10 .cal td.dia-casamento { font-weight: 600; color: #24412f; }
+.cv-10 .cal td.dia-casamento span { position: relative; z-index: 1; }
+.cv-10 .cal td.dia-casamento::before { content: ''; position: absolute; left: 50%; top: 50%; width: 7.4mm; height: 7.4mm; margin: -3.7mm 0 0 -3.7mm; border: .35mm solid #ad8c5c; border-radius: 50%; }
+.cv-10 .hora { margin-top: 3mm; font-size: 10pt; letter-spacing: .3em; text-transform: uppercase; }

@@ -81,6 +81,7 @@ body{background:#f5f7fb}
 .wed-footer i:last-child{transform:scaleX(-1)}
 .wed-footer svg{color:var(--wed-gold)}
 .wed-state{flex:1;display:flex;align-items:center;justify-content:center;padding:4rem 1rem;text-align:center;font-size:calc(1.5rem * var(--wed-font-scale, 1));color:var(--wed-green)}
+.wed-state-missing{flex-direction:column;gap:1rem;max-width:34rem;margin:0 auto}.wed-state-missing strong{font-weight:500}.wed-state-missing p{margin:0;font-size:1rem;line-height:1.6;color:var(--wed-muted, #5e635a)}
 
 @media(max-width:1180px){.wed-info-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.wed-cols{grid-template-columns:minmax(0,1fr)}}
 

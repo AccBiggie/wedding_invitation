@@ -2,7 +2,7 @@ import api from './api';
 import axios from 'axios';
 import type { ApiResponse } from '../types/api';
 
-export type ImageCategory = 'avatar' | 'guest' | 'godparent' | 'gift' | 'storeCategory' | 'gallery' | 'banner' | 'other';
+export type ImageCategory = 'avatar' | 'guest' | 'godparent' | 'gift' | 'storeCategory' | 'invitationCard' | 'gallery' | 'banner' | 'other';
 export interface ImageMetadata { id: string; url: string; entityType: ImageCategory; filename: string; mimeType: string; fileSize: number; width: number; height: number }
 export const resolveImageUrl = (value: string) => value.startsWith('/api/images/') ? `${String(api.defaults.baseURL).replace(/\/api\/?$/, '')}${value}` : value;
 export const imagesService = {

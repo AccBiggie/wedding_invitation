@@ -8,6 +8,22 @@ const normalize = value => value.normalize('NFD').replace(/[\u0300-\u036f]/g, ''
 const guestNames = name => name.split(';').map(value => value.trim()).filter(Boolean);
 const guestView = invitation => invitation.guests?.length ? invitation.guests : guestNames(invitation.name).map(name => ({ name, confirmed: false, confirmedAt: null }));
 
+// Sem 0/O, 1/I/L: o codigo pode ser digitado a partir do convite impresso.
+const CODE_ALPHABET = 'ABCDEFGHJKMNPQRSTUVWXYZ23456789';
+export const newCode = () => Array.from({ length: 10 }, () => CODE_ALPHABET[crypto.randomInt(CODE_ALPHABET.length)]).join('');
+const isDuplicate = error => error?.code === 11000;
+const publicView = item => ({ _id: item._id, name: item.name, status: item.status, confirmedAt: item.confirmedAt, confirmationDeadline: item.confirmationDeadline, guests: item.guests.map(guest => ({ _id: guest._id, name: guest.name, confirmed: guest.confirmed })) });
+
+async function assignCode(id) {
+  for (let attempt = 0; attempt < 5; attempt++) {
+    try {
+      const item = await Invitation.findOneAndUpdate({ _id: id, code: { $in: [null, ''] } }, { $set: { code: newCode() } }, { new: true });
+      return item || Invitation.findById(id);
+    } catch (error) { if (!isDuplicate(error)) throw error; }
+  }
+  throw new Error('Nao foi possivel gerar o codigo do convite.');
+}
+
 function idOrFail(id, res) {
   if (!mongoose.isValidObjectId(id)) { fail(res, 400, 'Identificador invalido.'); return false; }
   return true;
@@ -73,7 +89,11 @@ export async function create(req, res, next) {
     const confirmationDeadline = req.body.confirmationDeadline ? new Date(`${req.body.confirmationDeadline}T23:59:59.999Z`) : null;
     if (confirmationDeadline && Number.isNaN(confirmationDeadline.getTime())) errors.confirmationDeadline = ['A data limite e invalida.'];
     if (Object.keys(errors).length) return fail(res, 422, 'Os dados informados sao invalidos.', errors);
-    const item = await Invitation.create({ name, description: (req.body.description || '').trim(), type: req.body.type || 'in_person', confirmationDeadline, guests: guestNames(name).map(guestName => ({ name: guestName })), publicToken: crypto.randomBytes(32).toString('hex') });
+    const fields = { name, description: (req.body.description || '').trim(), type: req.body.type || 'in_person', confirmationDeadline, guests: guestNames(name).map(guestName => ({ name: guestName })), publicToken: crypto.randomBytes(32).toString('hex') };
+    let item;
+    for (let attempt = 0; !item; attempt++) {
+      try { item = await Invitation.create({ ...fields, code: newCode() }); } catch (error) { if (!isDuplicate(error) || attempt >= 4) throw error; }
+    }
     ok(res, item, 'Convite criado com sucesso.');
   } catch (error) { next(error); }
 }
@@ -99,6 +119,18 @@ export async function update(req, res, next) {
   } catch (error) { next(error); }
 }
 
+// Garante o codigo dos convites que vao ser impressos (os criados antes do campo existir).
+export async function ensureCodes(req, res, next) {
+  try {
+    const ids = Array.isArray(req.body.ids) ? [...new Set(req.body.ids.map(String))] : [];
+    if (!ids.length || ids.length > 500 || !ids.every(id => mongoose.isValidObjectId(id))) return fail(res, 422, 'Informe os convites.');
+    const items = await Invitation.find({ _id: { $in: ids } }).select('code');
+    const codes = {};
+    for (const item of items) codes[item._id] = item.code || (await assignCode(item._id)).code;
+    ok(res, codes);
+  } catch (error) { next(error); }
+}
+
 export async function remove(req, res, next) {
   try { if (!idOrFail(req.params.id, res)) return; const item = await Invitation.findByIdAndDelete(req.params.id); if (!item) return fail(res, 404, 'Convite nao encontrado.'); ok(res, null, 'Convite excluido com sucesso.'); } catch (error) { next(error); }
 }
@@ -109,7 +141,18 @@ export async function publicGet(req, res, next) {
     const item = await Invitation.findById(req.params.id).select('-__v');
     if (!item || normalize(item.name) !== decodeURIComponent(req.params.name) || req.query.token !== item.publicToken) return fail(res, 404, 'Convite nao encontrado.');
     await ensureGuests(item);
-    ok(res, { _id: item._id, name: item.name, status: item.status, confirmedAt: item.confirmedAt, confirmationDeadline: item.confirmationDeadline, guests: item.guests.map(guest => ({ _id: guest._id, name: guest.name, confirmed: guest.confirmed })) });
+    ok(res, publicView(item));
+  } catch (error) { next(error); }
+}
+
+export async function publicGetByCode(req, res, next) {
+  try {
+    const code = String(req.params.code || '').toUpperCase();
+    if (!/^[A-Z0-9]{8,32}$/.test(code)) return fail(res, 404, 'Convite nao encontrado.');
+    const item = await Invitation.findOne({ code });
+    if (!item) return fail(res, 404, 'Convite nao encontrado.');
+    await ensureGuests(item);
+    ok(res, publicView(item));
   } catch (error) { next(error); }
 }
 
@@ -134,6 +177,6 @@ export async function confirm(req, res, next) {
     item.status = confirmedGuests.length ? 'confirmed' : 'unconfirmed';
     item.confirmedAt = confirmedGuests.length ? confirmedGuests[0].confirmedAt : null;
     await item.save();
-    ok(res, { _id: item._id, name: item.name, status: item.status, confirmedAt: item.confirmedAt, confirmationDeadline: item.confirmationDeadline, guests: item.guests.map(guest => ({ _id: guest._id, name: guest.name, confirmed: guest.confirmed })) }, selected.size ? 'Confirmacao atualizada com sucesso!' : 'Nenhuma pessoa foi selecionada.');
+    ok(res, publicView(item), selected.size ? 'Confirmacao atualizada com sucesso!' : 'Nenhuma pessoa foi selecionada.');
   } catch (error) { next(error); }
 }

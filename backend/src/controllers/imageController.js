@@ -3,6 +3,7 @@ import { imageCategories, uploadImage, getImage, getImageUrl, openImage, deleteI
 import Godparent from '../models/Godparent.js';
 import GiftProduct from '../models/GiftProduct.js';
 import StoreCategory from '../models/StoreCategory.js';
+import InvitationCardSettings from '../models/InvitationCardSettings.js';
 import StoredImage from '../models/StoredImage.js';
 import { env } from '../config/env.js';
 
@@ -13,7 +14,8 @@ const isReferenced = async image => {
   return Boolean(await Promise.all([
     Godparent.exists({ $or: [{ image: url }, { images: url }] }),
     GiftProduct.exists({ $or: [{ image: url }, { images: url }] }),
-    StoreCategory.exists({ image: url })
+    StoreCategory.exists({ image: url }),
+    InvitationCardSettings.exists({ photo: url })
   ]).then(results => results.some(Boolean)));
 };
 
@@ -33,7 +35,7 @@ export async function show(req, res, next) {
   try {
     if (!mongoose.isValidObjectId(req.params.id)) return bad(res, 400, 'Identificador inválido.');
     const image = await getImage(req.params.id);
-    if (!image || !image.entityId || !['godparent', 'gift', 'storeCategory'].includes(image.entityType) || !await isReferenced(image)) return bad(res, 404, 'Imagem não encontrada.');
+    if (!image || !image.entityId || !['godparent', 'gift', 'storeCategory', 'invitationCard'].includes(image.entityType) || !await isReferenced(image)) return bad(res, 404, 'Imagem não encontrada.');
     if (env.r2.publicBaseUrl) {
       const base = new URL(env.r2.publicBaseUrl);
       if (base.protocol !== 'https:' || base.hostname.endsWith('.r2.dev')) return bad(res, 503, 'Domínio público de imagens inválido.');
