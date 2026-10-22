@@ -264,8 +264,7 @@ function LandingNav({ couple, onGravata, offsite = false }) {
 }
 
 // Rodape do componente Rodape do design system (layout 5 sem a faixa "Voce vem?"):
-// marca e redes, Menu, Contato, Endereco e a barra final com a logo da FETECH. O botao flutuante do WhatsApp fica fora do <footer> (o
-// container-type do rodape prenderia o position:fixed) e aparece em toda pagina com rodape.
+// marca e redes, Menu, Contato, Endereco e a barra final com a logo da FETECH.
 const FOOTER_ICONS = {
   whats: <><path d="M4.5 19.5l1.1-3.9A8 8 0 1 1 8.6 18.6z" /><path d="M9.2 8.6c.2-.5.5-.5.8-.5h.5c.2 0 .4.1.5.4l.7 1.6c.1.2 0 .4-.1.6l-.5.6c-.1.1-.1.3 0 .5.6 1 1.4 1.8 2.4 2.3.2.1.4.1.5 0l.6-.6c.2-.2.4-.2.6-.1l1.5.7c.3.1.4.3.4.5v.5c0 .4-.2.7-.6.9-.5.3-1.3.5-2.2.2-1.6-.5-3.3-2-4.3-3.6-.6-1-.9-2.1-.5-3z" /></>,
   mail: <><rect x="3.5" y="5.5" width="17" height="13" rx="2" /><path d="M4 7l8 6 8-6" /></>,
@@ -283,8 +282,7 @@ function SiteFooter({ wedding, onLanding }) {
   const go = id => onLanding ? event => scrollToSection(event, id) : undefined;
   const couple = `${wedding.couple[0]} & ${wedding.couple[1]}`;
   const FetechMark = <FetechLogo height={22} />;
-  return <>
-    <footer className="rd wed-foot">
+  return <footer className="rd wed-foot">
       <div className="lim grade">
         <div className="col sobre">
           <a className="marca" href={sectionHref('home')} onClick={go('home')} aria-label={`${couple}, voltar ao início`}><Monogram height={52} /><span className="nomes">{wedding.couple[0]} <em>&amp;</em> {wedding.couple[1]}</span></a>
@@ -315,9 +313,7 @@ function SiteFooter({ wedding, onLanding }) {
           ? <a className="credito" href={credit.url} target="_blank" rel="noopener noreferrer" aria-label={`Desenvolvido por ${credit.name}`}>desenvolvido por {FetechMark}</a>
           : <span className="credito">desenvolvido por {FetechMark}</span>}
       </div></div>
-    </footer>
-    {contact.whatsapp && <a className="rd-whats" href={contact.whatsapp} target="_blank" rel="noopener noreferrer" aria-label="Falar no WhatsApp"><FooterIcon name="whats" /></a>}
-  </>;
+  </footer>;
 }
 
 // Carrossel sobre scroll-snap nativo: o swipe no celular e a rolagem por

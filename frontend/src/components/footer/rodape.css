@@ -25,8 +25,6 @@
 .rd .barra-final { background: var(--rd-bg2); font-family: "Jost", "Helvetica Neue", Arial, sans-serif; font-size: 13px; color: var(--rd-mut); }
 .rd .barra-final .lim { display: flex; justify-content: space-between; align-items: center; gap: 12px; flex-wrap: wrap; padding-top: 16px; padding-bottom: 16px; }
 .rd .credito b { font-weight: 500; letter-spacing: .18em; color: var(--rd-tit); }
-.rd-whats { position: fixed; left: max(20px, env(safe-area-inset-left, 0px)); bottom: calc(20px + env(safe-area-inset-bottom, 0px)); z-index: 50; display: grid; place-items: center; width: 58px; height: 58px; border-radius: 50%; background: #25d366; color: #fff; box-shadow: 0 8px 20px rgba(0,0,0,.25); }
-.rd-whats .ic { width: 30px; height: 30px; fill: none; stroke: #fff; stroke-width: 1.6; }
 
 
 /* celular / telas estreitas */
@@ -39,8 +37,7 @@
   .rd .barra-final .lim { flex-direction: column; align-items: flex-start; gap: 6px; }
 }
 
-/* No site: logo SA em imagem, logo da FETECH, fontes do tema (o site nao carrega a Jost)
-   e o botao do WhatsApp fora do rodape (o container-type prenderia o position:fixed). */
+/* No site: logo SA em imagem, logo da FETECH e fontes do tema (o site nao carrega a Jost). */
 .rd { --font-serifa: var(--wed-font); }
 .rd h3, .rd .barra-final { font-family: var(--wed-font); }
 .rd h3 { font-size: 15px; }
@@ -50,16 +47,9 @@
 .rd .credito { display: inline-flex; align-items: center; gap: 10px; }
 .rd .credito svg { display: block; color: var(--rd-tit); }
 .rd .barra-final a.credito:hover svg { color: var(--rd-ac); }
-.rd-whats:hover { background: #1ebe5b; }
-.rd-whats:focus-visible { outline: 3px solid #fff; outline-offset: 3px; box-shadow: 0 0 0 6px #1f6f3f; }
-.rd-whats .ic { stroke-linecap: round; stroke-linejoin: round; }
-@media (max-width: 640px) { .rd-whats { left: max(16px, env(safe-area-inset-left, 0px)); bottom: calc(16px + env(safe-area-inset-bottom, 0px)); width: 54px; height: 54px; } }
-@media print { .rd-whats { display: none; } }
 /* .wed-foot (style.css) mantem o rodape acima do fundo fixo; as cores sao as do layout. */
 .rd.wed-foot { background: var(--rd-bg); color: var(--rd-tx); }
 .wed[data-wed-dark=true] .rd { --rd-bg: #161817; --rd-bg2: #0e0f0e; --rd-chip: #2a2c2b; }
-/* Abaixo da navbar (z-index 30): o menu aberto do celular cobre o botao. */
-.rd-whats { z-index: 25; }
-/* Ate 1200 px os botoes flutuantes (WhatsApp e voltar ao topo) alcancam o texto da barra final:
-   ela ganha espaco embaixo para o texto terminar acima deles. */
+/* Ate 1200 px o botao de voltar ao topo alcanca o texto da barra final:
+   ela ganha espaco embaixo para o texto terminar acima dele. */
 @media (max-width: 1200px) { .rd .barra-final .lim { padding-bottom: calc(16px + 78px + env(safe-area-inset-bottom, 0px)); } }
