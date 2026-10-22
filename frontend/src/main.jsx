@@ -323,7 +323,19 @@ function Carousel({ label, children }) {
   const [index, setIndex] = useState(0);
   const [paused, setPaused] = useState(false);
   const [edges, setEdges] = useState({ start: true, end: true, scrollable: false });
+  const [visible, setVisible] = useState(false);
+  const rootRef = useRef(null);
   const total = React.Children.count(children);
+
+  // Fora da tela o carrossel nao anda: cada troca de slide re-renderiza os cards
+  // durante a rolagem suave e travava o scroll da pagina.
+  useEffect(() => {
+    const root = rootRef.current;
+    if (!root || typeof IntersectionObserver === 'undefined') { setVisible(true); return; }
+    const observer = new IntersectionObserver(([entry]) => setVisible(entry.isIntersecting));
+    observer.observe(root);
+    return () => observer.disconnect();
+  }, []);
 
   // Mexe SO no scroll do trilho. Nada de scrollIntoView aqui: ele rola os
   // ancestrais para trazer o card ao campo de visao e, com a secao parcialmente
@@ -353,11 +365,13 @@ function Carousel({ label, children }) {
         if (distance < best) { best = distance; closest = position; }
       });
       setIndex(closest);
-      setEdges({
+      const next = {
         start: track.scrollLeft <= 1,
         end: track.scrollLeft + track.clientWidth >= track.scrollWidth - 1,
         scrollable: track.scrollWidth > track.clientWidth + 1
-      });
+      };
+      // Mesmo objeto quando nada mudou: sem re-render a cada quadro da rolagem.
+      setEdges(current => current.start === next.start && current.end === next.end && current.scrollable === next.scrollable ? current : next);
     };
     const onScroll = () => { if (!frame) frame = requestAnimationFrame(read); };
     read();
@@ -368,14 +382,14 @@ function Carousel({ label, children }) {
 
   // Anda sozinho, mas para enquanto o visitante esta mexendo ou lendo o card.
   useEffect(() => {
-    if (paused || !edges.scrollable || window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+    if (paused || !visible || !edges.scrollable || window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
     const timer = setInterval(() => goTo(edges.end ? 0 : index + 1), CAROUSEL_INTERVAL);
     return () => clearInterval(timer);
-  }, [paused, index, edges.scrollable, edges.end, goTo]);
+  }, [paused, visible, index, edges.scrollable, edges.end, goTo]);
 
   const hold = () => setPaused(true);
   const release = () => setPaused(false);
-  return <div className="wed-carousel" onMouseEnter={hold} onMouseLeave={release} onFocusCapture={hold} onBlurCapture={release} onTouchStart={hold} onTouchEnd={release}>
+  return <div className="wed-carousel" ref={rootRef} onMouseEnter={hold} onMouseLeave={release} onFocusCapture={hold} onBlurCapture={release} onTouchStart={hold} onTouchEnd={release}>
     <ScrollReveal stagger className="wed-carousel-track" ref={trackRef} tabIndex="0" role="group" aria-label={label}>{children}</ScrollReveal>
     {edges.scrollable && <>
       <button type="button" className="wed-carousel-arrow wed-carousel-prev" onClick={() => goTo(index - 1)} disabled={edges.start} aria-label="Anterior"><IconChevronLeft size={22} /></button>
