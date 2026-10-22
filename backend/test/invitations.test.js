@@ -1,4 +1,5 @@
 import test from 'node:test'; import assert from 'node:assert/strict'; import request from 'supertest'; import app from '../src/app.js'; import { signToken } from '../src/controllers/authController.js';
+import { newCode } from '../src/controllers/invitationController.js';
 const bearer = 'Bearer ' + signToken({ _id: 'test-admin', name: 'Administrador', email: 'accbiggie@gmail.com', role: 'admin' });
 test('health endpoint', async()=>{const r=await request(app).get('/api/health');assert.equal(r.status,200);assert.equal(r.body.success,true);});
 test('cadastro sem nome é rejeitado', async()=>{const r=await request(app).post('/api/invitations').set('Authorization',bearer).send({description:'x'});assert.equal(r.status,422);assert.equal(r.body.success,false);});
@@ -11,3 +12,8 @@ test('login sem credenciais retorna 422', async()=>{const r=await request(app).p
 test('dados do casamento são públicos', async()=>{const r=await request(app).get('/api/public/wedding');assert.equal(r.status,200);assert.equal(r.body.data.couple.length,2);assert.ok(r.body.data.datetime);assert.ok(r.body.data.ceremony.map);});
 test('recado sem nome e sem texto retorna 422', async()=>{const r=await request(app).post('/api/public/messages').send({});assert.equal(r.status,422);assert.ok(r.body.errors.name);assert.ok(r.body.errors.message);});
 test('moderação de recados exige login', async()=>{const r=await request(app).get('/api/messages');assert.equal(r.status,401);});
+test('código do convite tem 10 caracteres sem ambiguidade', ()=>{const codes=new Set(Array.from({length:200},newCode));assert.equal(codes.size,200);for(const code of codes)assert.match(code,/^[A-HJKMNP-Z2-9]{10}$/);});
+test('código de convite malformado retorna 404', async()=>{const r=await request(app).get('/api/public/invitations/code/abc');assert.equal(r.status,404);assert.equal(r.body.success,false);});
+test('gerar códigos exige ids válidos', async()=>{const r=await request(app).post('/api/invitations/codes').set('Authorization',bearer).send({ids:['nao-e-id']});assert.equal(r.status,422);});
+test('configurações do convite exigem login', async()=>{const r=await request(app).get('/api/invitation-card');assert.equal(r.status,401);});
+test('configurações do convite rejeitam endereço inválido', async()=>{const r=await request(app).put('/api/invitation-card').set('Authorization',bearer).send({siteUrl:'ftp://x',greeting:'Querido(a)',intro:'x',place:'x',address:'x',qrText:'x',photo:''});assert.equal(r.status,422);assert.ok(r.body.errors.siteUrl);});

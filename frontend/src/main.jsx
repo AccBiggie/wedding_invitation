@@ -631,18 +631,28 @@ function WeddingShell({ children, wedding }) {
 
 // Tela do link pessoal: apenas a acao de confirmar presenca. Data, horario,
 // locais e mapa passaram a viver na landing (/casamento).
+// Dois enderecos levam a esta tela: o link impresso no convite (/convite/<codigo>,
+// o do QR code) e o link antigo (/invitation/<id>/<nome>?token=...).
 function Public() {
-  const [, , id, name] = location.pathname.split('/');
+  const [, kind, id, name] = location.pathname.split('/');
+  const byCode = kind === 'convite';
   const wedding = useWedding();
   const [item, setItem] = useState(); const [error, setError] = useState(false); const [confirming, setConfirming] = useState(false); const [notification, setNotification] = useState(null); const [selectedGuestIds, setSelectedGuestIds] = useState([]); const [photoFailed, setPhotoFailed] = useState(false);
   const notify = (type, message) => setNotification({ type, message });
   useEffect(() => { if (!notification) return; const timer = setTimeout(() => setNotification(null), 4500); return () => clearTimeout(timer); }, [notification]);
-  useEffect(() => { api.get('/public/invitations/' + id + '/' + name, { params: { token: new URLSearchParams(location.search).get('token') } }).then(response => setItem(response.data.data)).catch(() => setError(true)); }, [id, name]);
+  useEffect(() => {
+    const request = byCode ? api.get('/public/invitations/code/' + encodeURIComponent(id || '')) : api.get('/public/invitations/' + id + '/' + name, { params: { token: new URLSearchParams(location.search).get('token') } });
+    request.then(response => setItem(response.data.data)).catch(() => setError(true));
+  }, [byCode, id, name]);
   useEffect(() => { if (item?.guests) setSelectedGuestIds(item.guests.filter(guest => guest.confirmed).map(guest => String(guest._id))); }, [item?._id]);
   // Convite valido: guarda o caminho para a landing saber a qual convite voltar.
   useEffect(() => { if (item) inviteStore.set(location.pathname + location.search); }, [item?._id]);
-  const confirm = async () => { setConfirming(true); try { const response = await api.post('/public/invitations/' + id + '/confirm', { guestIds: selectedGuestIds }); setItem(response.data.data); notify('success', response.data.message); } catch { notify('danger', 'N\u00e3o foi poss\u00edvel confirmar a presen\u00e7a.'); } finally { setConfirming(false); } };
-  if (error) return <WeddingShell><div className="wed-state">{'Convite não encontrado'}</div></WeddingShell>;
+  const confirm = async () => { setConfirming(true); try { const response = await api.post('/public/invitations/' + item._id + '/confirm', { guestIds: selectedGuestIds }); setItem(response.data.data); notify('success', response.data.message); } catch { notify('danger', 'N\u00e3o foi poss\u00edvel confirmar a presen\u00e7a.'); } finally { setConfirming(false); } };
+  if (error) return <WeddingShell wedding={wedding}><div className="wed-state wed-state-missing">
+    <strong>Não encontramos este convite</strong>
+    <p>Confira se o link está completo ou aponte a câmera de novo para o QR code do convite. Se continuar assim, fale com os noivos pelo contato no rodapé.</p>
+    <a className="wed-btn" href="/casamento">Ver o site do casamento</a>
+  </div></WeddingShell>;
   if (!item || !wedding) return <WeddingShell><div className="wed-state">Carregando...</div></WeddingShell>;
   const toggleGuest = guestId => setSelectedGuestIds(current => current.includes(guestId) ? current.filter(idValue => idValue !== guestId) : [...current, guestId]);
   const guests = item.guests || [];
@@ -700,7 +710,7 @@ function Admin() {
 }
 
 function App() {
-  if (location.pathname.startsWith('/invitation/')) return <Public />;
+  if (location.pathname.startsWith('/invitation/') || location.pathname.startsWith('/convite/')) return <Public />;
   if (location.pathname.startsWith('/casamento')) return <Landing />;
   if (location.pathname.startsWith('/lista-na-loja/')) return <StoreCategoryRoute />;
   return <Admin />;
