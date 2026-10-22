@@ -111,6 +111,7 @@ const IconQrcode = props => <Svg {...props}><path d="M4 4h6v6h-6z" /><path d="M1
 const IconCopy = props => <Svg {...props}><path d="M8 8m0 2a2 2 0 0 1 2 -2h8a2 2 0 0 1 2 2v8a2 2 0 0 1 -2 2h-8a2 2 0 0 1 -2 -2z" /><path d="M16 8v-2a2 2 0 0 0 -2 -2h-8a2 2 0 0 0 -2 2v8a2 2 0 0 0 2 2h2" /></Svg>;
 const IconChevronLeft = props => <Svg {...props} strokeWidth="1.8"><path d="M15 6l-6 6l6 6" /></Svg>;
 const IconChevronRight = props => <Svg {...props} strokeWidth="1.8"><path d="M9 6l6 6l-6 6" /></Svg>;
+const IconChevronUp = props => <Svg {...props} strokeWidth="1.8"><path d="M6 15l6 -6l6 6" /></Svg>;
 const IconInstagram = props => <Svg {...props}><path d="M4 4m0 4a4 4 0 0 1 4 -4h8a4 4 0 0 1 4 4v8a4 4 0 0 1 -4 4h-8a4 4 0 0 1 -4 -4z" /><path d="M12 12m-3 0a3 3 0 1 0 6 0a3 3 0 1 0 -6 0" /><path d="M16.5 7.5v.01" /></Svg>;
 const IconFacebook = props => <Svg {...props}><path d="M7 10v4h3v7h4v-7h3l1 -4h-4v-2a1 1 0 0 1 1 -1h3v-4h-3a5 5 0 0 0 -5 5v2h-3" /></Svg>;
 const IconWhatsapp = props => <Svg {...props}><path d="M3 21l1.65 -3.8a9 9 0 1 1 3.4 2.9l-5.05 .9" /><path d="M9 10a.5 .5 0 0 0 1 0v-1a.5 .5 0 0 0 -1 0v1a5 5 0 0 0 5 5h1a.5 .5 0 0 0 0 -1h-1a.5 .5 0 0 0 0 1" /></Svg>;
@@ -584,7 +585,23 @@ function Landing() {
       </div>
     </main>
     <SiteFooter wedding={wedding} onLanding />
+    <BackToTop sectionId="confirmar" />
   </div>;
+}
+
+// Botao de voltar ao topo, no estilo das setas do carrossel. Aparece quando a secao
+// indicada entra na tela e continua visivel dali para baixo (rodape incluso).
+function BackToTop({ sectionId }) {
+  const [visible, setVisible] = useState(false);
+  useEffect(() => {
+    const section = document.getElementById(sectionId);
+    if (!section || typeof IntersectionObserver === 'undefined') return;
+    const observer = new IntersectionObserver(([entry]) => setVisible(entry.isIntersecting || entry.boundingClientRect.top < 0));
+    observer.observe(section);
+    return () => observer.disconnect();
+  }, [sectionId]);
+  const toTop = () => window.scrollTo({ top: 0, behavior: window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth' });
+  return <button type="button" className={`wed-to-top${visible ? ' is-visible' : ''}`} onClick={toTop} aria-label="Voltar ao topo" aria-hidden={!visible} tabIndex={visible ? 0 : -1}><IconChevronUp size={22} /></button>;
 }
 
 // /lista-na-loja/:slug: produtos de uma categoria da "Lista na loja", com a mesma
