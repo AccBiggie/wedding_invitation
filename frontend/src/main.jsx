@@ -10,6 +10,7 @@ import { OliveGarland, OliveSprig, OliveVine } from './components/decor/Olive';
 import { ChurchSketch } from './components/decor/ChurchSketch';
 import { NavFlower } from './components/decor/NavFlower';
 import { Ceremony } from './components/ceremony/Ceremony';
+import { Guestbook } from './components/guestbook/Guestbook';
 import './components/footer/rodape.css';
 import { appearanceAccent, baseColors, defaultAppearance, fontSizeScale, landingFont, weddingDisplayFonts } from './theme/appearance';
 import monogramSvg from './assets/logo/monograma-sa.svg?raw';
@@ -105,7 +106,6 @@ const IconHeart = props => <Svg {...props} fill="currentColor" strokeWidth="0"><
 const IconCheck = props => <Svg {...props} strokeWidth="2.4"><path d="M5 12l5 5l10 -10" /></Svg>;
 const IconPhotoOff = props => <Svg {...props}><path d="M15 8h.01" /><path d="M6 3h12a3 3 0 0 1 3 3v12a3 3 0 0 1 -3 3h-12a3 3 0 0 1 -3 -3v-12a3 3 0 0 1 3 -3z" /><path d="M4 15l4 -4c.9 -.9 2 -.9 2.9 0l5.1 5" /><path d="M14 14l1 -1c.9 -.9 2 -.9 2.9 0l3.1 3" /><path d="M3 3l18 18" /></Svg>;
 const IconGift = props => <Svg {...props}><path d="M3 8m0 1a1 1 0 0 1 1 -1h16a1 1 0 0 1 1 1v2a1 1 0 0 1 -1 1h-16a1 1 0 0 1 -1 -1z" /><path d="M12 8l0 13" /><path d="M19 12v7a2 2 0 0 1 -2 2h-10a2 2 0 0 1 -2 -2v-7" /><path d="M7.5 8a2.5 2.5 0 0 1 0 -5a4.8 8 0 0 1 4.5 5a4.8 8 0 0 1 4.5 -5a2.5 2.5 0 0 1 0 5" /></Svg>;
-const IconMessage = props => <Svg {...props}><path d="M8 9h8" /><path d="M8 13h6" /><path d="M18 4a3 3 0 0 1 3 3v8a3 3 0 0 1 -3 3h-5l-5 3v-3h-2a3 3 0 0 1 -3 -3v-8a3 3 0 0 1 3 -3z" /></Svg>;
 const IconMenu = props => <Svg {...props} strokeWidth="1.8"><path d="M4 6h16M4 12h16M4 18h16" /></Svg>;
 const IconClose = props => <Svg {...props} strokeWidth="1.8"><path d="M18 6l-12 12M6 6l12 12" /></Svg>;
 const IconQrcode = props => <Svg {...props}><path d="M4 4h6v6h-6z" /><path d="M14 4h6v6h-6z" /><path d="M4 14h6v6h-6z" /><path d="M7 7v.01" /><path d="M17 7v.01" /><path d="M7 17v.01" /><path d="M14 14h3" /><path d="M20 14v.01" /><path d="M14 14v3" /><path d="M14 20h3" /><path d="M17 17h3" /><path d="M20 17v3" /></Svg>;
@@ -425,56 +425,6 @@ function GodparentCard({ couple }) {
   </div>;
 }
 
-const RECADOS_VISIVEIS = 4;
-function Guestbook() {
-  const [items, setItems] = useState([]);
-  const [form, setForm] = useState({ name: '', message: '' });
-  const [sending, setSending] = useState(false);
-  const [error, setError] = useState('');
-  const [sent, setSent] = useState(false);
-  useEffect(() => { api.get('/public/messages').then(response => setItems(response.data.data)).catch(() => setItems([])); }, []);
-  // O mural mostra no maximo 4 recados; os demais aparecem rolando a lista. A altura
-  // e medida porque cada recado tem um tamanho (offsetTop ignora a animacao de entrada).
-  const listRef = useRef(null);
-  useLayoutEffect(() => {
-    const list = listRef.current;
-    if (!list) return;
-    const fit = () => {
-      const fourth = list.children[RECADOS_VISIVEIS - 1];
-      list.style.maxHeight = list.children.length > RECADOS_VISIVEIS && fourth ? `${fourth.offsetTop + fourth.offsetHeight}px` : '';
-    };
-    fit();
-    const observer = new ResizeObserver(fit);
-    observer.observe(list);
-    return () => observer.disconnect();
-  }, [items]);
-  const submit = async event => {
-    event.preventDefault(); setSending(true); setError('');
-    try {
-      const response = await api.post('/public/messages', form);
-      setItems(current => [response.data.data, ...current]); setForm({ name: '', message: '' }); setSent(true);
-    } catch (requestError) { setError(requestError.response?.data?.message || 'Não foi possível enviar o seu recado.'); }
-    finally { setSending(false); }
-  };
-  return <div className="wed-recados">
-    <ScrollReveal as="form" className="wed-card wed-recado-form" onSubmit={submit}>
-      <label className="wed-field"><span>Seu nome</span><input required maxLength="120" value={form.name} onChange={event => { setSent(false); setForm({ ...form, name: event.target.value }); }} placeholder="Como podemos te chamar?" /></label>
-      <label className="wed-field"><span>Seu recado</span><textarea required rows="4" maxLength="800" value={form.message} onChange={event => { setSent(false); setForm({ ...form, message: event.target.value }); }} placeholder="Escreva um carinho para os noivos..." /></label>
-      {error && <p className="wed-form-error">{error}</p>}
-      {sent && !error && <p className="wed-form-ok"><IconCheck size={15} />Recado enviado. Obrigado!</p>}
-      <button className="wed-btn" disabled={sending}><IconMessage size={20} />{sending ? 'Enviando...' : 'Deixar recado'}</button>
-    </ScrollReveal>
-    <ScrollReveal stagger delay={80} className="wed-recado-list" ref={listRef} tabIndex={items.length > RECADOS_VISIVEIS ? 0 : undefined} role="region" aria-label="Recados do mural">
-      {items.length === 0
-        ? <p className="wed-empty">Nenhum recado ainda. Seja o primeiro a escrever!</p>
-        : items.map(item => <blockquote className="wed-card wed-recado" key={item._id}>
-          <p>{item.message}</p>
-          <footer><strong>{item.name}</strong><time>{new Date(item.createdAt).toLocaleDateString('pt-BR')}</time></footer>
-        </blockquote>)}
-    </ScrollReveal>
-  </div>;
-}
-
 // Ao chegar em "Padrinhos" a foto de fundo some e a pagina vira papel, com ramos
 // de oliveira crescendo nas laterais. Volta a foto ao subir de novo.
 function usePaperBackdrop(ready) {
@@ -581,10 +531,10 @@ function Landing() {
 
         {wedding.story && <OurStory story={wedding.story} finalDate={wedding.date.join(' ')} />}
 
-        <section className="wed-sec" id="recados">
+        <section className="wed-sec rc-sec" id="recados">
           <ScrollReveal as="h2" className="wed-sec-title"><OliveGarland seed={105} />Recados<OliveGarland seed={105} flip /></ScrollReveal>
           <ScrollReveal as="p" className="wed-sec-intro" preset="fade" delay={80}>Deixe uma mensagem para os noivos. Ela aparece aqui no mural para todo mundo ver.</ScrollReveal>
-          <Guestbook />
+          <Guestbook api={api} />
         </section>
 
         <section className="wed-sec wed-sec-cta" id="confirmar">

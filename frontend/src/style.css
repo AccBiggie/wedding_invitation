@@ -313,21 +313,6 @@ a.wed-shop-badge:hover{border-color:var(--wed-gold);background:#fffcf3}
 .wed-shop-empty{margin:1.3rem 0 0;padding:1.1rem 0 0;border-top:1px solid #f2ecdf;text-align:center;font-style:italic;font-size:calc(1.05rem * var(--wed-font-scale, 1));color:#8a918b}
 .wed-soon{margin-top:.2rem;font-size:calc(.82rem * var(--wed-font-scale, 1))!important;letter-spacing:.12em;text-transform:uppercase;color:#b3aa96!important}
 
-.wed-recados{display:grid;grid-template-columns:minmax(0,.92fr) minmax(0,1.08fr);gap:1rem;align-items:start}
-.wed-recado-form{display:flex;flex-direction:column;gap:.85rem;padding:1.2rem}
-.wed-field{display:flex;flex-direction:column;gap:.3rem}
-.wed-field>span{font-size:calc(1.02rem * var(--wed-font-scale, 1));color:var(--wed-green)}
-.wed-field input,.wed-field textarea{width:100%;padding:.65rem .8rem;border:1px solid #e6dcc6;border-radius:8px;background:#fffdf9;color:#4a544e;font-family:inherit;font-size:calc(1.05rem * var(--wed-font-scale, 1));resize:vertical}
-.wed-field input:focus,.wed-field textarea:focus{outline:2px solid var(--wed-gold);outline-offset:1px;border-color:var(--wed-gold)}
-.wed-form-error{margin:0;color:#a3423a;font-size:calc(1rem * var(--wed-font-scale, 1))}
-.wed-form-ok{display:flex;align-items:center;gap:.4rem;margin:0;color:#3f6b4d;font-size:calc(1rem * var(--wed-font-scale, 1))}
-.wed-recado-list{position:relative;display:flex;flex-direction:column;gap:.8rem;overflow-y:auto;scrollbar-width:thin;scrollbar-color:var(--wed-gold-soft) transparent;border-radius:var(--wed-radius,10px)}.wed-recado-list:focus-visible{outline:2px solid var(--wed-green);outline-offset:3px}.wed-recado-list:has(> :nth-child(5)){padding-right:.35rem}
-.wed-recado{margin:0;padding:1rem 1.1rem}
-.wed-recado p{margin:0 0 .6rem;font-style:italic;font-size:calc(1.08rem * var(--wed-font-scale, 1));line-height:1.5;overflow-wrap:anywhere}
-.wed-recado footer{display:flex;align-items:baseline;justify-content:space-between;gap:.6rem}
-.wed-recado strong{font-weight:500;color:var(--wed-green)}
-.wed-recado time{flex-shrink:0;font-size:calc(.9rem * var(--wed-font-scale, 1));color:#a6ac9f}
-.wed-empty{margin:0;padding:1.6rem;text-align:center;color:#8a918b}
 
 .wed-sec-cta{margin-bottom:2.6rem}
 .wed-cta{display:flex;flex-direction:column;align-items:center;gap:1rem;max-width:38rem;margin:0 auto;padding:1.7rem;text-align:center}
@@ -402,7 +387,6 @@ a.wed-shop-badge:hover{border-color:var(--wed-gold);background:#fffcf3}
   .wed-carousel-arrow{display:none}
 }
 @media(max-width:860px){
-  .wed-recados{grid-template-columns:minmax(0,1fr)}
   .wed-sec{padding:2.2rem 1.15rem;margin-bottom:1.1rem}
   .wed-lp-sheet{padding:1.1rem .9rem 0}
   .wed-lp-bg img{object-position:50% 22%}

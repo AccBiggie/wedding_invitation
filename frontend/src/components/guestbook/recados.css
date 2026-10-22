@@ -1,0 +1,61 @@
+/* Mural de recados (design system Botânica Aquarela), layout 5 · Bilhetes inclinados:
+   bilhetes girados em duas faixas continuas (a transicao do layout 8) e o formulario ao lado.
+   Responsivo por container: abaixo de 720 px o formulario vai para cima. */
+/* Fundo da secao: #f4ecdc no lugar do creme, tambem no degrade do fundo de papel da landing. */
+.wed-sec.rc-sec { --wed-cream: #f4ecdc; background-color: #f4ecdc; }
+.rc { container-type: inline-size; --tinta: var(--wed-green); color: var(--tinta, #24412f); font-family: var(--wed-font, "Cormorant Garamond", Georgia, serif); }
+.rc * { box-sizing: border-box; }
+.rc p { margin: 0; }
+.rc .ic { width: 20px; height: 20px; fill: none; stroke: currentColor; stroke-width: 1.6; stroke-linecap: round; stroke-linejoin: round; flex: none; }
+
+/* formulario */
+.rc-form { display: flex; flex-direction: column; gap: 8px; padding: 20px; border: 1px solid #ecdfc6; border-radius: 14px; background: #fffdf8; }
+.rc-form label { font-size: 16px; color: var(--tinta, #24412f); }
+.rc-form input, .rc-form textarea { width: 100%; font: inherit; font-size: 17px; padding: 10px 12px; border: 1px solid #e3d3b4; border-radius: 10px; background: #fffefb; color: var(--tinta, #24412f); resize: vertical; }
+.rc-form input:focus-visible, .rc-form textarea:focus-visible { outline: 2px solid #ad8c5c; outline-offset: 1px; }
+.rc-form textarea + .rc-enviar { margin-top: 6px; }
+.rc-enviar { display: inline-flex; align-items: center; justify-content: center; gap: 10px; font: inherit; font-size: 19px; padding: 12px 20px; border: 0; border-radius: 10px; background: var(--tinta, #24412f); color: #faf8f3; cursor: pointer; }
+.rc-enviar .ic { color: #e2c287; }
+.rc-enviar:disabled { opacity: .7; cursor: default; }
+.rc-enviar:focus-visible { outline: 2px solid #ad8c5c; outline-offset: 3px; }
+.rc-aviso { min-height: 1.2em; font-size: 15px; color: #8a6d45; }
+.rc-aviso.is-erro { color: #a33a2a; }
+.rc-conta { align-self: flex-end; margin-top: -4px; font-size: 13px; color: #6b665b; font-variant-numeric: tabular-nums; }
+
+/* bilhete */
+.rc-card { display: flex; flex-direction: column; gap: 14px; justify-content: space-between; padding: 20px 20px 16px; border: 1px solid #ecdfc6; border-radius: 14px; background: #fffdf8; }
+.rc-card .txt { font-size: 19px; line-height: 1.45; font-style: italic; color: #33403a; overflow-wrap: anywhere; }
+.rc-card .pe { display: flex; justify-content: space-between; align-items: baseline; gap: 10px; font-size: 15px; padding-top: 10px; border-top: 1px solid #f0e6d2; }
+.rc-card .pe b { font-weight: 600; color: var(--tinta, #24412f); }
+.rc-card .pe span { flex: none; color: #6b665b; font-variant-numeric: tabular-nums; }
+.rc-card.post { background: #fdf6dd; border-color: #eadca9; transform: rotate(var(--r)); box-shadow: 0 6px 14px rgba(60,50,20,.1); }
+.rc-card.post:focus-visible { outline: 2px solid #ad8c5c; outline-offset: 3px; }
+
+/* 5 · Bilhetes inclinados */
+.rc-5 .lado.inv { display: grid; grid-template-columns: minmax(0, 1fr) 320px; gap: 22px; align-items: center; }
+.rc-5 .faixas { min-width: 0; display: grid; gap: 4px; }
+.rc-5 .faixa { overflow: hidden; padding: 6px 0; mask-image: linear-gradient(90deg, transparent, #000 7%, #000 93%, transparent); -webkit-mask-image: linear-gradient(90deg, transparent, #000 7%, #000 93%, transparent); }
+/* Espaco como margem de cada bilhete (e nao gap + padding): metade da faixa fica igual a uma volta exata, sem pulo de 1 px no recomeco. */
+.rc-5 .faixa-in { display: flex; width: max-content; padding: 4px 0; animation: rc-rola 55s linear infinite; }
+.rc-5 .faixa.b .faixa-in { animation-direction: reverse; animation-duration: 65s; }
+.rc-5 .faixa:hover .faixa-in, .rc-5 .faixa:focus-within .faixa-in { animation-play-state: paused; }
+.rc-5 .rc-card.post { width: 260px; min-height: 0; margin: 8px 18px 8px 0; transition: transform .25s ease; }
+.rc-5 .rc-card.post:hover { transform: rotate(0deg) scale(1.04); z-index: 1; }
+/* sem recados: um bilhete parado, centrado */
+.rc-5 .faixa.vazia { mask-image: none; -webkit-mask-image: none; }
+.rc-5 .faixa.vazia .faixa-in { animation: none; width: auto; justify-content: center; }
+.rc-5 .faixa.vazia .rc-card.post { margin-right: 0; }
+@keyframes rc-rola { to { transform: translateX(-50%); } }
+@media (prefers-reduced-motion: reduce) {
+  .rc-5 .faixa { overflow-x: auto; mask-image: none; -webkit-mask-image: none; }
+  .rc-5 .faixa-in { animation: none; }
+  .rc-5 .faixa-in > [aria-hidden="true"] { display: none; }
+  .rc-5 .rc-card.post { transition: none; }
+}
+
+/* celular */
+@container (max-width: 720px) {
+  .rc-5 .lado.inv { grid-template-columns: 1fr; }
+  .rc-5 .lado.inv .rc-form { order: -1; }
+  .rc-5 .rc-card.post { width: 220px; }
+}
