@@ -407,6 +407,7 @@ function GodparentCard({ couple }) {
   </div>;
 }
 
+const RECADOS_VISIVEIS = 4;
 function Guestbook() {
   const [items, setItems] = useState([]);
   const [form, setForm] = useState({ name: '', message: '' });
@@ -414,6 +415,21 @@ function Guestbook() {
   const [error, setError] = useState('');
   const [sent, setSent] = useState(false);
   useEffect(() => { api.get('/public/messages').then(response => setItems(response.data.data)).catch(() => setItems([])); }, []);
+  // O mural mostra no maximo 4 recados; os demais aparecem rolando a lista. A altura
+  // e medida porque cada recado tem um tamanho (offsetTop ignora a animacao de entrada).
+  const listRef = useRef(null);
+  useLayoutEffect(() => {
+    const list = listRef.current;
+    if (!list) return;
+    const fit = () => {
+      const fourth = list.children[RECADOS_VISIVEIS - 1];
+      list.style.maxHeight = list.children.length > RECADOS_VISIVEIS && fourth ? `${fourth.offsetTop + fourth.offsetHeight}px` : '';
+    };
+    fit();
+    const observer = new ResizeObserver(fit);
+    observer.observe(list);
+    return () => observer.disconnect();
+  }, [items]);
   const submit = async event => {
     event.preventDefault(); setSending(true); setError('');
     try {
@@ -430,7 +446,7 @@ function Guestbook() {
       {sent && !error && <p className="wed-form-ok"><IconCheck size={15} />Recado enviado. Obrigado!</p>}
       <button className="wed-btn" disabled={sending}><IconMessage size={20} />{sending ? 'Enviando...' : 'Deixar recado'}</button>
     </ScrollReveal>
-    <ScrollReveal stagger delay={80} className="wed-recado-list">
+    <ScrollReveal stagger delay={80} className="wed-recado-list" ref={listRef} tabIndex={items.length > RECADOS_VISIVEIS ? 0 : undefined} role="region" aria-label="Recados do mural">
       {items.length === 0
         ? <p className="wed-empty">Nenhum recado ainda. Seja o primeiro a escrever!</p>
         : items.map(item => <blockquote className="wed-card wed-recado" key={item._id}>
