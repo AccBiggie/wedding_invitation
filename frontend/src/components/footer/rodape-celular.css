@@ -1,0 +1,30 @@
+/* Rodape no celular (design system Botanica Aquarela, componente RodapeCelular, layout 10 · Minimo).
+   So abaixo de 720 px; no computador o rodape de sempre continua. Classes .rcm-* (as .rc-* do
+   design system ja sao do mural de recados neste site). */
+.rcm { --rc-bg: #2f3130; --rc-bar: #252726; --rc-txt: #c9c3b6; --rc-suave: #9d978b; --rc-claro: #f2ede2; --rc-ouro: #c9ab78; --rc-linha: rgba(242,237,226,.12);
+  position: relative; z-index: 1; background: var(--rc-bg); color: var(--rc-txt); font-family: var(--wed-font, "Cormorant Garamond", Georgia, serif); text-align: center; }
+.rcm * { box-sizing: border-box; }
+.rcm p { margin: 0; }
+.rcm a { color: inherit; text-decoration: none; }
+.rcm-in { padding: 38px 22px 28px; }
+.rcm-mono { display: flex; justify-content: center; margin: 0 auto 10px; color: var(--rc-ouro); }
+.rcm-mono .wed-monogram svg { width: auto; height: 100%; }
+.rcm-nomes { font-family: "Great Vibes", cursive; font-size: 34px; line-height: 1.1; color: var(--rc-claro); }
+.rcm-data { margin-top: 4px; font-size: 15px; letter-spacing: .14em; text-transform: uppercase; color: var(--rc-ouro); }
+.rcm-data .rcm-hora { text-transform: none; }
+.rcm-botoes { display: flex; justify-content: center; gap: 12px; margin: 22px 0; }
+.rcm-botoes a, .rcm-botoes button { width: 48px; height: 48px; border-radius: 50%; display: grid; place-items: center; padding: 0; cursor: pointer;
+  background: rgba(242,237,226,.07); border: 1px solid var(--rc-linha); color: var(--rc-ouro); transition: background .2s; }
+.rcm-botoes a:hover, .rcm-botoes button:hover { background: rgba(201,171,120,.18); }
+.rcm-botoes svg { width: 18px; height: 18px; fill: none; stroke: currentColor; stroke-width: 1.6; stroke-linecap: round; stroke-linejoin: round; }
+.rcm-menu { display: flex; flex-wrap: wrap; justify-content: center; gap: 4px 18px; font-size: 16px; line-height: 1.6; }
+.rcm-menu a { display: inline-block; padding: 2px 0; }
+.rcm-menu a:hover { color: var(--rc-claro); }
+.rcm-barra { --fx-fundo: var(--rc-bar); background: var(--rc-bar); padding: 16px 22px calc(18px + env(safe-area-inset-bottom, 0px));
+  display: flex; flex-direction: column; align-items: center; gap: 10px; font-size: 14px; color: var(--rc-suave); }
+.rcm-dev { display: inline-flex; align-items: flex-end; gap: 10px; color: var(--rc-suave); fill: var(--rc-claro); }
+.rcm-logo { display: block; width: 104px; line-height: 0; }
+.rcm-logo .logo-fetech { display: block; width: 100%; height: auto; }
+.rcm a:focus-visible, .rcm button:focus-visible { outline: 2px solid var(--rc-ouro); outline-offset: 2px; }
+/* No celular o "voltar ao topo" e o 4o botao redondo do rodape: sem o botao flutuante. */
+@media (max-width: 719.98px) { body .wed-to-top { display: none; } }

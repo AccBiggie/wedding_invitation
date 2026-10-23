@@ -12,6 +12,7 @@ import { NavFlower } from './components/decor/NavFlower';
 import { Ceremony } from './components/ceremony/Ceremony';
 import { Guestbook } from './components/guestbook/Guestbook';
 import './components/footer/rodape.css';
+import './components/footer/rodape-celular.css';
 import { FetechAnimatedLogo } from './components/footer/FetechAnimatedLogo';
 import { appearanceAccent, baseColors, defaultAppearance, fontSizeScale, landingFont, weddingDisplayFonts } from './theme/appearance';
 import monogramSvg from './assets/logo/monograma-sa.svg?raw';
@@ -262,6 +263,55 @@ const FOOTER_ICONS = {
 };
 const FooterIcon = ({ name }) => <svg className="ic" viewBox="0 0 24 24" aria-hidden="true">{FOOTER_ICONS[name]}</svg>;
 
+// Abaixo de 720 px o rodape troca de versao (layout 10 · Minimo do RodapeCelular). So uma
+// versao e renderizada, para haver uma unica instancia do logo FETECH animado.
+const MOBILE_FOOTER = '(max-width: 719.98px)';
+function useMobileFooter() {
+  const [mobile, setMobile] = useState(() => window.matchMedia(MOBILE_FOOTER).matches);
+  useEffect(() => {
+    const query = window.matchMedia(MOBILE_FOOTER), update = () => setMobile(query.matches);
+    query.addEventListener('change', update);
+    return () => query.removeEventListener('change', update);
+  }, []);
+  return mobile;
+}
+
+const MOBILE_ICONS = {
+  whats: <><path d="M3.5 20.5l1.3-4.2A8.5 8.5 0 1 1 8 19.4z" /><path d="M9 8.6c.2 2.6 3.6 6 6.3 6.3l1.2-1.4-2-1.2-.9.8c-1-.4-2.1-1.5-2.6-2.6l.8-.9L10.6 7.6z" /></>,
+  mail: <><rect x="3" y="5.5" width="18" height="13" rx="2" /><path d="M3.5 7l8.5 6 8.5-6" /></>,
+  pin: <><path d="M12 21s-6.5-6-6.5-11a6.5 6.5 0 0 1 13 0c0 5-6.5 11-6.5 11z" /><circle cx="12" cy="10" r="2.3" /></>,
+  up: <path d="M6 14l6-6 6 6" />
+};
+const MobileIcon = ({ name }) => <svg viewBox="0 0 24 24" aria-hidden="true">{MOBILE_ICONS[name]}</svg>;
+
+function MobileFooter({ wedding, sectionHref, go, couple }) {
+  const contact = wedding.contact || {};
+  const address = contact.address || {};
+  const credit = wedding.credit || {};
+  const fullAddress = [address.street?.replace(' · ', ', '), address.city, address.zip && `CEP ${address.zip}`].filter(Boolean).join(', ');
+  const toTop = () => window.scrollTo({ top: 0, behavior: window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth' });
+  return <footer className="rcm wed-foot">
+    <div className="rcm-in">
+      <div className="rcm-mono"><Monogram height={58} /></div>
+      <p className="rcm-nomes">{wedding.couple[0]} &amp; {wedding.couple[1]}</p>
+      <p className="rcm-data">{wedding.date.join(' ')} · <span className="rcm-hora">{wedding.time.join('')}</span></p>
+      <div className="rcm-botoes">
+        {contact.whatsapp && <a href={contact.whatsapp} target="_blank" rel="noopener noreferrer" aria-label={`WhatsApp ${contact.phone || ''}`.trim()}><MobileIcon name="whats" /></a>}
+        {contact.email && <a href={`mailto:${contact.email}`} aria-label={`E-mail ${contact.email}`}><MobileIcon name="mail" /></a>}
+        {wedding.ceremony?.query && <a href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(wedding.ceremony.query)}`} target="_blank" rel="noopener noreferrer" aria-label={`Endereço no mapa: ${fullAddress}`}><MobileIcon name="pin" /></a>}
+        <button type="button" onClick={toTop} aria-label="Voltar ao topo"><MobileIcon name="up" /></button>
+      </div>
+      <nav className="rcm-menu" aria-label="Menu do rodapé">{NAV.slice(1).filter(item => !item.action).map(item => <a key={item.id} href={sectionHref(item.id)} onClick={go(item.id)}>{item.label}</a>)}</nav>
+    </div>
+    <div className="rcm-barra">
+      <span>© {new Date().getFullYear()} {couple}. Todos os direitos reservados.</span>
+      {credit.url
+        ? <a className="rcm-dev" href={credit.url} target="_blank" rel="noopener noreferrer" aria-label={`${credit.name || 'FETECH'}, desenvolvedor do site`}><span aria-hidden="true">desenvolvido por</span><span className="rcm-logo"><FetechAnimatedLogo /></span></a>
+        : <span className="rcm-dev"><span>desenvolvido por</span><span className="rcm-logo"><FetechAnimatedLogo /></span></span>}
+    </div>
+  </footer>;
+}
+
 function SiteFooter({ wedding, onLanding }) {
   const contact = wedding.contact || {};
   const address = contact.address || {};
@@ -270,6 +320,8 @@ function SiteFooter({ wedding, onLanding }) {
   const sectionHref = id => onLanding ? `#${id}` : `/casamento#${id}`;
   const go = id => onLanding ? event => scrollToSection(event, id) : undefined;
   const couple = `${wedding.couple[0]} & ${wedding.couple[1]}`;
+  const mobile = useMobileFooter();
+  if (mobile) return <MobileFooter wedding={wedding} sectionHref={sectionHref} go={go} couple={couple} />;
   return <footer className="rd wed-foot">
       <div className="lim grade">
         <div className="col sobre">
