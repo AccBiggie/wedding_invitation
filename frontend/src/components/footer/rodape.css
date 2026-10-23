@@ -42,9 +42,13 @@
 .rd .barra-final { font-size: 15px; }
 .rd .marca .wed-monogram { color: var(--rd-ac); }
 .rd .marca .wed-monogram svg { height: 100%; width: auto; }
-.rd .credito { display: inline-flex; align-items: center; gap: 10px; }
-.rd .credito svg { display: block; color: var(--rd-tit); }
-.rd .barra-final a.credito:hover svg { color: var(--rd-ac); }
+/* Logo FETECH animado: letras e bonecos herdam o fill; --fx-fundo e a cor da barra final
+   (contornozinho dos bonecos). O viewBox sobra em cima para a cabeca dela: alinhar pela base. */
+.rd .credito { display: inline-flex; align-items: flex-end; gap: 10px; fill: var(--rd-tit); --fx-fundo: var(--rd-bg2); }
+.rd .barra-final a.credito:hover { fill: var(--rd-ac); }
+.rd .logo-fetech-host { display: block; line-height: 0; }
+.rd .credito .logo-fetech { display: block; width: 120px; height: auto; }
+@container (max-width: 600px) { .rd .credito .logo-fetech { width: 104px; } }
 /* .wed-foot (style.css) mantem o rodape acima do fundo fixo; as cores sao as do layout. */
 .rd.wed-foot { background: var(--rd-bg); color: var(--rd-tx); }
 .wed[data-wed-dark=true] .rd { --rd-bg: #161817; --rd-bg2: #0e0f0e; --rd-chip: #2a2c2b; }
