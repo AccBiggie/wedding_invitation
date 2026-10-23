@@ -6,11 +6,12 @@ import { PublicGodparents, PublicGifts, PublicStoreCategories } from './pages/Pu
 import { GravataDialog, PixQrDialog, usePixStatus } from './pages/Pix/GravataEntry';
 import { ScrollReveal } from './components/reveal/ScrollReveal';
 import { OurStory } from './components/story/OurStory';
-import { OliveGarland, OliveSprig, OliveVine } from './components/decor/Olive';
+import { OliveGarland, OliveVine } from './components/decor/Olive';
 import { ChurchSketch } from './components/decor/ChurchSketch';
 import { NavFlower } from './components/decor/NavFlower';
 import { Ceremony } from './components/ceremony/Ceremony';
 import { Guestbook } from './components/guestbook/Guestbook';
+import { InvitationPage } from './components/invitation/InvitationPage';
 import './components/footer/rodape.css';
 import './components/footer/rodape-celular.css';
 import { FetechAnimatedLogo } from './components/footer/FetechAnimatedLogo';
@@ -23,13 +24,6 @@ const AdminApp = React.lazy(() => import('./routes/AdminApp').then(module => ({ 
 const StoreCategoryContent = React.lazy(() => import('./pages/StoreCategory/StoreCategoryContent').then(module => ({ default: module.StoreCategoryContent })));
 
 const slug = value => value.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase().trim().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
-
-function Toast({ notification, onClose }) {
-  if (!notification) return null;
-  return <div className={`alert alert-${notification.type} position-fixed top-0 end-0 m-3 shadow`} style={{ zIndex: 2000, minWidth: 300 }} role="alert">
-    {notification.message}<button className="btn-close float-end" onClick={onClose} />
-  </div>;
-}
 
 function Login({ onSuccess }) {
   const [form, setForm] = useState({ email: '', password: '' });
@@ -102,11 +96,7 @@ function usePublicAppearance(wedding) {
 const Svg = ({ children, size = 24, viewBox = '0 0 24 24', ...props }) => <svg width={size} height={size} viewBox={viewBox} fill="none" stroke="currentColor" strokeWidth="1.3" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true" {...props}>{children}</svg>;
 // Monograma S&A do casal (logo da landing). Herda a cor do texto (currentColor).
 const Monogram = ({ height = 28, className = '' }) => <span className={`wed-monogram ${className}`} style={{ height, width: Math.round(height * 1536 / 1926) }} aria-hidden="true" dangerouslySetInnerHTML={{ __html: monogramSvg }} />;
-const IconCalendar = props => <Svg {...props}><path d="M4 7a2 2 0 0 1 2 -2h12a2 2 0 0 1 2 2v12a2 2 0 0 1 -2 2h-12a2 2 0 0 1 -2 -2z" /><path d="M16 3v4M8 3v4M4 11h16M8 15h2v2h-2z" /></Svg>;
-const IconMapPin = props => <Svg {...props}><path d="M12 11m-3 0a3 3 0 1 0 6 0a3 3 0 1 0 -6 0" /><path d="M17.657 16.657l-4.243 4.243a2 2 0 0 1 -2.827 0l-4.244 -4.243a8 8 0 1 1 11.314 0z" /></Svg>;
 const IconHeart = props => <Svg {...props} fill="currentColor" strokeWidth="0"><path d="M19.5 12.572l-7.5 7.428l-7.5 -7.428a5 5 0 1 1 7.5 -6.566a5 5 0 1 1 7.5 6.566z" /></Svg>;
-const IconCheck = props => <Svg {...props} strokeWidth="2.4"><path d="M5 12l5 5l10 -10" /></Svg>;
-const IconPhotoOff = props => <Svg {...props}><path d="M15 8h.01" /><path d="M6 3h12a3 3 0 0 1 3 3v12a3 3 0 0 1 -3 3h-12a3 3 0 0 1 -3 -3v-12a3 3 0 0 1 3 -3z" /><path d="M4 15l4 -4c.9 -.9 2 -.9 2.9 0l5.1 5" /><path d="M14 14l1 -1c.9 -.9 2 -.9 2.9 0l3.1 3" /><path d="M3 3l18 18" /></Svg>;
 const IconGift = props => <Svg {...props}><path d="M3 8m0 1a1 1 0 0 1 1 -1h16a1 1 0 0 1 1 1v2a1 1 0 0 1 -1 1h-16a1 1 0 0 1 -1 -1z" /><path d="M12 8l0 13" /><path d="M19 12v7a2 2 0 0 1 -2 2h-10a2 2 0 0 1 -2 -2v-7" /><path d="M7.5 8a2.5 2.5 0 0 1 0 -5a4.8 8 0 0 1 4.5 5a4.8 8 0 0 1 4.5 -5a2.5 2.5 0 0 1 0 5" /></Svg>;
 const IconMenu = props => <Svg {...props} strokeWidth="1.8"><path d="M4 6h16M4 12h16M4 18h16" /></Svg>;
 const IconClose = props => <Svg {...props} strokeWidth="1.8"><path d="M18 6l-12 12M6 6l12 12" /></Svg>;
@@ -116,23 +106,6 @@ const IconChevronLeft = props => <Svg {...props} strokeWidth="1.8"><path d="M15 
 const IconChevronRight = props => <Svg {...props} strokeWidth="1.8"><path d="M9 6l6 6l-6 6" /></Svg>;
 const IconChevronUp = props => <Svg {...props} strokeWidth="1.8"><path d="M6 15l6 -6l6 6" /></Svg>;
 
-const LEAF = 'M0 0c9 -3.6 16.5 -1.2 20.5 7c-9.3 3.6 -16.6 1.2 -20.5 -7z';
-// Raminho de oliveira dos titulos (mesmo tema da secao "Nossa historia").
-const Sprig = ({ flip }) => <OliveSprig flip={flip} />;
-const Branch = ({ className }) => <svg className={className} viewBox="0 0 110 320" fill="none" stroke="currentColor" strokeWidth="1.1" strokeLinecap="round" preserveAspectRatio="xMidYMid meet" aria-hidden="true">
-  <path d="M12 316c24 -48 40 -102 46 -158c5 -50 0 -102 -14 -152" />
-  {[[62, 106, -42], [58, 150, -26], [55, 196, -10], [50, 244, 8], [46, 62, -54]].map(([x, y, angle]) => <g key={`${x}-${y}`}>
-    <path d={LEAF} transform={`translate(${x} ${y}) rotate(${angle})`} /><path d={LEAF} transform={`translate(${x} ${y}) rotate(${180 - angle})`} />
-  </g>)}
-  <path d="M44 12m-5 0a5 5 0 1 0 10 0a5 5 0 1 0 -10 0" /><path d="M30 34m-3.5 0a3.5 3.5 0 1 0 7 0a3.5 3.5 0 1 0 -7 0" />
-</svg>;
-const Flourish = ({ className }) => <svg className={className} viewBox="0 0 240 60" fill="none" stroke="currentColor" strokeWidth="1.1" strokeLinecap="round" preserveAspectRatio="xMidYMid meet" aria-hidden="true">
-  <path d="M4 54c46 0 92 -8 130 -26c34 -16 70 -22 102 -20" />
-  {[[40, 50, 200], [78, 45, 210], [116, 35, 220], [154, 24, 235], [192, 16, 250]].map(([x, y, angle]) => <g key={`${x}-${y}`}>
-    <path d={LEAF} transform={`translate(${x} ${y}) rotate(${angle})`} /><path d={LEAF} transform={`translate(${x} ${y}) rotate(${angle - 110})`} />
-  </g>)}
-  <path d="M120 26m-5 0a5 5 0 1 0 10 0a5 5 0 1 0 -10 0" /><path d="M62 44m-3.5 0a3.5 3.5 0 1 0 7 0a3.5 3.5 0 1 0 -7 0" /><path d="M198 12m-4 0a4 4 0 1 0 8 0a4 4 0 1 0 -8 0" />
-</svg>;
 const MapArt = () => <svg className="wed-map-art" viewBox="0 0 400 190" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
   <rect width="400" height="190" fill="#f1efe6" />
   <g fill="#dde7d7"><rect x="12" y="18" width="92" height="50" rx="6" /><rect x="298" y="112" width="90" height="62" rx="6" /><rect x="146" y="140" width="72" height="42" rx="6" /><rect x="286" y="10" width="60" height="34" rx="6" /></g>
@@ -661,9 +634,7 @@ function Public() {
   const [, kind, id, name] = location.pathname.split('/');
   const byCode = kind === 'convite';
   const wedding = useWedding();
-  const [item, setItem] = useState(); const [error, setError] = useState(false); const [confirming, setConfirming] = useState(false); const [notification, setNotification] = useState(null); const [selectedGuestIds, setSelectedGuestIds] = useState([]); const [photoFailed, setPhotoFailed] = useState(false);
-  const notify = (type, message) => setNotification({ type, message });
-  useEffect(() => { if (!notification) return; const timer = setTimeout(() => setNotification(null), 4500); return () => clearTimeout(timer); }, [notification]);
+  const [item, setItem] = useState(); const [error, setError] = useState(false); const [confirming, setConfirming] = useState(false); const [status, setStatus] = useState(null); const [selectedGuestIds, setSelectedGuestIds] = useState([]);
   useEffect(() => {
     const request = byCode ? api.get('/public/invitations/code/' + encodeURIComponent(id || '')) : api.get('/public/invitations/' + id + '/' + name, { params: { token: new URLSearchParams(location.search).get('token') } });
     request.then(response => setItem(response.data.data)).catch(() => setError(true));
@@ -671,53 +642,31 @@ function Public() {
   useEffect(() => { if (item?.guests) setSelectedGuestIds(item.guests.filter(guest => guest.confirmed).map(guest => String(guest._id))); }, [item?._id]);
   // Convite valido: guarda o caminho para a landing saber a qual convite voltar.
   useEffect(() => { if (item) inviteStore.set(location.pathname + location.search); }, [item?._id]);
-  const confirm = async () => { setConfirming(true); try { const response = await api.post('/public/invitations/' + item._id + '/confirm', { guestIds: selectedGuestIds }); setItem(response.data.data); notify('success', response.data.message); } catch { notify('danger', 'N\u00e3o foi poss\u00edvel confirmar a presen\u00e7a.'); } finally { setConfirming(false); } };
+  const confirm = async () => {
+    setConfirming(true); setStatus(null);
+    try {
+      const response = await api.post('/public/invitations/' + item._id + '/confirm', { guestIds: selectedGuestIds });
+      setItem(response.data.data);
+      setStatus({ error: false, text: 'Confirmação atualizada! Obrigado, estamos ansiosos para ver vocês.' });
+    } catch { setStatus({ error: true, text: 'Não foi possível atualizar a confirmação. Tente de novo em instantes.' }); }
+    finally { setConfirming(false); }
+  };
   if (error) return <WeddingShell wedding={wedding}><div className="wed-state wed-state-missing">
     <strong>Não encontramos este convite</strong>
     <p>Confira se o link está completo ou aponte a câmera de novo para o QR code do convite. Se continuar assim, fale com os noivos pelo contato no rodapé.</p>
     <a className="wed-btn" href="/casamento">Ver o site do casamento</a>
   </div></WeddingShell>;
   if (!item || !wedding) return <WeddingShell><div className="wed-state">Carregando...</div></WeddingShell>;
-  const toggleGuest = guestId => setSelectedGuestIds(current => current.includes(guestId) ? current.filter(idValue => idValue !== guestId) : [...current, guestId]);
+  const toggleGuest = guestId => {
+    setStatus(null);
+    setSelectedGuestIds(current => current.includes(guestId) ? current.filter(idValue => idValue !== guestId) : [...current, guestId]);
+  };
   const guests = item.guests || [];
   const deadline = item.confirmationDeadline ? new Date(item.confirmationDeadline).toLocaleDateString('pt-BR', { timeZone: 'UTC' }) : null;
   return <WeddingShell wedding={wedding}>
-    <Toast notification={notification} onClose={() => setNotification(null)} />
-    <div className="wed-main">
-      <section className="wed-hero">
-        <Branch className="wed-branch wed-branch-start" /><Branch className="wed-branch wed-branch-end" />
-        <div className="wed-hero-photo">
-          {photoFailed
-            ? <div className="wed-photo-empty"><IconPhotoOff size={56} /><span>Imagem do casal</span></div>
-            : <img src={wedding.photo} alt={`${wedding.couple[0]} e ${wedding.couple[1]}`} onError={() => setPhotoFailed(true)} />}
-        </div>
-        <div className="wed-hero-content">
-          <h1 className="wed-names">{wedding.couple[0]} <span className="wed-amp">&amp;</span> {wedding.couple[1]}</h1>
-          <div className="wed-rule"><i /><IconHeart size={14} /><i /></div>
-          <p className="wed-verse">{wedding.verse}</p>
-        </div>
-      </section>
-      <section className="wed-panel wed-panel-confirm" id="confirmar">
-        <div className="wed-card">
-          <h2 className="wed-card-title wed-card-title-start"><Sprig />{'Selecione as pessoas que confirmam presença:'}</h2>
-          <div className="wed-guests">{guests.map(guest => <label className="wed-guest" key={guest._id}>
-            <input type="checkbox" checked={selectedGuestIds.includes(String(guest._id))} onChange={() => toggleGuest(String(guest._id))} />
-            <span className="wed-check"><IconCheck size={13} /></span><span className="wed-guest-name">{guest.name}</span>
-            {guest.confirmed && <span className="wed-badge"><IconCheck size={12} />Confirmado</span>}
-          </label>)}</div>
-          <button className="wed-btn" disabled={confirming} onClick={confirm}><IconHeart size={20} />{confirming ? 'Atualizando...' : 'Atualizar confirmação'}</button>
-        </div>
-        {deadline && <div className="wed-card wed-deadline">
-          <span className="wed-deadline-icon"><IconCalendar size={22} /></span>
-          <p>{'Confirme sua presença até '}{deadline}</p><Flourish className="wed-flourish" />
-        </div>}
-        <a className="wed-card wed-info-link wed-details" href="/casamento">
-          <span className="wed-details-icon"><IconMapPin size={26} /></span>
-          <span className="wed-details-text"><strong>{'Data, horário, local e lista de presentes'}</strong><span>Veja todos os detalhes do casamento</span></span>
-          <span className="wed-info-hint">abrir</span>
-        </a>
-      </section>
-    </div>
+    <main className="pc-main">
+      <InvitationPage wedding={wedding} guests={guests} selected={selectedGuestIds} onToggle={toggleGuest} onConfirm={confirm} confirming={confirming} status={status} deadline={deadline} />
+    </main>
   </WeddingShell>;
 }
 

@@ -1,0 +1,52 @@
+/* Pagina do convite (design system Botanica Aquarela, componente PaginaConvite, layout 9 ·
+   Detalhes em blocos). Mesmas medidas e cores da referencia, com tudo sob .cv9: os nomes
+   genericos (.ic, .lista, .bt, .ok, .tile) afetariam outros blocos do site. */
+.cv9 { --papel-claro: #fbf8f0; --branco: #fffdf8; --tinta: #24412f; --tinta-suave: #5f665f; --ouro: #ad8c5c; --ouro-claro: #c9ab78;
+  --verde: #24412f; --verde-claro: #e3ebdf; --linha: #e6dcc8;
+  --font-serifa: "Cormorant Garamond", Georgia, serif; --f-ui: "Jost", "Helvetica Neue", Arial, sans-serif; --f-cal: "Great Vibes", cursive;
+  font-family: var(--font-serifa); color: var(--tinta); font-size: 18px; line-height: 1.45; }
+.cv9, .cv9 * { box-sizing: border-box; }
+.cv9 button { font-family: inherit; }
+.cv9 p { margin: 0; }
+.cv9 .nm { font-family: var(--f-cal); font-weight: 400; line-height: 1; color: var(--verde); margin: 0; }
+.cv9 .nm em { font-style: normal; color: var(--ouro-claro); }
+.cv9 .bencao { font-style: italic; color: var(--tinta-suave); }
+.cv9 .prazo { font-size: 16px; color: var(--tinta-suave); }
+.cv9 .lista { border: 1px solid var(--linha); border-radius: 14px; background: var(--branco); overflow: hidden; }
+.cv9 .lista label { position: relative; display: flex; align-items: center; gap: 14px; padding: 14px 16px; border-top: 1px solid var(--linha); cursor: pointer; min-height: 54px; }
+.cv9 .lista label:first-child { border-top: 0; }
+.cv9 .lista input { position: absolute; opacity: 0; width: 1px; height: 1px; }
+.cv9 .lista .cx { width: 22px; height: 22px; border-radius: 6px; border: 1.5px solid #bcb29c; display: grid; place-items: center; flex: none; transition: .2s; }
+.cv9 .lista .cx svg { width: 14px; height: 14px; stroke: #fff; fill: none; stroke-width: 2.6; opacity: 0; }
+.cv9 .lista input:checked + .cx { background: var(--verde); border-color: var(--verde); }
+.cv9 .lista input:checked + .cx svg { opacity: 1; }
+.cv9 .lista .nome { flex: 1; min-width: 0; font-size: 19px; overflow-wrap: anywhere; }
+.cv9 .selo { font-family: var(--f-ui); font-size: 12.5px; padding: 4px 10px; border-radius: 999px; background: var(--verde-claro); color: var(--verde); white-space: nowrap; }
+.cv9 .bt { display: flex; align-items: center; justify-content: center; gap: 10px; width: 100%; min-height: 56px; border: 0; border-radius: 12px; background: var(--verde); color: var(--papel-claro); font-size: 21px; cursor: pointer; transition: transform .15s, background .2s; }
+.cv9 .bt:hover { background: #1b3424; } .cv9 .bt:active { transform: scale(.99); }
+.cv9 .bt .co { color: var(--ouro-claro); }
+.cv9 .bt[disabled] { opacity: .7; cursor: wait; }
+.cv9 .ok { display: none; align-items: center; gap: 10px; padding: 12px 14px; border-radius: 12px; background: var(--verde-claro); color: var(--verde); font-size: 17px; }
+.cv9 .ok.on { display: flex; animation: cv9-aparece .35s ease; }
+.cv9 .ok.erro { background: #f6e3df; color: #8a2f22; }
+@keyframes cv9-aparece { from { opacity: 0; transform: translateY(6px); } }
+.cv9 .ic { width: 22px; height: 22px; flex: none; fill: none; stroke: var(--ouro); stroke-width: 1.6; stroke-linecap: round; stroke-linejoin: round; }
+.cv9 .hero { display: grid; grid-template-columns: 1.1fr 1fr; gap: 0; }
+.cv9 .hero .foto { position: relative; min-height: 340px; background: #dfe6d2 center / cover no-repeat; }
+.cv9 .hero .lado { padding: 30px 28px; display: grid; gap: 14px; align-content: center; background: var(--branco); scroll-margin-top: 6rem; }
+.cv9 .nm { font-size: 54px; }
+.cv9 .tiles { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; padding: 22px 28px 32px; }
+.cv9 .tile { background: var(--branco); border: 1px solid var(--linha); border-radius: 16px; padding: 16px; display: grid; gap: 4px; align-content: start; text-decoration: none; color: inherit; }
+.cv9 a.tile:hover { border-color: var(--ouro-claro); }
+.cv9 .tile .ic { margin-bottom: 4px; }
+.cv9 .tile b { font-weight: 600; font-size: 18px; } .cv9 .tile span { font-size: 15px; color: var(--tinta-suave); }
+.cv9 a.tile:focus-visible, .cv9 .bt:focus-visible, .cv9 .lista label:focus-within { outline: 2px solid #24412f; outline-offset: 2px; }
+@media (max-width: 760px) {
+  .cv9 .hero { grid-template-columns: 1fr; } .cv9 .hero .foto { min-height: 240px; }
+  .cv9 .tiles { grid-template-columns: 1fr 1fr; padding: 16px; } .cv9 .hero .lado { padding: 22px 16px; } .cv9 .nm { font-size: 44px; }
+}
+@media (prefers-reduced-motion: reduce) { .cv9 .ok.on { animation: none; } .cv9 .bt { transition: none; } }
+
+/* No site: a pagina ocupa a area entre a navbar e o rodape, centrada, com o papel claro de fundo. */
+.wed-invitation .pc-main { flex: 1; background: var(--papel-claro, #fbf8f0); }
+.wed-invitation .pc-main .cv9 { max-width: 1080px; margin: 0 auto; background: #fbf8f0; }
