@@ -4,27 +4,10 @@ body{background:#f5f7fb}
 .wed-topbar{display:flex;align-items:center;padding:.8rem 1.6rem;background:#fdfbf5;border-bottom:1px solid var(--wed-gold-soft)}
 .wed-brand{display:flex;align-items:center;gap:.7rem;font-size:calc(1.4rem * var(--wed-font-scale, 1));letter-spacing:.01em;color:var(--wed-green)}
 .wed-brand svg{color:var(--wed-gold)}
-.wed-main{flex:1;display:grid;grid-template-columns:minmax(0,.66fr) minmax(0,1fr)}
 
-.wed-hero{position:relative;overflow:hidden;min-height:460px;display:flex;flex-direction:column;justify-content:flex-end;background:linear-gradient(180deg,#f2eee3,var(--wed-cream) 76%);border-right:1px solid var(--wed-gold-soft)}
-.wed-hero::after{content:'';position:absolute;left:0;right:0;bottom:0;height:58%;background:linear-gradient(180deg,rgba(251,248,241,0),var(--wed-cream) 68%)}
-.wed-hero-photo{position:absolute;inset:0;display:flex;align-items:center;justify-content:center}
-.wed-hero-photo img{width:100%;height:100%;object-fit:cover;object-position:50% 32%;filter:saturate(.92)}
-.wed-hero-photo::after{content:'';position:absolute;inset:0;background:linear-gradient(180deg,rgba(251,248,241,.2),rgba(251,248,241,.04))}
-.wed-photo-empty{display:flex;flex-direction:column;align-items:center;gap:.7rem;margin-bottom:34%;color:#b7b0a0}
-.wed-photo-empty span{font-size:calc(.95rem * var(--wed-font-scale, 1));letter-spacing:.14em;text-transform:uppercase}
-.wed-branch{position:absolute;color:var(--wed-gold);opacity:.45;pointer-events:none}
-.wed-branch-start{left:-14px;top:12%;width:78px;height:56%}
-.wed-branch-end{right:-26px;top:4%;width:62px;height:40%;transform:scaleX(-1)}
-.wed-hero-content{position:relative;z-index:1;padding:0 2rem 3.2rem;text-align:center}
 .wed-names{margin:0;font-weight:500;line-height:1.05;color:var(--wed-green);font-size:calc(clamp(2.2rem,4.6vw,4.6rem) * var(--wed-font-scale, 1))}
 .wed-amp{color:var(--wed-gold);font-style:italic}
-.wed-rule{display:flex;align-items:center;justify-content:center;gap:.8rem;margin:1.1rem 0 1.2rem;color:var(--wed-gold)}
-.wed-rule i{display:block;height:1px;width:clamp(48px,9vw,120px);background:linear-gradient(90deg,transparent,var(--wed-gold))}
-.wed-rule i:last-child{transform:scaleX(-1)}
-.wed-verse{margin:0 auto;max-width:26rem;font-style:italic;font-size:calc(1.15rem * var(--wed-font-scale, 1));line-height:1.55;color:#5d6761}
 
-.wed-panel{display:flex;flex-direction:column;gap:1.1rem;padding:1.6rem}
 .wed-info-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:1rem}
 .wed-card,.wed-info{background:var(--wed-card);border:1px solid var(--wed-gold-soft);border-radius:10px}
 .wed-info{padding:1.1rem .8rem;text-align:center}
@@ -39,22 +22,7 @@ body{background:#f5f7fb}
 .wed-info-value span{display:block;font-size:calc(1.02rem * var(--wed-font-scale, 1));line-height:1.35;color:#6c756f}
 .wed-cols{display:grid;grid-template-columns:minmax(0,1.12fr) minmax(0,.88fr);gap:1rem}
 .wed-card{padding:1.1rem}
-.wed-card-title{display:flex;align-items:center;justify-content:center;gap:.6rem;margin:0 0 .9rem;font-size:calc(1.25rem * var(--wed-font-scale, 1));font-weight:500;color:var(--wed-green)}
-.wed-card-title-start{justify-content:flex-start}
-.wed-card-title svg{color:var(--wed-gold);flex-shrink:0}
 
-.wed-guests{display:flex;flex-direction:column;margin-bottom:1rem;border:1px solid #f0e8d8;border-radius:8px;overflow:hidden}
-.wed-guest{position:relative;display:flex;align-items:center;gap:.85rem;padding:.72rem .9rem;font-size:calc(1.12rem * var(--wed-font-scale, 1));color:#4a544e;cursor:pointer;border-bottom:1px solid #f2ecdf}
-.wed-guest-name{flex:1;min-width:0;overflow-wrap:anywhere}
-.wed-guest:last-child{border-bottom:0}
-.wed-guest:hover{background:#fdfaf2}
-.wed-guest input{position:absolute;width:0;height:0;opacity:0;pointer-events:none}
-.wed-check{display:flex;align-items:center;justify-content:center;flex-shrink:0;width:21px;height:21px;border:1.5px solid #cec6b1;border-radius:4px;color:#fff;transition:background .15s,border-color .15s}
-.wed-check svg{opacity:0}
-.wed-guest input:checked+.wed-check{background:var(--wed-green);border-color:var(--wed-green)}
-.wed-guest input:checked+.wed-check svg{opacity:1}
-.wed-guest input:focus-visible+.wed-check{outline:2px solid var(--wed-gold);outline-offset:2px}
-.wed-badge{display:inline-flex;align-items:center;gap:.3rem;flex-shrink:0;padding:.16rem .7rem;border-radius:999px;background:#e9f1e4;color:#3f6b4d;font-size:calc(.98rem * var(--wed-font-scale, 1));white-space:nowrap}
 .wed-btn{display:flex;align-items:center;justify-content:center;gap:.6rem;width:100%;padding:.85rem 1rem;border:0;border-radius:8px;background:var(--wed-green);color:#fdfaf2;font-family:inherit;font-size:calc(1.28rem * var(--wed-font-scale, 1));cursor:pointer;transition:background .15s}
 .wed-btn:hover:not(:disabled){background:var(--wed-green-dark)}
 .wed-btn:disabled{opacity:.7;cursor:default}
@@ -71,10 +39,6 @@ body{background:#f5f7fb}
 .wed-map-foot strong{display:block;font-weight:500;font-size:calc(1.05rem * var(--wed-font-scale, 1));color:var(--wed-green)}
 .wed-map-foot span{font-size:calc(.98rem * var(--wed-font-scale, 1));color:#78817b}
 
-.wed-deadline{position:relative;display:flex;align-items:center;gap:.9rem;overflow:hidden}
-.wed-deadline-icon{display:flex;align-items:center;justify-content:center;flex-shrink:0;width:44px;height:44px;border-radius:8px;background:#c9a961;color:#fffdf9}
-.wed-deadline p{margin:0;font-size:calc(1.22rem * var(--wed-font-scale, 1));color:var(--wed-green)}
-.wed-flourish{position:absolute;right:.6rem;bottom:0;width:200px;height:52px;color:var(--wed-gold);opacity:.5;pointer-events:none}
 
 .wed-footer{display:flex;align-items:center;justify-content:center;gap:1rem;padding:.9rem;background:var(--wed-green)}
 .wed-footer i{display:block;height:1px;width:clamp(70px,18vw,200px);background:linear-gradient(90deg,transparent,var(--wed-gold))}
@@ -88,55 +52,36 @@ body{background:#f5f7fb}
 /* Uma coluna: o heroi passa a ocupar a largura toda, entao os nomes deixam de
    escalar pela largura da coluna e precisam de outra referencia de vw. */
 @media(max-width:860px){
-  .wed-main{grid-template-columns:minmax(0,1fr)}
-  .wed-hero{min-height:440px;border-right:0;border-bottom:1px solid var(--wed-gold-soft)}
-  .wed-hero-content{padding:0 1.25rem 2.2rem}
   .wed-names{font-size:calc(clamp(2.1rem,10vw,3.6rem) * var(--wed-font-scale, 1))}
-  .wed-verse{font-size:calc(1.08rem * var(--wed-font-scale, 1));max-width:32rem}
-  .wed-panel{padding:1.1rem;gap:.9rem}
 }
 
 /* Celular em pe. */
 @media(max-width:560px){
   .wed-topbar{padding:.7rem 1rem}
   .wed-brand{font-size:calc(1.25rem * var(--wed-font-scale, 1));gap:.55rem}
-  .wed-branch-start{width:56px}
-  .wed-branch-end{width:46px}
   .wed-info{padding:.85rem .6rem}
   .wed-info-icon{margin-bottom:.4rem}
   .wed-info-label{font-size:calc(1.08rem * var(--wed-font-scale, 1))}
   .wed-info-value span{font-size:calc(.95rem * var(--wed-font-scale, 1))}
   .wed-info-hint{font-size:calc(.8rem * var(--wed-font-scale, 1));margin-top:.35rem}
   .wed-card{padding:.9rem}
-  .wed-card-title{align-items:flex-start;font-size:calc(1.12rem * var(--wed-font-scale, 1));margin-bottom:.75rem}
-  .wed-card-title svg{margin-top:.15rem}
-  .wed-guest{font-size:calc(1.05rem * var(--wed-font-scale, 1));padding:.7rem}
-  .wed-badge{padding:.14rem .55rem;font-size:calc(.9rem * var(--wed-font-scale, 1))}
   .wed-btn{font-size:calc(1.15rem * var(--wed-font-scale, 1));padding:.8rem 1rem}
   .wed-map-canvas{height:200px}
-  .wed-deadline p{font-size:calc(1.1rem * var(--wed-font-scale, 1))}
-  .wed-flourish{display:none}
   .wed-state{font-size:calc(1.25rem * var(--wed-font-scale, 1));padding:3rem 1rem}
 }
 
 /* Celulares estreitos (iPhone SE, Galaxy A0x: 320-380px). */
 @media(max-width:380px){
-  .wed-panel{padding:.85rem;gap:.8rem}
   .wed-info-grid{gap:.7rem}
   .wed-info-label{font-size:calc(1rem * var(--wed-font-scale, 1))}
   .wed-info-value span{font-size:calc(.9rem * var(--wed-font-scale, 1))}
   .wed-cols{gap:.8rem}
-  .wed-hero{min-height:400px}
-  .wed-guest{gap:.6rem;font-size:calc(1rem * var(--wed-font-scale, 1));padding:.65rem .6rem}
-  .wed-badge{font-size:calc(.85rem * var(--wed-font-scale, 1))}
   .wed-map-foot span{font-size:calc(.9rem * var(--wed-font-scale, 1))}
 }
 
 /* Celular deitado: o heroi nao pode comer a tela inteira. */
 @media(max-width:860px) and (max-height:520px){
-  .wed-hero{min-height:300px}
   .wed-names{font-size:calc(clamp(2rem,7vw,3rem) * var(--wed-font-scale, 1))}
-  .wed-hero-content{padding-bottom:1.5rem}
 }
 
 /* Touch: mapa vira previa clicavel — evita que o dedo role o mapa em vez da
@@ -149,13 +94,6 @@ body{background:#f5f7fb}
 /* ==========================================================================
    Tela de confirmacao (link pessoal) — so a acao de confirmar presenca.
    ========================================================================== */
-.wed-panel-confirm{justify-content:center}
-.wed-details{display:flex;align-items:center;gap:.9rem;padding:1rem 1.1rem;text-decoration:none;color:inherit}
-.wed-details-icon{flex-shrink:0;color:var(--wed-gold)}
-.wed-details-text{flex:1;min-width:0;display:flex;flex-direction:column}
-.wed-details-text strong{font-weight:500;font-size:calc(1.12rem * var(--wed-font-scale, 1));color:var(--wed-green)}
-.wed-details-text span{font-size:calc(1rem * var(--wed-font-scale, 1));color:#78817b}
-.wed-details .wed-info-hint{flex-shrink:0;margin-top:0}
 
 /* ==========================================================================
    Landing page (/casamento)
@@ -233,6 +171,14 @@ body{background:#f5f7fb}
 .wed-carousel-arrow{position:absolute;top:50%;z-index:2;display:flex;align-items:center;justify-content:center;width:42px;height:42px;margin-top:-1.4rem;transform:translateY(-50%);border:1px solid var(--wed-gold-soft);border-radius:50%;background:var(--wed-card);color:var(--wed-green);cursor:pointer;box-shadow:0 4px 14px rgba(0,0,0,.14);transition:background .15s,color .15s,border-color .15s,opacity .15s}
 .wed-carousel-arrow:hover:not(:disabled){background:var(--wed-green);border-color:var(--wed-green);color:#fdfaf2}
 .wed-carousel-arrow:disabled{opacity:.3;cursor:default}
+.wed-to-top{position:fixed;right:max(1.5rem,env(safe-area-inset-right));bottom:calc(1.5rem + env(safe-area-inset-bottom));z-index:25;display:flex;align-items:center;justify-content:center;width:42px;height:42px;padding:0;border:1px solid var(--wed-gold-soft);border-radius:50%;background:var(--wed-card);color:var(--wed-green);cursor:pointer;box-shadow:0 4px 14px rgba(0,0,0,.14);opacity:0;visibility:hidden;transform:translateY(12px);transition:opacity .25s,transform .25s,visibility 0s .25s,background .15s,color .15s,border-color .15s}
+.wed-to-top.is-visible{opacity:1;visibility:visible;transform:none;transition:opacity .25s,transform .25s,visibility 0s,background .15s,color .15s,border-color .15s}
+.wed-to-top:hover{background:var(--wed-green);border-color:var(--wed-green);color:#fdfaf2}
+/* Correcao optica: o "^" tem o vao embaixo e, centrado pela caixa, parece baixo. */
+.wed-to-top svg{transform:translateY(-1px)}
+.wed-to-top:focus-visible{outline:2px solid var(--wed-green);outline-offset:3px}
+@media(max-width:640px){.wed-to-top{right:max(1rem,env(safe-area-inset-right));bottom:calc(1rem + env(safe-area-inset-bottom))}}
+@media(prefers-reduced-motion:reduce){.wed-to-top{transition:none}}
 .wed-carousel-prev{left:-16px}
 .wed-carousel-next{right:-16px}
 .wed-carousel-dots{display:flex;justify-content:center;gap:.45rem;margin-top:1rem}
@@ -305,21 +251,6 @@ a.wed-shop-badge:hover{border-color:var(--wed-gold);background:#fffcf3}
 .wed-shop-empty{margin:1.3rem 0 0;padding:1.1rem 0 0;border-top:1px solid #f2ecdf;text-align:center;font-style:italic;font-size:calc(1.05rem * var(--wed-font-scale, 1));color:#8a918b}
 .wed-soon{margin-top:.2rem;font-size:calc(.82rem * var(--wed-font-scale, 1))!important;letter-spacing:.12em;text-transform:uppercase;color:#b3aa96!important}
 
-.wed-recados{display:grid;grid-template-columns:minmax(0,.92fr) minmax(0,1.08fr);gap:1rem;align-items:start}
-.wed-recado-form{display:flex;flex-direction:column;gap:.85rem;padding:1.2rem}
-.wed-field{display:flex;flex-direction:column;gap:.3rem}
-.wed-field>span{font-size:calc(1.02rem * var(--wed-font-scale, 1));color:var(--wed-green)}
-.wed-field input,.wed-field textarea{width:100%;padding:.65rem .8rem;border:1px solid #e6dcc6;border-radius:8px;background:#fffdf9;color:#4a544e;font-family:inherit;font-size:calc(1.05rem * var(--wed-font-scale, 1));resize:vertical}
-.wed-field input:focus,.wed-field textarea:focus{outline:2px solid var(--wed-gold);outline-offset:1px;border-color:var(--wed-gold)}
-.wed-form-error{margin:0;color:#a3423a;font-size:calc(1rem * var(--wed-font-scale, 1))}
-.wed-form-ok{display:flex;align-items:center;gap:.4rem;margin:0;color:#3f6b4d;font-size:calc(1rem * var(--wed-font-scale, 1))}
-.wed-recado-list{display:flex;flex-direction:column;gap:.8rem;max-height:34rem;overflow-y:auto}
-.wed-recado{margin:0;padding:1rem 1.1rem}
-.wed-recado p{margin:0 0 .6rem;font-style:italic;font-size:calc(1.08rem * var(--wed-font-scale, 1));line-height:1.5;overflow-wrap:anywhere}
-.wed-recado footer{display:flex;align-items:baseline;justify-content:space-between;gap:.6rem}
-.wed-recado strong{font-weight:500;color:var(--wed-green)}
-.wed-recado time{flex-shrink:0;font-size:calc(.9rem * var(--wed-font-scale, 1));color:#a6ac9f}
-.wed-empty{margin:0;padding:1.6rem;text-align:center;color:#8a918b}
 
 .wed-sec-cta{margin-bottom:2.6rem}
 .wed-cta{display:flex;flex-direction:column;align-items:center;gap:1rem;max-width:38rem;margin:0 auto;padding:1.7rem;text-align:center}
@@ -331,22 +262,6 @@ a.wed-shop-badge:hover{border-color:var(--wed-gold);background:#fffcf3}
    Rodape do site publico
    ========================================================================== */
 .wed-foot{position:relative;z-index:1;background:#2e2e2e;color:#b0b0b0}
-.wed-foot-top{display:grid;grid-template-columns:1.25fr 1fr 1.15fr 1.35fr;gap:2rem;max-width:1180px;margin:0 auto;padding:3rem 1.5rem 2.7rem}
-.wed-foot-logo{display:flex;align-items:center;gap:.6rem;color:#fff;font-size:calc(1.62rem * var(--wed-font-scale, 1))}
-.wed-foot-logo svg{color:var(--wed-gold)}
-.wed-foot-logo em{font-style:italic}
-.wed-foot-social{display:flex;flex-wrap:wrap;gap:.7rem;margin-top:1.4rem}
-.wed-foot-social a{display:flex;align-items:center;justify-content:center;width:40px;height:40px;border-radius:50%;background:#3d3d3d;color:#c9c9c9;transition:background .15s,color .15s}
-.wed-foot-social a:hover{background:var(--wed-gold);color:#2e2e2e}
-.wed-foot-col h3{margin:0 0 1.05rem;font-size:calc(1.02rem * var(--wed-font-scale, 1));font-weight:500;letter-spacing:.09em;text-transform:uppercase;color:#fff}
-.wed-foot-col ul{display:flex;flex-direction:column;gap:.55rem;margin:0;padding:0;list-style:none}
-.wed-foot-col a{display:flex;align-items:flex-start;gap:.5rem;color:#a5a5a5;font-size:calc(1.05rem * var(--wed-font-scale, 1));line-height:1.35;text-decoration:none;transition:color .15s}
-.wed-foot-col a:hover{color:var(--wed-gold)}
-.wed-foot-col svg{flex-shrink:0;margin-top:3px;color:var(--wed-gold)}
-.wed-foot-plain{color:#8c8c8c;font-size:calc(1.02rem * var(--wed-font-scale, 1))}
-.wed-foot-bar{background:#1f1f1f}
-.wed-foot-bar-inner{display:flex;align-items:center;justify-content:space-between;gap:1rem;max-width:1180px;margin:0 auto;padding:1rem 1.5rem;font-size:calc(.98rem * var(--wed-font-scale, 1));color:#8c8c8c}
-.wed-foot-fetech{display:flex;color:#e6e6e6}
 
 @media(max-width:980px){
   .wed-nav-toggle{display:flex}
@@ -355,7 +270,6 @@ a.wed-shop-badge:hover{border-color:var(--wed-gold);background:#fffcf3}
   .wed-nav-links a{padding:.85rem 1rem;text-shadow:none}
 }
 @media(max-width:1180px){.wed-carousel-track>*{flex-basis:calc((100% - 1.2rem) / 2)}}
-@media(max-width:900px){.wed-foot-top{grid-template-columns:repeat(2,minmax(0,1fr));gap:1.9rem}}
 /* Pagina /lista-na-loja/:slug */
 .wed-nav-back{display:inline-flex;align-items:center;gap:.35rem;margin-left:auto;padding:.45rem .8rem;border:1px solid rgba(231,221,196,.45);border-radius:999px;color:#f3eee1;font-size:calc(1rem * var(--wed-font-scale, 1));text-decoration:none;white-space:nowrap;text-shadow:0 1px 10px rgba(0,0,0,.5);transition:background .15s,border-color .15s}
 .wed-nav-back:hover{background:rgba(255,255,255,.13);border-color:var(--wed-gold-soft);color:#fff}
@@ -411,8 +325,6 @@ a.wed-shop-badge:hover{border-color:var(--wed-gold);background:#fffcf3}
   .wed-carousel-arrow{display:none}
 }
 @media(max-width:860px){
-  .wed-recados{grid-template-columns:minmax(0,1fr)}
-  .wed-recado-list{max-height:none}
   .wed-sec{padding:2.2rem 1.15rem;margin-bottom:1.1rem}
   .wed-lp-sheet{padding:1.1rem .9rem 0}
   .wed-lp-bg img{object-position:50% 22%}
@@ -438,27 +350,20 @@ a.wed-shop-badge:hover{border-color:var(--wed-gold);background:#fffcf3}
   .wed-shop-thumb{width:78px;height:78px}
   .wed-shop-name{font-size:calc(.98rem * var(--wed-font-scale, 1))}
   .wed-pix-actions{width:100%;flex-direction:column}
-  .wed-foot-top{grid-template-columns:minmax(0,1fr);padding:2.3rem 1.25rem 2rem}
-  .wed-foot-bar-inner{flex-direction:column;align-items:flex-start;gap:.85rem}
-  .wed-details{flex-wrap:wrap}
 }
 
 /* Aparência pública configurada no painel. */
 .wed{font-family:var(--wed-font,'Cormorant Garamond',Georgia,serif)}
-.wed .wed-names,.wed .wed-sec-title,.wed .wed-card-title,.wed .wed-nav-brand,.wed .wed-brand{font-family:var(--wed-display-font,var(--wed-font,'Cormorant Garamond',Georgia,serif))}
+.wed .wed-names,.wed .wed-sec-title,.wed .wed-nav-brand,.wed .wed-brand{font-family:var(--wed-display-font,var(--wed-font,'Cormorant Garamond',Georgia,serif))}
 .wed-lp .wed-sec{border-radius:calc(var(--wed-radius,10px) + 4px)}
 .wed .wed-card,.wed .wed-info,.wed .wed-btn,.wed .wed-count-box{border-radius:var(--wed-radius,10px)}
 .wed[data-wed-dark=true]{color:#e2e2df}
 .wed[data-wed-dark=true] .wed-card,.wed[data-wed-dark=true] .wed-info{border-color:#ffffff30}
 .wed[data-wed-dark=true] .wed-foot{background:#111}
-.wed[data-wed-dark=true] .wed-foot-bar{background:#090909}
 .wed-invitation .wed-topbar{background:var(--wed-card)}
-.wed-invitation .wed-hero{background:var(--wed-cream)}
-.wed-invitation .wed-hero::after{background:linear-gradient(180deg,transparent,var(--wed-cream) 68%)}
-.wed-invitation[data-wed-dark=true] .wed-hero-photo::after{background:linear-gradient(180deg,rgba(0,0,0,.28),transparent)}
-.wed-invitation[data-wed-dark=true] .wed-verse,.wed-invitation[data-wed-dark=true] .wed-guest,.wed-invitation[data-wed-dark=true] .wed-details-text span{color:#c3c7c3}
-.wed-invitation[data-wed-dark=true] .wed-guest:hover,.wed-invitation[data-wed-dark=true] .wed-info-link:hover{background:rgba(255,255,255,.08)}
-.wed-invitation[data-wed-dark=true] .wed-guests,.wed-invitation[data-wed-dark=true] .wed-guest{border-color:#ffffff30}
+/* Pagina do convite: o cabecalho e o da landing (.wed-lp so para as regras dele); o wrapper nao gera caixa, e o sticky vale para a pagina toda (clip, e nao hidden, para nao virar container de rolagem). */
+.wed-invitation{overflow:visible;overflow-x:clip}.wed-invitation .wed-nav-host{display:contents}
+.wed-invitation[data-wed-dark=true] .wed-info-link:hover{background:rgba(255,255,255,.08)}
 .wed-invitation[data-wed-dark=true] .wed-info-link:active{background:rgba(255,255,255,.12)}
 .wed-invitation[data-wed-scheme=dark-nav] .wed-topbar{background:#171717}
 .wed-invitation[data-wed-scheme=dark-nav] .wed-brand{color:#fff}
@@ -467,9 +372,6 @@ a.wed-shop-badge:hover{border-color:var(--wed-gold);background:#fffcf3}
 .wed-invitation[data-wed-scheme=colored][data-wed-bright-accent=true] .wed-brand{color:#171717}
 .wed-invitation[data-wed-navbar-behavior=sticky] .wed-topbar{position:sticky;top:0;z-index:2}
 .wed-invitation[data-wed-navigation-style=floating] .wed-topbar{margin:10px 10px 0;border:1px solid var(--wed-gold-soft);border-radius:var(--wed-radius,10px)}
-.wed-invitation[data-wed-container=boxed] .wed-main{width:min(100%,1000px);margin:0 auto}
-.wed-invitation[data-wed-container=default] .wed-main{width:min(100%,1360px);margin:0 auto}
-.wed-invitation[data-wed-container=fluid] .wed-main{width:100%}
 .wed-lp[data-wed-container=fluid] .wed-sec{max-width:none}
 .wed-lp[data-wed-container=boxed] .wed-sec{max-width:940px}
 .wed-lp[data-wed-navbar-behavior=sticky] .wed-nav{position:fixed;left:0;right:0;top:0}
@@ -488,7 +390,6 @@ a.wed-shop-badge:hover{border-color:var(--wed-gold);background:#fffcf3}
 .wed-lp[data-wed-scheme=colored][data-wed-dark=true] .wed-nav.is-scrolled{background:var(--wed-accent)}
 @media(min-width:981px){
   .wed-invitation[data-wed-navigation=sidebar] .wed-topbar{position:fixed;top:0;bottom:0;left:0;z-index:2;width:210px;align-items:flex-start;padding:1.5rem}
-  .wed-invitation[data-wed-navigation=sidebar] .wed-main{width:calc(100% - 210px);margin-left:210px;margin-right:0}
   .wed-invitation[data-wed-navigation=sidebar] .wed-foot{margin-left:210px}
   .wed-invitation[data-wed-navigation=sidebar][data-wed-navigation-style=floating] .wed-topbar{top:10px;bottom:10px;left:10px;width:200px}
   .wed-lp[data-wed-navigation=sidebar] .wed-nav{position:fixed;left:0;top:0;bottom:0;right:auto;width:220px;margin:0;border-radius:0;background:var(--wed-green-dark)}
@@ -876,7 +777,8 @@ a.wed-shop-badge:hover{border-color:var(--wed-gold);background:#fffcf3}
    numa moldura dourada, ancoras de 20 px em verde pela largura toda, uma florzinha em
    aquarela embaixo da secao ativa e "Confirme sua presenca" como botao solido. */
 .wed-lp:has(> .wed-nav.is-floral){--nav-h:84px}
-.wed-lp .wed-nav.is-floral,.wed-lp .wed-nav.is-floral.is-scrolled{background:rgba(250,247,240,.94);-webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px);border-bottom:0;box-shadow:0 6px 24px rgba(15,28,20,.18)}
+/* Navbar fixa opaca e sem backdrop-filter: o blur era refeito a cada quadro da rolagem sobre a foto da abertura e travava o scroll. */
+.wed-lp .wed-nav.is-floral,.wed-lp .wed-nav.is-floral.is-scrolled{background:#faf7f0;border-bottom:0;box-shadow:0 6px 24px rgba(15,28,20,.18)}
 .wed-lp .wed-nav.is-floral .wed-nav-inner{gap:32px;max-width:1480px;padding:0 40px}
 .wed-lp .wed-nav.is-floral .wed-nav-brand{flex:none;justify-content:center;width:56px;height:56px;border:1px solid #c9ab78;border-radius:50%;text-shadow:none}
 .wed-lp .wed-nav.is-floral .wed-nav-brand .wed-monogram{margin:0;color:#ad8c5c;filter:none}

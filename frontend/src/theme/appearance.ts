@@ -21,9 +21,10 @@ export type Appearance = {
   navbarBehavior: 'default' | 'sticky';
   navigationStyle: 'attached' | 'floating';
   offcanvasStyle: 'attached' | 'floating';
+  branches: 'on' | 'off';
 };
 export const defaultAppearance: Appearance = {
-  scheme: 'light', accent: 'wedding', customAccent: '#1f4536', font: 'serif', fontSize: 'normal', base: 'neutral', radius: '1', navigation: 'navbar', container: 'default', navbarBehavior: 'default', navigationStyle: 'attached', offcanvasStyle: 'attached'
+  scheme: 'light', accent: 'wedding', customAccent: '#1f4536', font: 'serif', fontSize: 'normal', base: 'neutral', radius: '1', navigation: 'navbar', container: 'default', navbarBehavior: 'default', navigationStyle: 'attached', offcanvasStyle: 'attached', branches: 'on'
 };
 export const appearanceAccent = (settings: Appearance) => settings.accent === 'custom' ? settings.customAccent : accentColors[settings.accent];
 export const landingFont = {

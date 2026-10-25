@@ -1,0 +1,54 @@
+/* Bloco "Cerimônia" (design system Botânica Aquarela), so o layout 2 · Linha do tempo. Ordem fixa: Data, Horário, Local da celebração, Local da festa. Responsivo por container. */
+.ce { container-type: inline-size; color: var(--tinta, #24412f); font-family: var(--font-serifa, "Cormorant Garamond", Georgia, serif); }
+.ce * { box-sizing: border-box; }
+.ce p, .ce h2, .ce ol, .ce ul { margin: 0; padding: 0; }
+.ce ol, .ce ul { list-style: none; }
+.ce-in { position: relative; padding: 28px 28px 30px; border-radius: 14px; background: #fdfbf6; border: 1px solid #ecdfc6; }
+.ce .script { font-family: "Great Vibes", "Pinyon Script", cursive; font-weight: 400; }
+.ce .titulo { font-size: 48px; line-height: 1.1; text-align: center; color: var(--tinta, #24412f); }
+.ce .ic { width: 26px; height: 26px; fill: none; stroke: #ad8c5c; stroke-width: 1.5; stroke-linecap: round; stroke-linejoin: round; flex: none; }
+.ce .rot { font-size: 13px; line-height: 18px; letter-spacing: .18em; text-transform: uppercase; color: #8a6d45; }
+.ce .val { font-size: 19px; line-height: 1.35; color: var(--tinta, #24412f); }
+.ce .val small, .ce small, .ce .end { font-size: 15px; line-height: 1.4; color: var(--tinta-suave, #666c66); }
+.ce .nome-local { font-size: 22px; line-height: 1.25; color: var(--tinta, #24412f); }
+.ce .quando { font-size: 15px; color: #8a6d45; margin-top: 4px; }
+.ce a { color: #8a6d45; text-decoration: none; }
+.ce a:focus-visible, .ce button:focus-visible { outline: 2px solid var(--tinta, #24412f); outline-offset: 3px; border-radius: 4px; }
+.ce .links { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 12px; }
+.ce .links a { display: inline-flex; align-items: center; gap: 6px; padding: 7px 14px; border: 1px solid #c9ab78; border-radius: 999px; font-size: 15px; color: var(--tinta, #24412f); background: #fffdf8; }
+/* mapa: moldura do layout; o conteudo e o mapa do Google do site */
+.ce .mapa { position: relative; height: 220px; border-radius: 12px; overflow: hidden; border: 1px solid #e3d8c1; background: #e9efe2; }
+/* abas */
+.ce .abas { display: flex; gap: 8px; justify-content: center; margin: 18px 0 14px; }
+.ce .abas button { display: inline-flex; align-items: center; gap: 8px; font: inherit; font-size: 17px; padding: 8px 18px; border-radius: 999px; border: 1px solid #c9ab78; background: #fffdf8; color: var(--tinta, #24412f); cursor: pointer; }
+.ce .abas button .ic { width: 20px; height: 20px; }
+.ce .abas button[aria-selected="true"] { background: var(--tinta, #24412f); color: #faf8f3; border-color: var(--tinta, #24412f); }
+.ce .abas button[aria-selected="true"] .ic { stroke: #e2c287; }
+.ce .painel-aba { display: grid; grid-template-columns: 1fr 1.6fr; gap: 20px; align-items: center; }
+.ce .painel-aba[hidden] { display: none; }
+
+/* 2 · Linha do tempo */
+.ce-2 .hero { text-align: center; font-size: 22px; letter-spacing: .14em; text-transform: uppercase; margin-top: 4px; }
+.ce-2 .tempo { position: relative; display: grid; grid-template-columns: 1fr 1fr; gap: 24px; margin-top: 26px; text-align: center; }
+.ce-2 .tempo::before { content: ''; position: absolute; left: 25%; right: 25%; top: 26px; border-top: 1px dashed #c9ab78; }
+.ce-2 .tempo li { position: relative; display: flex; flex-direction: column; align-items: center; gap: 4px; }
+.ce-2 .bola { width: 52px; height: 52px; border-radius: 50%; display: grid; place-items: center; background: #fffdf8; border: 1px solid #c9ab78; margin-bottom: 6px; }
+.ce-2 .tempo b { font-size: 20px; font-weight: 600; }
+
+/* celular */
+@container (max-width: 640px) {
+  .ce-in { padding: 22px 16px 22px; }
+  .ce .titulo { font-size: 40px; }
+  .ce .painel-aba { grid-template-columns: 1fr; }
+  .ce-2 .tempo { grid-template-columns: 1fr; }
+  .ce-2 .tempo::before { display: none; }
+}
+
+/* No site: a secao .wed-sec ja e o cartao do bloco; tinta, fonte e superficies seguem o tema. */
+.wed-sec .ce { --tinta: var(--wed-green); --font-serifa: var(--wed-font); }
+.wed-sec .ce-in { padding: 0; background: none; border: 0; border-radius: 0; }
+.wed-sec .ce .bola, .wed-sec .ce .links a, .wed-sec .ce .abas button:not([aria-selected="true"]) { background: var(--wed-card); }
+.ce .abas button:hover:not([aria-selected="true"]), .ce .links a:hover { border-color: #ad8c5c; }
+.ce .painel-aba:focus-visible { outline: 2px solid var(--tinta, #24412f); outline-offset: 4px; border-radius: 12px; }
+.ce .mapa iframe { position: relative; display: block; width: 100%; height: 100%; border: 0; }
+@media (hover: none) { .ce .mapa iframe { pointer-events: none; } }

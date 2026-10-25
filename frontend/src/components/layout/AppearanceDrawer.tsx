@@ -1,4 +1,4 @@
-import { Alert, Box, Button, ButtonBase, Divider, Drawer, IconButton, Stack, TextField, Typography } from '@mui/material';
+import { Alert, Box, Button, ButtonBase, Divider, Drawer, FormControlLabel, IconButton, Stack, Switch, TextField, Typography } from '@mui/material';
 import Close from '@mui/icons-material/Close';
 import RestartAlt from '@mui/icons-material/RestartAlt';
 import Check from '@mui/icons-material/Check';
@@ -91,6 +91,11 @@ export function AppearanceDrawer({ open, settings, onChange, onClose, onSave, bu
       <ChoiceGroup title="Comportamento da barra" hint="A barra pode acompanhar a rolagem." kind="navbarBehavior" choices={navbarBehaviors} settings={settings} change={onChange} />
       <ChoiceGroup title="Estilo da navegação" hint="Navegação anexada ou flutuante." kind="navigationStyle" choices={styles} settings={settings} change={onChange} />
       <ChoiceGroup title="Estilo do menu móvel" hint="Menu móvel anexado ou flutuante." kind="offcanvasStyle" choices={styles} settings={settings} change={onChange} />
+      <Divider sx={{ my: 2 }} /><Typography variant="overline" color="text.secondary">Decoração</Typography>
+      <Box sx={{ mb: 3 }}>
+        <FormControlLabel control={<Switch checked={settings.branches !== 'off'} onChange={event => onChange({ ...settings, branches: event.target.checked ? 'on' : 'off' })} slotProps={{ input: { 'aria-describedby': 'branches-hint' } }} />} label={<Typography variant="subtitle2" sx={{ fontWeight: 700 }}>Ramos procedurais nas laterais</Typography>} />
+        <Typography id="branches-hint" variant="caption" color="text.secondary" sx={{ display: 'block' }}>Jardins desenhados nas colunas laterais da página de casamento, com a animação de desenho à mão. Desligados, não são desenhados nem animados, e a página fica mais leve.</Typography>
+      </Box>
     </Box>
     <Divider /><Stack spacing={1} sx={{ p: 2.5 }}><Button variant="outlined" startIcon={<RestartAlt />} disabled={busy || !ready} onClick={() => onChange({ ...defaultAppearance })}>Restaurar padrão</Button><Button variant="contained" disabled={busy || !ready} onClick={onSave}>{busy ? 'Carregando...' : 'Salvar'}</Button><Button component="a" href="/casamento" target="_blank" rel="noreferrer">Ver página de casamento</Button></Stack>
   </Drawer>;

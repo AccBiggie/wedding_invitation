@@ -35,7 +35,13 @@ export const wedding = {
   party: {
     label: 'Local da Festa',
     lines: ['Igreja Luterana', 'de Sussuí'],
-    map: 'https://maps.app.goo.gl/PjsrKNU3og4HTd738'
+    map: 'https://maps.app.goo.gl/PjsrKNU3og4HTd738',
+    // Bloco "Cerimônia": nome, endereço curto, busca do mapa incorporado e horário.
+    // TODO(noivos): conferir o endereço e o horário da festa.
+    name: 'Igreja Luterana de Sussuí',
+    address: 'Sussuí · Eng. Beltrão/PR',
+    query: 'Igreja Luterana de Sussuí, Engenheiro Beltrão - PR',
+    time: 'Logo após a cerimônia'
   },
   ceremony: {
     label: 'Local da Celebração',
@@ -83,10 +89,14 @@ export const wedding = {
       { photo: '/historia/polaroid-portao.webp', caption: 'para sempre' }
     ]
   },
+  // Crédito da barra final do rodapé (logo da FETECH). TODO: link do site da FETECH.
+  credit: { name: 'FETECH', url: '' },
   contact: {
     phone: '(44) 99883-3731',
     whatsapp: 'https://wa.me/5544998833731',
     email: 'fetech.ferreira@gmail.com',
+    // Endereço do rodapé, em linhas.
+    address: { street: 'R. Minas Gerais, 762-862 · Ivailândia', city: 'Eng. Beltrão - PR', zip: '87306-800' },
     // TODO(noivos): preencher para os icones aparecerem no rodape.
     instagram: '',
     facebook: ''

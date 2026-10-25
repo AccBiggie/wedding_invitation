@@ -1,0 +1,57 @@
+/* Rodapé (design system Botânica Aquarela), layout 5 sem a faixa "Você vem?". Responsivo por container. */
+.rd { container-type: inline-size; position: relative; overflow: hidden; font-family: var(--font-serifa, "Cormorant Garamond", Georgia, serif);
+  --rd-bg: #2f3130; --rd-bg2: #252726; --rd-tx: #e8e2d4; --rd-mut: #b8b2a4; --rd-tit: #ffffff; --rd-ac: #c9a96a; --rd-chip: #3d403e;
+  background: var(--rd-bg); color: var(--rd-tx); }
+.rd * { box-sizing: border-box; }
+.rd p, .rd h3, .rd ul { margin: 0; padding: 0; }
+.rd ul { list-style: none; }
+.rd a { color: inherit; text-decoration: none; }
+.rd a:hover { color: var(--rd-ac); }
+.rd a:focus-visible { outline: 2px solid var(--rd-ac); outline-offset: 3px; border-radius: 4px; }
+.rd .lim { max-width: 1080px; margin: 0 auto; padding: 0 28px; position: relative; }
+.rd .ic { width: 18px; height: 18px; fill: none; stroke: currentColor; stroke-width: 1.5; stroke-linecap: round; stroke-linejoin: round; flex: none; }
+.rd .grade { display: grid; grid-template-columns: 1.25fr 1fr 1.15fr 1.25fr; gap: 32px; padding-top: 52px; padding-bottom: 46px; }
+.rd h3 { font-family: "Jost", "Helvetica Neue", Arial, sans-serif; font-size: 14px; font-weight: 500; letter-spacing: .16em; text-transform: uppercase; color: var(--rd-tit); margin-bottom: 16px; }
+.rd .col ul { display: grid; gap: 9px; font-size: 18px; line-height: 1.35; color: var(--rd-mut); }
+.rd .contato li, .rd .endereco li { display: flex; gap: 10px; align-items: flex-start; }
+.rd .contato .ic, .rd .endereco .ic { color: var(--rd-ac); margin-top: 3px; }
+.rd .endereco li + li { font-size: 16px; opacity: .85; }
+.rd .marca { display: inline-flex; align-items: center; gap: 12px; }
+.rd .redes { display: flex; gap: 10px; margin-top: 20px; }
+.rd .redes a { display: grid; place-items: center; width: 40px; height: 40px; border-radius: 50%; background: var(--rd-chip); color: var(--rd-tx); }
+.rd .redes a:hover { background: var(--rd-ac); color: var(--rd-bg); }
+.rd .barra-final { background: var(--rd-bg2); font-family: "Jost", "Helvetica Neue", Arial, sans-serif; font-size: 13px; color: var(--rd-mut); }
+.rd .barra-final .lim { display: flex; justify-content: space-between; align-items: center; gap: 12px; flex-wrap: wrap; padding-top: 16px; padding-bottom: 16px; }
+.rd .credito b { font-weight: 500; letter-spacing: .18em; color: var(--rd-tit); }
+
+
+/* celular / telas estreitas */
+@container (max-width: 980px) {
+  .rd .grade { grid-template-columns: 1fr 1fr; }
+}
+@container (max-width: 600px) {
+  .rd .lim { padding: 0 20px; }
+  .rd .grade { grid-template-columns: 1fr; gap: 28px; }
+  .rd .barra-final .lim { flex-direction: column; align-items: flex-start; gap: 6px; }
+}
+
+/* No site: logo SA em imagem, logo da FETECH e fontes do tema (o site nao carrega a Jost). */
+.rd { --font-serifa: var(--wed-font); }
+.rd h3, .rd .barra-final { font-family: var(--wed-font); }
+.rd h3 { font-size: 15px; }
+.rd .barra-final { font-size: 15px; }
+.rd .marca .wed-monogram { color: var(--rd-ac); }
+.rd .marca .wed-monogram svg { height: 100%; width: auto; }
+/* Logo FETECH animado: letras e bonecos herdam o fill; --fx-fundo e a cor da barra final
+   (contornozinho dos bonecos). O viewBox sobra em cima para a cabeca dela: alinhar pela base. */
+.rd .credito { display: inline-flex; align-items: flex-end; gap: 10px; fill: var(--rd-tit); --fx-fundo: var(--rd-bg2); }
+.rd .barra-final a.credito:hover { fill: var(--rd-ac); }
+.rd .logo-fetech-host { display: block; line-height: 0; }
+.rd .credito .logo-fetech { display: block; width: 120px; height: auto; }
+@container (max-width: 600px) { .rd .credito .logo-fetech { width: 104px; } }
+/* .wed-foot (style.css) mantem o rodape acima do fundo fixo; as cores sao as do layout. */
+.rd.wed-foot { background: var(--rd-bg); color: var(--rd-tx); }
+.wed[data-wed-dark=true] .rd { --rd-bg: #161817; --rd-bg2: #0e0f0e; --rd-chip: #2a2c2b; }
+/* Ate 1200 px o botao de voltar ao topo alcanca o texto da barra final:
+   ela ganha espaco embaixo para o texto terminar acima dele. */
+@media (max-width: 1200px) { .rd .barra-final .lim { padding-bottom: calc(16px + 78px + env(safe-area-inset-bottom, 0px)); } }
