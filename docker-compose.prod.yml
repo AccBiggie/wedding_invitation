@@ -20,6 +20,8 @@ services:
       - caddy_data:/data
       - caddy_config:/config
     depends_on: [frontend]
+    # So a rede edge (com IPv6): o Caddy recebe o IP real de cada celular, tambem por IPv6.
+    networks: [edge]
     logging: *logging
 
   frontend:
@@ -29,6 +31,7 @@ services:
     restart: unless-stopped
     depends_on:
       backend: { condition: service_healthy }
+    networks: [edge, default]
     logging: *logging
 
   backend:
@@ -90,6 +93,16 @@ services:
           sleep 86400
         done
     logging: *logging
+
+networks:
+  # Sem IPv6 na rede do Docker, o acesso por IPv6 chega pelo docker-proxy e todos os
+  # visitantes aparecem com o mesmo IP (o do gateway), dividindo o limite de requisicoes.
+  edge:
+    enable_ipv6: true
+    ipam:
+      config:
+        - subnet: fd4d:6169:6c00:1::/64
+  default: {}
 
 volumes:
   mongodb_data:
