@@ -41,7 +41,7 @@ services:
       NODE_ENV: production
       PORT: 3000
       TRUST_PROXY: 2
-      MONGODB_URI: mongodb://mongodb:27017/wedding_invitations
+      MONGODB_URI: mongodb://${MONGO_ROOT_USER:?defina MONGO_ROOT_USER no .env}:${MONGO_ROOT_PASSWORD:?defina MONGO_ROOT_PASSWORD no .env}@mongodb:27017/wedding_invitations?authSource=admin
       FRONTEND_URL: https://${DOMAIN:?defina DOMAIN no .env}
       JWT_SECRET: ${JWT_SECRET:?defina JWT_SECRET no .env}
       JWT_EXPIRES_IN: ${JWT_EXPIRES_IN:-7d}
@@ -69,6 +69,12 @@ services:
     # 8.2: a 8.0 se recusa a subir em kernel 6.19+ (SERVER-121912), como o 7.0 da VPS.
     image: mongo:8.2
     restart: unless-stopped
+    # Banco pequeno: 0,5 GB de cache basta e deixa a RAM para o resto. --auth exige usuario e senha.
+    command: ["--auth", "--wiredTigerCacheSizeGB", "0.5"]
+    environment:
+      # So criam o usuario num volume vazio (VPS nova). Num banco existente, crie antes: bash deploy/mongo-create-user.sh
+      MONGO_INITDB_ROOT_USERNAME: ${MONGO_ROOT_USER:?defina MONGO_ROOT_USER no .env}
+      MONGO_INITDB_ROOT_PASSWORD: ${MONGO_ROOT_PASSWORD:?defina MONGO_ROOT_PASSWORD no .env}
     volumes: [mongodb_data:/data/db]
     healthcheck:
       test: ["CMD", "mongosh", "--quiet", "--eval", "db.adminCommand('ping').ok"]
@@ -79,20 +85,37 @@ services:
     logging: *logging
 
   # Backup diario do banco em ./backups (mantem 14 dias). Restaurar: ver deploy/restore.sh.
+  # Copia externa no R2: servico backup-offsite, logo abaixo.
   backup:
     image: mongo:8.2
     restart: unless-stopped
     depends_on:
       mongodb: { condition: service_healthy }
+    environment:
+      MONGO_URI: mongodb://${MONGO_ROOT_USER:?defina MONGO_ROOT_USER no .env}:${MONGO_ROOT_PASSWORD:?defina MONGO_ROOT_PASSWORD no .env}@mongodb:27017/wedding_invitations?authSource=admin
     volumes: ["./backups:/backups"]
     entrypoint: ["/bin/sh", "-c"]
     command:
       - |
         while true; do
-          mongodump --uri=mongodb://mongodb:27017/wedding_invitations --gzip --archive=/backups/wedding-$$(date +%F).archive.gz && echo "backup ok $$(date)"
+          mongodump --uri="$$MONGO_URI" --gzip --archive=/backups/wedding-$$(date +%F).archive.gz && echo "backup ok $$(date)"
           find /backups -name 'wedding-*.archive.gz' -mtime +14 -delete
           sleep 86400
         done
+    logging: *logging
+
+  # Copia os backups para um bucket do R2 so de backups (fora da VPS). Desligado sem BACKUP_R2_*.
+  backup-offsite:
+    build: ./backend
+    restart: unless-stopped
+    command: ["node", "scripts/offsite-backup.js"]
+    environment:
+      BACKUP_R2_ACCOUNT_ID: ${BACKUP_R2_ACCOUNT_ID:-}
+      BACKUP_R2_ENDPOINT: ${BACKUP_R2_ENDPOINT:-}
+      BACKUP_R2_ACCESS_KEY_ID: ${BACKUP_R2_ACCESS_KEY_ID:-}
+      BACKUP_R2_SECRET_ACCESS_KEY: ${BACKUP_R2_SECRET_ACCESS_KEY:-}
+      BACKUP_R2_BUCKET: ${BACKUP_R2_BUCKET:-}
+    volumes: ["./backups:/backups:ro"]
     logging: *logging
 
 networks:

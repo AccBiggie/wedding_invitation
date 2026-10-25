@@ -6,7 +6,7 @@ cd "$(dirname "$0")/.."
 test -f .env || { echo "Falta o .env de producao em $(pwd) (modelo: .env.production.example)." >&2; exit 1; }
 
 git fetch --prune origin production
-git checkout -q production
+git checkout -q -f production
 git reset -q --hard origin/production
 echo "Versao: $(git log -1 --format='%h %s')"
 
