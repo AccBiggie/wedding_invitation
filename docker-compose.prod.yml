@@ -54,6 +54,7 @@ services:
       R2_ENDPOINT: ${R2_ENDPOINT:-}
       R2_PUBLIC_BASE_URL: ${R2_PUBLIC_BASE_URL:-}
       IMAGE_WEBP_QUALITY: ${IMAGE_WEBP_QUALITY:-80}
+      PUBLIC_READ_LIMIT: ${PUBLIC_READ_LIMIT:-2000}
     depends_on:
       mongodb: { condition: service_healthy }
     healthcheck:
