@@ -1,0 +1,72 @@
+# Verificacoes de PR. Na protecao da branch production, marque como obrigatorios os
+# jobs "Origem da PR", "Frontend", "Backend" e "Imagens de producao".
+name: CI
+
+on:
+  pull_request:
+    branches: [main, production]
+  push:
+    branches: [main]
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  source:
+    name: Origem da PR
+    runs-on: ubuntu-latest
+    steps:
+      - name: Producao so recebe PR vinda da main
+        if: github.event_name == 'pull_request' && github.base_ref == 'production'
+        run: |
+          if [ "${{ github.head_ref }}" != "main" ] || [ "${{ github.event.pull_request.head.repo.full_name }}" != "${{ github.repository }}" ]; then
+            echo "::error::A branch production so aceita PR vinda da main deste repositorio (recebido: ${{ github.event.pull_request.head.repo.full_name }}:${{ github.head_ref }})."
+            exit 1
+          fi
+      - run: echo "Origem ok."
+
+  frontend:
+    name: Frontend
+    runs-on: ubuntu-latest
+    defaults: { run: { working-directory: frontend } }
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: { node-version: 22, cache: npm, cache-dependency-path: frontend/package-lock.json }
+      - run: npm ci
+      - run: npm run lint
+      - run: npm run typecheck
+      - run: npm run build
+        env: { VITE_API_URL: /api }
+
+  backend:
+    name: Backend
+    runs-on: ubuntu-latest
+    defaults: { run: { working-directory: backend } }
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: { node-version: 22, cache: npm, cache-dependency-path: backend/package-lock.json }
+      - run: npm ci
+      - run: npm test
+        env: { NODE_ENV: test, JWT_SECRET: ci-somente-para-testes-0123456789abcdef }
+
+  images:
+    name: Imagens de producao
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Build das imagens do docker-compose.prod.yml
+        env:
+          DOMAIN: ci.example.com
+          ACME_EMAIL: ci@example.com
+          JWT_SECRET: ci-somente-para-validar-o-compose-0123456789
+          ADMIN_EMAIL: ci@example.com
+          ADMIN_PASSWORD: ci
+        run: |
+          docker compose -f docker-compose.prod.yml config --quiet
+          docker compose -f docker-compose.prod.yml build

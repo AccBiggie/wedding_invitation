@@ -1,3 +1,8 @@
+// Em producao nao ha segredo padrao: sem JWT_SECRET forte o servidor nao sobe.
+if (process.env.NODE_ENV === 'production' && (!process.env.JWT_SECRET || process.env.JWT_SECRET.length < 32)) {
+  throw new Error('JWT_SECRET ausente ou curto demais (minimo 32 caracteres) em producao.');
+}
+
 export const env = {
   port: Number(process.env.PORT || 3000),
   mongoUri: process.env.MONGODB_URI || 'mongodb://localhost:27017/wedding_invitations',
