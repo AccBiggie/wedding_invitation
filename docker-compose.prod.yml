@@ -62,7 +62,8 @@ services:
     logging: *logging
 
   mongodb:
-    image: mongo:8.0
+    # 8.2: a 8.0 se recusa a subir em kernel 6.19+ (SERVER-121912), como o 7.0 da VPS.
+    image: mongo:8.2
     restart: unless-stopped
     volumes: [mongodb_data:/data/db]
     healthcheck:
@@ -75,7 +76,7 @@ services:
 
   # Backup diario do banco em ./backups (mantem 14 dias). Restaurar: ver deploy/restore.sh.
   backup:
-    image: mongo:8.0
+    image: mongo:8.2
     restart: unless-stopped
     depends_on:
       mongodb: { condition: service_healthy }
