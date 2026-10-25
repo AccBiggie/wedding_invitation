@@ -1,0 +1,96 @@
+# Producao (VPS). Uso: docker compose -f docker-compose.prod.yml up -d --build
+# As variaveis vem do .env ao lado deste arquivo (modelo em .env.production.example).
+# So o Caddy expoe portas (80/443, com HTTPS automatico); backend e banco ficam na rede interna.
+name: wedding
+
+x-logging: &logging
+  driver: json-file
+  options: { max-size: 10m, max-file: "3" }
+
+services:
+  caddy:
+    image: caddy:2.8.4-alpine
+    restart: unless-stopped
+    ports: ["80:80", "443:443", "443:443/udp"]
+    environment:
+      DOMAIN: ${DOMAIN:?defina DOMAIN no .env}
+      ACME_EMAIL: ${ACME_EMAIL:?defina ACME_EMAIL no .env}
+    volumes:
+      - ./deploy/Caddyfile:/etc/caddy/Caddyfile:ro
+      - caddy_data:/data
+      - caddy_config:/config
+    depends_on: [frontend]
+    logging: *logging
+
+  frontend:
+    build:
+      context: ./frontend
+      args: { VITE_API_URL: /api }
+    restart: unless-stopped
+    depends_on:
+      backend: { condition: service_healthy }
+    logging: *logging
+
+  backend:
+    build: ./backend
+    restart: unless-stopped
+    environment:
+      NODE_ENV: production
+      PORT: 3000
+      TRUST_PROXY: 2
+      MONGODB_URI: mongodb://mongodb:27017/wedding_invitations
+      FRONTEND_URL: https://${DOMAIN:?defina DOMAIN no .env}
+      JWT_SECRET: ${JWT_SECRET:?defina JWT_SECRET no .env}
+      JWT_EXPIRES_IN: ${JWT_EXPIRES_IN:-7d}
+      ADMIN_EMAIL: ${ADMIN_EMAIL:?defina ADMIN_EMAIL no .env}
+      ADMIN_PASSWORD: ${ADMIN_PASSWORD:?defina ADMIN_PASSWORD no .env}
+      R2_ACCOUNT_ID: ${R2_ACCOUNT_ID:-}
+      R2_ACCESS_KEY_ID: ${R2_ACCESS_KEY_ID:-}
+      R2_SECRET_ACCESS_KEY: ${R2_SECRET_ACCESS_KEY:-}
+      R2_BUCKET: ${R2_BUCKET:-}
+      R2_ENDPOINT: ${R2_ENDPOINT:-}
+      R2_PUBLIC_BASE_URL: ${R2_PUBLIC_BASE_URL:-}
+      IMAGE_WEBP_QUALITY: ${IMAGE_WEBP_QUALITY:-80}
+    depends_on:
+      mongodb: { condition: service_healthy }
+    healthcheck:
+      test: ["CMD", "wget", "-qO-", "http://localhost:3000/api/health"]
+      interval: 15s
+      timeout: 5s
+      retries: 5
+      start_period: 20s
+    logging: *logging
+
+  mongodb:
+    image: mongo:8.0
+    restart: unless-stopped
+    volumes: [mongodb_data:/data/db]
+    healthcheck:
+      test: ["CMD", "mongosh", "--quiet", "--eval", "db.adminCommand('ping').ok"]
+      interval: 15s
+      timeout: 5s
+      retries: 5
+      start_period: 20s
+    logging: *logging
+
+  # Backup diario do banco em ./backups (mantem 14 dias). Restaurar: ver deploy/restore.sh.
+  backup:
+    image: mongo:8.0
+    restart: unless-stopped
+    depends_on:
+      mongodb: { condition: service_healthy }
+    volumes: ["./backups:/backups"]
+    entrypoint: ["/bin/sh", "-c"]
+    command:
+      - |
+        while true; do
+          mongodump --uri=mongodb://mongodb:27017/wedding_invitations --gzip --archive=/backups/wedding-$$(date +%F).archive.gz && echo "backup ok $$(date)"
+          find /backups -name 'wedding-*.archive.gz' -mtime +14 -delete
+          sleep 86400
+        done
+    logging: *logging
+
+volumes:
+  mongodb_data:
+  caddy_data:
+  caddy_config:
