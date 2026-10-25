@@ -67,6 +67,8 @@ jobs:
           JWT_SECRET: ci-somente-para-validar-o-compose-0123456789
           ADMIN_EMAIL: ci@example.com
           ADMIN_PASSWORD: ci
+          MONGO_ROOT_USER: ci
+          MONGO_ROOT_PASSWORD: ci
         run: |
           docker compose -f docker-compose.prod.yml config --quiet
           docker compose -f docker-compose.prod.yml build
