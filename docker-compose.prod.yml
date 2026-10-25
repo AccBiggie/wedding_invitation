@@ -20,6 +20,8 @@ services:
       - caddy_data:/data
       - caddy_config:/config
     depends_on: [frontend]
+    # So a rede edge (com IPv6): o Caddy recebe o IP real de cada celular, tambem por IPv6.
+    networks: [edge]
     logging: *logging
 
   frontend:
@@ -29,6 +31,7 @@ services:
     restart: unless-stopped
     depends_on:
       backend: { condition: service_healthy }
+    networks: [edge, default]
     logging: *logging
 
   backend:
@@ -51,6 +54,7 @@ services:
       R2_ENDPOINT: ${R2_ENDPOINT:-}
       R2_PUBLIC_BASE_URL: ${R2_PUBLIC_BASE_URL:-}
       IMAGE_WEBP_QUALITY: ${IMAGE_WEBP_QUALITY:-80}
+      PUBLIC_READ_LIMIT: ${PUBLIC_READ_LIMIT:-2000}
     depends_on:
       mongodb: { condition: service_healthy }
     healthcheck:
@@ -62,7 +66,8 @@ services:
     logging: *logging
 
   mongodb:
-    image: mongo:8.0
+    # 8.2: a 8.0 se recusa a subir em kernel 6.19+ (SERVER-121912), como o 7.0 da VPS.
+    image: mongo:8.2
     restart: unless-stopped
     volumes: [mongodb_data:/data/db]
     healthcheck:
@@ -75,7 +80,7 @@ services:
 
   # Backup diario do banco em ./backups (mantem 14 dias). Restaurar: ver deploy/restore.sh.
   backup:
-    image: mongo:8.0
+    image: mongo:8.2
     restart: unless-stopped
     depends_on:
       mongodb: { condition: service_healthy }
@@ -89,6 +94,16 @@ services:
           sleep 86400
         done
     logging: *logging
+
+networks:
+  # Sem IPv6 na rede do Docker, o acesso por IPv6 chega pelo docker-proxy e todos os
+  # visitantes aparecem com o mesmo IP (o do gateway), dividindo o limite de requisicoes.
+  edge:
+    enable_ipv6: true
+    ipam:
+      config:
+        - subnet: fd4d:6169:6c00:1::/64
+  default: {}
 
 volumes:
   mongodb_data:

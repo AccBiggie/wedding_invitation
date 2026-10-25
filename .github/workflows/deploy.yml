@@ -35,7 +35,8 @@ jobs:
           VPS_HOST: ${{ secrets.VPS_HOST }}
           VPS_USER: ${{ secrets.VPS_USER }}
           VPS_PORT: ${{ secrets.VPS_PORT || '22' }}
-        run: ssh -i ~/.ssh/id_deploy -p "$VPS_PORT" -o BatchMode=yes "$VPS_USER@$VPS_HOST" 'bash /opt/wedding/deploy/deploy.sh'
+        # Atualiza o codigo antes de chamar o script, para nunca rodar um deploy.sh desatualizado.
+        run: ssh -i ~/.ssh/id_deploy -p "$VPS_PORT" -o BatchMode=yes "$VPS_USER@$VPS_HOST" 'cd /opt/wedding && git fetch -q origin production && git checkout -q -B production origin/production && bash deploy/deploy.sh'
       - name: Conferir o site no ar
         if: vars.SITE_URL != ''
         run: |
