@@ -17,3 +17,4 @@ test('código de convite malformado retorna 404', async()=>{const r=await reques
 test('gerar códigos exige ids válidos', async()=>{const r=await request(app).post('/api/invitations/codes').set('Authorization',bearer).send({ids:['nao-e-id']});assert.equal(r.status,422);});
 test('configurações do convite exigem login', async()=>{const r=await request(app).get('/api/invitation-card');assert.equal(r.status,401);});
 test('configurações do convite rejeitam endereço inválido', async()=>{const r=await request(app).put('/api/invitation-card').set('Authorization',bearer).send({siteUrl:'ftp://x',greeting:'Querido(a)',intro:'x',place:'x',address:'x',qrText:'x',photo:''});assert.equal(r.status,422);assert.ok(r.body.errors.siteUrl);});
+test('leituras públicas aguentam muitos acessos do mesmo IP (CGNAT)', async()=>{for(let i=0;i<150;i++){const r=await request(app).get('/api/public/wedding');assert.equal(r.status,200,`requisição ${i+1}`);}});

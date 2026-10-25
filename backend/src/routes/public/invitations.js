@@ -1,2 +1,2 @@
-import { Router } from 'express'; import rateLimit from 'express-rate-limit'; import * as c from '../../controllers/invitationController.js';
-const r=Router(); const limiter=rateLimit({windowMs:15*60*1000,max:100}); r.get('/code/:code',limiter,c.publicGetByCode); r.get('/:id/:name',limiter,c.publicGet); r.post('/:id/confirm',limiter,c.confirm); export default r;
+import { Router } from 'express'; import { confirmLimit, publicReadLimit } from '../../middlewares/rateLimits.js'; import * as c from '../../controllers/invitationController.js';
+const r=Router(); r.get('/code/:code',publicReadLimit,c.publicGetByCode); r.get('/:id/:name',publicReadLimit,c.publicGet); r.post('/:id/confirm',confirmLimit,c.confirm); export default r;
