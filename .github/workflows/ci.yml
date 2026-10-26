@@ -22,9 +22,14 @@ jobs:
     steps:
       - name: Producao so recebe PR vinda da main
         if: github.event_name == 'pull_request' && github.base_ref == 'production'
+        # Nomes de branch/repo vem de quem abre a PR: so por variavel de ambiente, nunca direto no script
+        env:
+          HEAD_REF: ${{ github.head_ref }}
+          HEAD_REPO: ${{ github.event.pull_request.head.repo.full_name }}
+          REPO: ${{ github.repository }}
         run: |
-          if [ "${{ github.head_ref }}" != "main" ] || [ "${{ github.event.pull_request.head.repo.full_name }}" != "${{ github.repository }}" ]; then
-            echo "::error::A branch production so aceita PR vinda da main deste repositorio (recebido: ${{ github.event.pull_request.head.repo.full_name }}:${{ github.head_ref }})."
+          if [ "$HEAD_REF" != "main" ] || [ "$HEAD_REPO" != "$REPO" ]; then
+            echo "::error::A branch production so aceita PR vinda da main deste repositorio (recebido: $HEAD_REPO:$HEAD_REF)."
             exit 1
           fi
       - run: echo "Origem ok."
