@@ -14,3 +14,7 @@
 	}
 	reverse_proxy frontend:80
 }
+
+# Outros sites da VPS (ex.: Fetech). Cada projeto grava o seu arquivo em /opt/caddy-sites
+# no proprio deploy e recarrega o Caddy; sem arquivos, o import e ignorado.
+import /etc/caddy/sites/*.caddy

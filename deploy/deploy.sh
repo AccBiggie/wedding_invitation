@@ -10,6 +10,9 @@ git checkout -q -f production
 git reset -q --hard origin/production
 echo "Versao: $(git log -1 --format='%h %s')"
 
+# Rede compartilhada com os outros projetos da VPS (ex.: Fetech).
+docker network inspect proxy >/dev/null 2>&1 || docker network create --subnet 172.30.250.0/24 proxy
+
 docker compose -f docker-compose.prod.yml up -d --build --remove-orphans
 docker image prune -f >/dev/null
 
