@@ -19,9 +19,12 @@ services:
       - ./deploy/Caddyfile:/etc/caddy/Caddyfile:ro
       - caddy_data:/data
       - caddy_config:/config
+      # Sites de outros projetos da VPS (importados no fim do Caddyfile)
+      - /opt/caddy-sites:/etc/caddy/sites:ro
     depends_on: [frontend]
-    # So a rede edge (com IPv6): o Caddy recebe o IP real de cada celular, tambem por IPv6.
-    networks: [edge]
+    # Rede edge (com IPv6): o Caddy recebe o IP real de cada celular, tambem por IPv6.
+    # Rede proxy: alcanca os sites dos outros projetos da VPS.
+    networks: [edge, proxy]
     logging: *logging
 
   frontend:
@@ -127,6 +130,10 @@ networks:
       config:
         - subnet: fd4d:6169:6c00:1::/64
   default: {}
+  # Compartilhada com os outros projetos da VPS; criada pelo deploy.sh (sub-rede fixa 172.30.250.0/24)
+  proxy:
+    external: true
+    name: proxy
 
 volumes:
   mongodb_data:
