@@ -89,8 +89,8 @@ export const wedding = {
       { photo: '/historia/polaroid-portao.webp', caption: 'para sempre' }
     ]
   },
-  // Crédito da barra final do rodapé (logo da FETECH). TODO: link do site da FETECH.
-  credit: { name: 'FETECH', url: '' },
+  // Crédito da barra final do rodapé: a logo da FETECH leva ao site da empresa.
+  credit: { name: 'FETECH', url: 'https://www.fetech.systems/' },
   contact: {
     phone: '(44) 99883-3731',
     whatsapp: 'https://wa.me/5544998833731',
