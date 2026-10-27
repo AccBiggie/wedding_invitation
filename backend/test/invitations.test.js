@@ -1,5 +1,5 @@
 import test from 'node:test'; import assert from 'node:assert/strict'; import request from 'supertest'; import app from '../src/app.js'; import { signToken } from '../src/controllers/authController.js';
-import { newCode } from '../src/controllers/invitationController.js';
+import { mayConfirm, newCode } from '../src/controllers/invitationController.js';
 const bearer = 'Bearer ' + signToken({ _id: 'test-admin', name: 'Administrador', email: 'accbiggie@gmail.com', role: 'admin' });
 test('health endpoint', async()=>{const r=await request(app).get('/api/health');assert.equal(r.status,200);assert.equal(r.body.success,true);});
 test('cadastro sem nome é rejeitado', async()=>{const r=await request(app).post('/api/invitations').set('Authorization',bearer).send({description:'x'});assert.equal(r.status,422);assert.equal(r.body.success,false);});
@@ -18,3 +18,11 @@ test('gerar códigos exige ids válidos', async()=>{const r=await request(app).p
 test('configurações do convite exigem login', async()=>{const r=await request(app).get('/api/invitation-card');assert.equal(r.status,401);});
 test('configurações do convite rejeitam endereço inválido', async()=>{const r=await request(app).put('/api/invitation-card').set('Authorization',bearer).send({siteUrl:'ftp://x',greeting:'Querido(a)',intro:'x',place:'x',address:'x',qrText:'x',photo:''});assert.equal(r.status,422);assert.ok(r.body.errors.siteUrl);});
 test('leituras públicas aguentam muitos acessos do mesmo IP (CGNAT)', async()=>{for(let i=0;i<150;i++){const r=await request(app).get('/api/public/wedding');assert.equal(r.status,200,`requisição ${i+1}`);}});
+test('confirmar presença sem código nem token é recusado', async()=>{const r=await request(app).post('/api/public/invitations/6add8554d73ef6b703fdf5e9/confirm').send({guestIds:[]});assert.equal(r.status,404);assert.equal(r.body.success,false);});
+test('confirmação só aceita o código ou o token do próprio convite', ()=>{const item={code:'ABC123XYZ9',publicToken:'token-secreto-do-convite'};
+assert.equal(mayConfirm(item,{body:{},query:{}}),false);
+assert.equal(mayConfirm(item,{body:{code:'AAAAAAAAAA'},query:{}}),false);
+assert.equal(mayConfirm(item,{body:{},query:{token:'token-errado'}}),false);
+assert.equal(mayConfirm(item,{body:{code:'ABC123XYZ'},query:{}}),false);
+assert.equal(mayConfirm(item,{body:{code:' abc123xyz9 '},query:{}}),true);
+assert.equal(mayConfirm(item,{body:{},query:{token:'token-secreto-do-convite'}}),true);});

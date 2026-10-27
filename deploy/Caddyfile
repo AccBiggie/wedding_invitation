@@ -6,6 +6,10 @@
 {$DOMAIN} {
 	encode zstd gzip
 	header {
+		# CSP: scripts so do site (o index.html nao tem script inline). Estilos precisam de
+		# unsafe-inline (atributos style do React e <style> injetado pelo MUI) e das fontes do
+		# Google. img-src aceita https: porque o painel permite cadastrar imagem por URL.
+		Content-Security-Policy "default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' data: https://fonts.gstatic.com; img-src 'self' data: blob: https:; connect-src 'self'; frame-src https://www.google.com; frame-ancestors 'self'; base-uri 'self'; form-action 'self'; object-src 'none'"
 		Strict-Transport-Security "max-age=31536000; includeSubDomains"
 		X-Content-Type-Options nosniff
 		Referrer-Policy strict-origin-when-cross-origin

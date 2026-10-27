@@ -12,6 +12,20 @@ const guestView = invitation => invitation.guests?.length ? invitation.guests : 
 const CODE_ALPHABET = 'ABCDEFGHJKMNPQRSTUVWXYZ23456789';
 export const newCode = () => Array.from({ length: 10 }, () => CODE_ALPHABET[crypto.randomInt(CODE_ALPHABET.length)]).join('');
 const isDuplicate = error => error?.code === 11000;
+// Comparacao de tamanho constante: nao revela por tempo de resposta quantos caracteres bateram.
+function sameSecret(a, b) {
+  if (typeof a !== 'string' || typeof b !== 'string' || !a || !b) return false;
+  const x = Buffer.from(a), y = Buffer.from(b);
+  return x.length === y.length && crypto.timingSafeEqual(x, y);
+}
+
+// Confirmar presenca exige a mesma prova usada para abrir o convite: o codigo do link
+// impresso (QR) ou o token do link antigo. So o id (um ObjectId, parcialmente previsivel)
+// deixaria qualquer pessoa marcar e desmarcar convidados de outros convites.
+export const mayConfirm = (item, req) =>
+  sameSecret(typeof req.body?.code === 'string' ? req.body.code.trim().toUpperCase() : '', item.code) ||
+  sameSecret(typeof req.query?.token === 'string' ? req.query.token : '', item.publicToken);
+
 const publicView = item => ({ _id: item._id, name: item.name, status: item.status, confirmedAt: item.confirmedAt, confirmationDeadline: item.confirmationDeadline, guests: item.guests.map(guest => ({ _id: guest._id, name: guest.name, confirmed: guest.confirmed })) });
 
 async function assignCode(id) {
@@ -159,8 +173,11 @@ export async function publicGetByCode(req, res, next) {
 export async function confirm(req, res, next) {
   try {
     if (!idOrFail(req.params.id, res)) return;
+    // Sem prova nenhuma nem chega a consultar o banco.
+    if (!req.body?.code && !req.query?.token) return fail(res, 404, 'Convite nao encontrado.');
     const item = await Invitation.findById(req.params.id);
-    if (!item) return fail(res, 404, 'Convite nao encontrado.');
+    // Mesma resposta para convite inexistente e para prova errada: nao confirma se o id existe.
+    if (!item || !mayConfirm(item, req)) return fail(res, 404, 'Convite nao encontrado.');
     await ensureGuests(item);
     const selectedIds = Array.isArray(req.body.guestIds) ? req.body.guestIds : item.guests.map(guest => String(guest._id));
     const selected = new Set(selectedIds.map(String));
