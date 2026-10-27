@@ -633,10 +633,12 @@ function WeddingShell({ children, wedding }) {
 function Public() {
   const [, kind, id, name] = location.pathname.split('/');
   const byCode = kind === 'convite';
+  // Mesma prova usada para abrir o convite: o backend exige ela de novo ao confirmar.
+  const token = new URLSearchParams(location.search).get('token');
   const wedding = useWedding();
   const [item, setItem] = useState(); const [error, setError] = useState(false); const [confirming, setConfirming] = useState(false); const [status, setStatus] = useState(null); const [selectedGuestIds, setSelectedGuestIds] = useState([]);
   useEffect(() => {
-    const request = byCode ? api.get('/public/invitations/code/' + encodeURIComponent(id || '')) : api.get('/public/invitations/' + id + '/' + name, { params: { token: new URLSearchParams(location.search).get('token') } });
+    const request = byCode ? api.get('/public/invitations/code/' + encodeURIComponent(id || '')) : api.get('/public/invitations/' + id + '/' + name, { params: { token } });
     request.then(response => setItem(response.data.data)).catch(() => setError(true));
   }, [byCode, id, name]);
   useEffect(() => { if (item?.guests) setSelectedGuestIds(item.guests.filter(guest => guest.confirmed).map(guest => String(guest._id))); }, [item?._id]);
@@ -645,7 +647,7 @@ function Public() {
   const confirm = async () => {
     setConfirming(true); setStatus(null);
     try {
-      const response = await api.post('/public/invitations/' + item._id + '/confirm', { guestIds: selectedGuestIds });
+      const response = await api.post('/public/invitations/' + item._id + '/confirm', { guestIds: selectedGuestIds, ...(byCode && { code: id }) }, byCode ? undefined : { params: { token } });
       setItem(response.data.data);
       setStatus({ error: false, text: 'Confirmação atualizada! Obrigado, estamos ansiosos para ver vocês.' });
     } catch { setStatus({ error: true, text: 'Não foi possível atualizar a confirmação. Tente de novo em instantes.' }); }

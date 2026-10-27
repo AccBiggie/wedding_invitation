@@ -154,7 +154,9 @@ test('convite publico continua confirmando convidados individualmente', { skip: 
   const publicItem = await request(app).get(publicUrl);
   assert.equal(publicItem.status, 200);
   const guestId = publicItem.body.data.guests[0]._id;
-  const confirmed = await request(app).post(`/api/public/invitations/${item._id}/confirm`).send({ guestIds: [guestId] });
+  const withoutToken = await request(app).post(`/api/public/invitations/${item._id}/confirm`).send({ guestIds: [guestId] });
+  assert.equal(withoutToken.status, 404);
+  const confirmed = await request(app).post(`/api/public/invitations/${item._id}/confirm`).query({ token: item.publicToken }).send({ guestIds: [guestId] });
   assert.equal(confirmed.status, 200);
   assert.equal(confirmed.body.data.guests[0].confirmed, true);
   assert.equal(confirmed.body.data.guests[1].confirmed, false);
