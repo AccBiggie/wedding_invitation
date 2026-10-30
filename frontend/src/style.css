@@ -24,7 +24,7 @@ body{background:#f5f7fb}
 .wed-card{padding:1.1rem}
 
 .wed-btn{display:flex;align-items:center;justify-content:center;gap:.6rem;width:100%;padding:.85rem 1rem;border:0;border-radius:8px;background:var(--wed-green);color:#fdfaf2;font-family:inherit;font-size:calc(1.28rem * var(--wed-font-scale, 1));cursor:pointer;transition:background .15s}
-.wed-btn:hover:not(:disabled){background:var(--wed-green-dark)}
+.wed-btn:hover:not(:disabled){background:var(--wed-green-dark);color:#fdfaf2;text-decoration:none}
 .wed-btn:disabled{opacity:.7;cursor:default}
 .wed-btn svg{color:var(--wed-gold)}
 
