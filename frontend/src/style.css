@@ -701,14 +701,6 @@ a.wed-shop-badge:hover{border-color:var(--wed-gold);background:#fffcf3}
 /* Igreja em traco como marca d'agua do fundo de papel. */
 .wed-church{position:absolute;left:50%;bottom:2vh;width:min(880px,82vw);height:auto;transform:translateX(-50%);opacity:0;transition:opacity 1.4s ease .3s}
 .wed-lp.is-paper .wed-church{opacity:.55}
-.wed-church path,.wed-church circle{fill:none;stroke:#a8875a;stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round;vector-effect:non-scaling-stroke}
-.wed-church .thin{stroke-width:1;opacity:.85}
-.wed-church .glass{fill:#f1e7d2}
-.wed-church .door{fill:#e9dbbd}
-.wed-church .roof{fill:#efe2c6}
-.wed-church .cross{stroke:#b8955a;stroke-width:2.2}
-.wed-church .tree circle{fill:#e3e8d8;stroke:#8fa27f}
-.wed-church .tree path{stroke:#8fa27f}
 /* Secoes levemente translucidas no meio (a igreja aparece suave por tras) e opacas nas bordas, por onde os ramos do jardim passam por baixo. */
 .wed-lp.is-paper .wed-sec:not(.wed-story){background:linear-gradient(90deg,var(--wed-cream) 0 120px,color-mix(in srgb,var(--wed-cream) 84%,transparent) 190px calc(100% - 190px),var(--wed-cream) calc(100% - 120px))}
 .wed-lp .wed-sec:not(.wed-story){transition:box-shadow 1s ease,background-color 1s ease}
