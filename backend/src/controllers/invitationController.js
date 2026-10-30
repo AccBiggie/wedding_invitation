@@ -75,14 +75,15 @@ export async function list(req, res, next) {
     const [data, total, allInvitations] = await Promise.all([
       Invitation.find(query).sort({ [sortBy]: sortOrder }).skip((page - 1) * limit).limit(limit),
       Invitation.countDocuments(query),
-      Invitation.find(query).select('name guests')
+      Invitation.find(query).select('name guests type')
     ]);
     const summary = allInvitations.reduce((result, invitation) => {
       const guests = guestView(invitation);
       result.people += guests.length;
       result.confirmed += guests.filter(guest => guest.confirmed).length;
+      result[invitation.type === 'virtual' ? 'virtual' : 'inPerson'] += 1;
       return result;
-    }, { people: 0, confirmed: 0 });
+    }, { people: 0, confirmed: 0, inPerson: 0, virtual: 0 });
     summary.unconfirmed = summary.people - summary.confirmed;
     ok(res, { data, pagination: { page, limit, total, totalPages: Math.ceil(total / limit) }, summary: { total, ...summary } });
   } catch (error) { next(error); }
