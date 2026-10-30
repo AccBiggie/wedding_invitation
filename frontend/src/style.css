@@ -24,7 +24,7 @@ body{background:#f5f7fb}
 .wed-card{padding:1.1rem}
 
 .wed-btn{display:flex;align-items:center;justify-content:center;gap:.6rem;width:100%;padding:.85rem 1rem;border:0;border-radius:8px;background:var(--wed-green);color:#fdfaf2;font-family:inherit;font-size:calc(1.28rem * var(--wed-font-scale, 1));cursor:pointer;transition:background .15s}
-.wed-btn:hover:not(:disabled){background:var(--wed-green-dark)}
+.wed-btn:hover:not(:disabled){background:var(--wed-green-dark);color:#fdfaf2;text-decoration:none}
 .wed-btn:disabled{opacity:.7;cursor:default}
 .wed-btn svg{color:var(--wed-gold)}
 
@@ -584,8 +584,8 @@ a.wed-shop-badge:hover{border-color:var(--wed-gold);background:#fffcf3}
 .wed-floral-frame{position:absolute;left:-32.174%;top:-32.174%;width:164.348%;height:164.348%;overflow:visible;pointer-events:none}
 .wed-story-text{position:relative;flex:1;min-width:0;padding-left:1.6rem;border-left:1.5px dashed rgba(184,149,90,.6)}
 .wed-story-pin{position:absolute;left:-11px;top:-2px;width:20px;height:19px;padding:3px;border-radius:50%;background:var(--st-paper);fill:var(--st-gold);stroke:none}
-.wed-story-number{display:block;font-family:'Cormorant Garamond',Georgia,serif;font-size:calc(1.5rem * var(--wed-font-scale, 1));line-height:1;color:var(--st-gold)}
-.wed-story-text h3{margin:.15rem 0 .25rem;font-family:'Cormorant Garamond',Georgia,serif;font-weight:500;font-size:calc(1.85rem * var(--wed-font-scale, 1));line-height:1.1;color:var(--st-green)}
+.wed-story-number{display:block;font-family:var(--wed-font,'Cormorant Garamond',Georgia,serif);font-size:calc(1.5rem * var(--wed-font-scale, 1));line-height:1;color:var(--st-gold)}
+.wed-story-text h3{margin:.15rem 0 .25rem;font-family:var(--wed-font,'Cormorant Garamond',Georgia,serif);font-weight:500;font-size:calc(1.85rem * var(--wed-font-scale, 1));line-height:1.1;color:var(--st-green)}
 .wed-story-date{margin:0 0 .7rem;font-size:calc(.8rem * var(--wed-font-scale, 1));letter-spacing:.22em;text-transform:uppercase;color:#7a6a4f}
 .wed-story-copy{margin:0;font-size:calc(1.1rem * var(--wed-font-scale, 1));line-height:1.55;color:var(--st-ink)}
 /* Notas manuscritas e desenhos no lado livre */
@@ -598,7 +598,7 @@ a.wed-shop-badge:hover{border-color:var(--wed-gold);background:#fffcf3}
 .wed-story-doodle .wine{fill:#ecd9a8;stroke:none}
 .wed-story-doodle .board{fill:#fbf3e3}
 .wed-story-doodle .tree{fill:#dfe6d4;stroke:var(--st-sage-dark);stroke-width:1}
-.wed-story-doodle text{font-family:'Cormorant Garamond',Georgia,serif;font-size:11px;letter-spacing:.08em;fill:#8a6d43;stroke:none}
+.wed-story-doodle text{font-family:var(--wed-font,'Cormorant Garamond',Georgia,serif);font-size:11px;letter-spacing:.08em;fill:#8a6d43;stroke:none}
 .wed-story-doodle.is-signpost svg{width:120px}
 .wed-story-doodle.is-chapel svg{width:170px}
 .wed-story-note{margin:0;font-family:'Parisienne','Great Vibes',cursive;font-size:calc(1.35rem * var(--wed-font-scale, 1));line-height:1.25;text-align:center;color:#8b7550;transform:rotate(-6deg)}
@@ -701,14 +701,6 @@ a.wed-shop-badge:hover{border-color:var(--wed-gold);background:#fffcf3}
 /* Igreja em traco como marca d'agua do fundo de papel. */
 .wed-church{position:absolute;left:50%;bottom:2vh;width:min(880px,82vw);height:auto;transform:translateX(-50%);opacity:0;transition:opacity 1.4s ease .3s}
 .wed-lp.is-paper .wed-church{opacity:.55}
-.wed-church path,.wed-church circle{fill:none;stroke:#a8875a;stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round;vector-effect:non-scaling-stroke}
-.wed-church .thin{stroke-width:1;opacity:.85}
-.wed-church .glass{fill:#f1e7d2}
-.wed-church .door{fill:#e9dbbd}
-.wed-church .roof{fill:#efe2c6}
-.wed-church .cross{stroke:#b8955a;stroke-width:2.2}
-.wed-church .tree circle{fill:#e3e8d8;stroke:#8fa27f}
-.wed-church .tree path{stroke:#8fa27f}
 /* Secoes levemente translucidas no meio (a igreja aparece suave por tras) e opacas nas bordas, por onde os ramos do jardim passam por baixo. */
 .wed-lp.is-paper .wed-sec:not(.wed-story){background:linear-gradient(90deg,var(--wed-cream) 0 120px,color-mix(in srgb,var(--wed-cream) 84%,transparent) 190px calc(100% - 190px),var(--wed-cream) calc(100% - 120px))}
 .wed-lp .wed-sec:not(.wed-story){transition:box-shadow 1s ease,background-color 1s ease}
@@ -751,10 +743,10 @@ a.wed-shop-badge:hover{border-color:var(--wed-gold);background:#fffcf3}
 .wed-sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
 .wed-lp-hero .wed-count{gap:12px;margin-top:26px}
 .wed-lp-hero .wed-count-box{width:86px;min-width:0;padding:12px 0 10px;border:1px solid rgba(226,194,135,.65);border-radius:14px;background:rgba(20,36,26,.34);box-shadow:inset 0 0 0 1px rgba(252,248,238,.08);-webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px)}
-.wed-lp-hero .wed-count-box strong{font-family:'Cormorant Garamond',Georgia,serif;font-size:calc(38px * var(--wed-font-scale, 1));line-height:40px;font-weight:500;color:#fffaf0}
+.wed-lp-hero .wed-count-box strong{font-family:var(--wed-font,'Cormorant Garamond',Georgia,serif);font-size:calc(38px * var(--wed-font-scale, 1));line-height:40px;font-weight:500;color:#fffaf0}
 .wed-lp-hero .wed-count-box span{margin-top:4px;font-size:calc(11px * var(--wed-font-scale, 1));line-height:14px;letter-spacing:.28em;text-transform:uppercase;color:#f1e2c2}
 .wed-lp-hero .wed-count-done{color:#fffaf0;text-shadow:0 1px 12px rgba(10,20,14,.5)}
-.wed-lp-hero .wed-lp-scroll{display:inline-flex;align-items:center;gap:10px;margin-top:28px;padding:11px 24px;border:1px solid #d9b77a;border-radius:999px;background:rgba(252,248,238,.94);color:#24412f;font-family:'Cormorant Garamond',Georgia,serif;font-size:calc(16px * var(--wed-font-scale, 1));line-height:20px;letter-spacing:.06em;text-decoration:none;transition:background .15s,box-shadow .15s}
+.wed-lp-hero .wed-lp-scroll{display:inline-flex;align-items:center;gap:10px;margin-top:28px;padding:11px 24px;border:1px solid #d9b77a;border-radius:999px;background:rgba(252,248,238,.94);color:#24412f;font-family:var(--wed-font,'Cormorant Garamond',Georgia,serif);font-size:calc(16px * var(--wed-font-scale, 1));line-height:20px;letter-spacing:.06em;text-decoration:none;transition:background .15s,box-shadow .15s}
 .wed-lp-hero .wed-lp-scroll:hover{background:#fffaf0;color:#24412f;border-color:#d9b77a;box-shadow:0 6px 18px rgba(10,20,14,.25)}
 .wed-lp-hero .wed-lp-scroll:focus-visible{outline:2px solid #fffaf0;outline-offset:3px}
 /* Celular: nomes em duas linhas ("Stefani &" / "Andre"), caixas de 68 px e veu um pouco mais forte. */
@@ -784,7 +776,7 @@ a.wed-shop-badge:hover{border-color:var(--wed-gold);background:#fffcf3}
 .wed-lp .wed-nav.is-floral .wed-nav-brand .wed-monogram{margin:0;color:#ad8c5c;filter:none}
 .wed-lp .wed-nav.is-floral .wed-nav-brand:focus-visible,.wed-lp .wed-nav.is-floral .wed-nav-links a:focus-visible,.wed-lp .wed-nav.is-floral .wed-nav-toggle:focus-visible{outline:2px solid #24412f;outline-offset:4px}
 .wed-lp .wed-nav.is-floral .wed-nav-links{position:relative;flex:1;justify-content:space-between;gap:12px;margin-left:0}
-.wed-lp .wed-nav.is-floral .wed-nav-links a{position:relative;padding:6px 2px;border-radius:4px;background:none;color:#24412f;font-family:'Cormorant Garamond',Georgia,serif;font-size:calc(20px * var(--wed-font-scale, 1));line-height:24px;font-weight:500;text-shadow:none}
+.wed-lp .wed-nav.is-floral .wed-nav-links a{position:relative;padding:6px 2px;border-radius:4px;background:none;color:#24412f;font-family:var(--wed-font,'Cormorant Garamond',Georgia,serif);font-size:calc(20px * var(--wed-font-scale, 1));line-height:24px;font-weight:500;text-shadow:none}
 .wed-lp .wed-nav.is-floral .wed-nav-links a:hover{background:none;color:#24412f;text-decoration:underline;text-decoration-color:#c9ab78;text-decoration-thickness:1px;text-underline-offset:6px}
 .wed-lp .wed-nav.is-floral .wed-nav-links a.is-active{background:none;color:#24412f}
 .wed-lp .wed-nav.is-floral .wed-nav-links a.is-cta{padding:10px 22px;border-radius:999px;background:#24412f;color:#faf8f3}
