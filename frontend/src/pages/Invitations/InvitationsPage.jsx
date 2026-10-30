@@ -52,7 +52,7 @@ export function InvitationsPage() {
   const [items, setItems] = useState([]);
   const [filters, setFilters] = useState({ startDate: monthStart(), endDate: monthEnd() });
   const [pagination, setPagination] = useState({ page: 1, limit: 20, total: 0, totalPages: 0 });
-  const [summary, setSummary] = useState({ total: 0, people: 0, confirmed: 0, unconfirmed: 0 });
+  const [summary, setSummary] = useState({ total: 0, inPerson: 0, virtual: 0, people: 0, confirmed: 0, unconfirmed: 0 });
   const [loading, setLoading] = useState(true);
   const [editLoading, setEditLoading] = useState(false);
   const [formOpen, setFormOpen] = useState(false);
@@ -179,7 +179,7 @@ export function InvitationsPage() {
       <Divider />
       {INVITE_LAYOUTS.map(({ layout, name }) => <MenuItem key={layout} disabled={preparing} onClick={() => rowAction(item => void startPrint(layout, [item]))}><ListItemIcon><PrintOutlined fontSize="small" /></ListItemIcon><ListItemText>Imprimir — {name}</ListItemText></MenuItem>)}
     </Menu>
-    <Stack direction="row" spacing={1} useFlexGap sx={{ flexWrap: 'wrap', px: 2, pt: 2 }}>{[[summary.total, 'Convites'], [summary.people, 'Pessoas'], [summary.confirmed, 'Confirmados'], [summary.unconfirmed, 'Não confirmados']].map(([value, label]) => <Chip key={label} variant="outlined" label={`${label}: ${value}`} />)}</Stack>
+    <Stack direction="row" spacing={1} useFlexGap sx={{ flexWrap: 'wrap', px: 2, pt: 2 }}>{[[summary.total, 'Convites'], [summary.inPerson, 'Presenciais'], [summary.virtual, 'Online'], [summary.people, 'Pessoas'], [summary.confirmed, 'Confirmados'], [summary.unconfirmed, 'Não confirmados']].map(([value, label]) => <Chip key={label} variant="outlined" label={`${label}: ${value}`} />)}</Stack>
     <TablePagination component="div" count={pagination.total} page={pagination.page - 1} rowsPerPage={pagination.limit} onPageChange={(_, page) => setPagination(current => ({ ...current, page: page + 1 }))} onRowsPerPageChange={event => setPagination(current => ({ ...current, limit: Number(event.target.value), page: 1 }))} rowsPerPageOptions={[10, 20, 50, 100, 200]} labelRowsPerPage="Por página:" labelDisplayedRows={({ from, to, count }) => `${from}–${to} de ${count}`} getItemAriaLabel={type => type === 'next' ? 'Próxima página' : 'Página anterior'} />
     </Paper>
     {editLoading && <CrudDialog title="Carregando convite" onClose={closeForm}><CircularProgress aria-label="Carregando convite" /></CrudDialog>}

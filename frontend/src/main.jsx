@@ -7,7 +7,6 @@ import { GravataDialog, PixQrDialog, usePixStatus } from './pages/Pix/GravataEnt
 import { ScrollReveal } from './components/reveal/ScrollReveal';
 import { OurStory } from './components/story/OurStory';
 import { OliveGarland, OliveVine } from './components/decor/Olive';
-import { ChurchSketch } from './components/decor/ChurchSketch';
 import { NavFlower } from './components/decor/NavFlower';
 import { Ceremony } from './components/ceremony/Ceremony';
 import { Guestbook } from './components/guestbook/Guestbook';
@@ -476,7 +475,7 @@ function Landing() {
   const target = new Date(wedding.datetime).getTime();
   const copyPix = async () => { try { await navigator.clipboard.writeText(pixKey); setCopied(true); setTimeout(() => setCopied(false), 2500); } catch { /* sem clipboard */ } };
   return <div className={`wed wed-lp${paper ? ' is-paper' : ''}`} {...appearanceProps}>
-    <div className="wed-lp-paper" aria-hidden="true"><ChurchSketch />{wedding.appearance?.branches !== 'off' && <><OliveVine className="is-left" from="top" /><OliveVine className="is-right" /></>}</div>
+    <div className="wed-lp-paper" aria-hidden="true"><img className="wed-church" src="/igreja.png" alt="" decoding="async" />{wedding.appearance?.branches !== 'off' && <><OliveVine className="is-left" from="top" /><OliveVine className="is-right" /></>}</div>
     <div className="wed-lp-bg" aria-hidden="true">
       {photoFailed ? <div className="wed-lp-bg-empty" /> : <img src={wedding.photo} alt="" onError={() => setPhotoFailed(true)} />}
     </div>

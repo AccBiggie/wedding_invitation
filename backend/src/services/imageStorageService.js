@@ -105,6 +105,24 @@ export async function replaceImage(image, buffer, mimeType, filename) {
 
 export async function openImage(image) { return storage().send(new GetObjectCommand({ Bucket: env.r2.bucket, Key: image.objectKey })); }
 
+// Miniaturas para fotos exibidas bem menores que o original (ex.: porta-retratos dos padrinhos).
+// Reduzir 1200px para ~100px no navegador borra a foto; aqui a reducao usa Lanczos e um leve
+// sharpen. Larguras fixas para ninguem forcar processamento arbitrario; cache em memoria pequeno.
+export const thumbnailWidths = [480];
+const thumbnailCache = new Map();
+const THUMBNAIL_CACHE_LIMIT = 200;
+export async function thumbnail(image, width) {
+  const key = `${image._id}:${image.updatedAt?.getTime?.() || 0}:${width}`;
+  const cached = thumbnailCache.get(key);
+  if (cached) { thumbnailCache.delete(key); thumbnailCache.set(key, cached); return cached; }
+  const chunks = [];
+  for await (const chunk of (await openImage(image)).Body) chunks.push(chunk);
+  const buffer = await sharp(Buffer.concat(chunks)).resize(width, width, { fit: 'inside', withoutEnlargement: true }).sharpen({ sigma: 0.5 }).webp({ quality: 85 }).toBuffer();
+  thumbnailCache.set(key, buffer);
+  if (thumbnailCache.size > THUMBNAIL_CACHE_LIMIT) thumbnailCache.delete(thumbnailCache.keys().next().value);
+  return buffer;
+}
+
 export function imageIds(values) {
   return [...new Set(values.map(value => /^\/api\/images\/([a-f\d]{24})$/i.exec(value)?.[1]).filter(Boolean))];
 }

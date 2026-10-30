@@ -78,6 +78,12 @@ test('upload, vínculo, substituição e exclusão preservam banco e objetos', {
     const displayed = await request(app).get(url);
     assert.equal(displayed.status, 200);
     assert.equal(displayed.headers['content-type'], 'image/webp');
+    // Miniatura: so larguras permitidas, nunca amplia a original.
+    const thumb = await request(app).get(url + '?w=480').buffer(true).parse((res, done) => { const chunks = []; res.on('data', chunk => chunks.push(chunk)); res.on('end', () => done(null, Buffer.concat(chunks))); });
+    assert.equal(thumb.status, 200);
+    assert.equal(thumb.headers['content-type'], 'image/webp');
+    assert.equal((await sharp(thumb.body).metadata()).width, 20);
+    assert.equal((await request(app).get(url + '?w=999')).status, 400);
     assert.equal((await request(app).delete(url)).status, 401);
     assert.equal((await request(app).delete(url).set('Authorization', token)).status, 409);
     const oldKey = (await StoredImage.findById(id)).objectKey;

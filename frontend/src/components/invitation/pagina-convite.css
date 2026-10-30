@@ -50,3 +50,5 @@
 /* No site: a pagina ocupa a area entre a navbar e o rodape, centrada, com o papel claro de fundo. */
 .wed-invitation .pc-main { flex: 1; background: var(--papel-claro, #fbf8f0); }
 .wed-invitation .pc-main .cv9 { max-width: 1080px; margin: 0 auto; background: #fbf8f0; }
+/* Fontes seguem o tema escolhido no painel: texto e rotulos na fonte do site, nomes na fonte de titulos. */
+.wed .cv9 { --font-serifa: var(--wed-font, "Cormorant Garamond", Georgia, serif); --f-ui: var(--wed-font, "Jost", "Helvetica Neue", Arial, sans-serif); --f-cal: var(--wed-display-font, var(--wed-font, "Great Vibes", cursive)); }
