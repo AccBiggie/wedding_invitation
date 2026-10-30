@@ -3,7 +3,7 @@ import { resolveImageUrl } from '../services/images.service';
 // SVGs tematicos das categorias da "Lista na loja". Para adicionar um icone, basta
 // colocar <chave>.svg em src/assets/category-icons (e, se quiser, o rotulo abaixo).
 const files = import.meta.glob<string>('../assets/category-icons/*.svg', { eager: true, query: '?url', import: 'default' });
-const labels: Record<string, string> = { beleza: 'Beleza e Perfumaria', camisetas: 'Camisetas', chuteiras: 'Chuteiras', eletrodomesticos: 'Eletrodomésticos', jogos: 'Jogos', loucas: 'Louças', panelas: 'Panelas', tacas: 'Taças', utensilios: 'Utensílios' };
+const labels: Record<string, string> = { beleza: 'Beleza e Perfumaria', camisetas: 'Camisetas', chuteiras: 'Chuteiras', eletrodomesticos: 'Eletrodomésticos', jogos: 'Jogos', loucas: 'Louças', panelas: 'Panelas', tacas: 'Taças', tapetes: 'Tapetes', utensilios: 'Utensílios' };
 const keyOf = (path: string) => path.split('/').pop()!.replace(/\.svg$/, '');
 
 export interface CategoryIcon { key: string; label: string; url: string }

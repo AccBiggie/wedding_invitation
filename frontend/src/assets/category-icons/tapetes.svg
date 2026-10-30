@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 240 240" role="img" aria-label="Tapetes">
+  <defs><radialGradient id="bg" cx="50%" cy="38%" r="72%"><stop offset="0" stop-color="#fffdf7"/><stop offset="1" stop-color="#efe5cf"/></radialGradient></defs>
+  <rect width="240" height="240" fill="url(#bg)"/>
+  <ellipse cx="120" cy="184" rx="68" ry="7" fill="#e2d4b4" opacity=".55"/>
+  <g fill="none" stroke="#1f4536" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M74 104 H170 L186 164 H58 Z" fill="#fffaf0"/>
+    <path d="M82 112 H162 L174 156 H70 Z" stroke="#c0a057" stroke-width="2"/>
+    <path d="M122 118 L142 134 L122 150 L102 134 Z" fill="#ecd9a2" stroke="#c0a057" stroke-width="2"/>
+    <path d="M92 134 h4 M148 134 h4" stroke="#c0a057" stroke-width="2.4"/>
+    <path d="M64 165 v9 M74 165 v9 M84 165 v9 M94 165 v9 M104 165 v9 M114 165 v9 M124 165 v9 M134 165 v9 M144 165 v9 M154 165 v9 M164 165 v9 M174 165 v9 M184 165 v9" stroke-width="2.2"/>
+    <path d="M74 74 H170 A8 17 0 0 1 170 108 H74" fill="#efe5cf"/>
+    <path d="M96 76 v30 M120 76 v30 M144 76 v30" stroke="#c0a057" stroke-width="2"/>
+    <ellipse cx="74" cy="91" rx="8" ry="17" fill="#fffaf0"/>
+    <path d="M74 91 c3 0 3 -6 0 -6 c-4 0 -5 9 0 10 c5 0 6 -13 0 -14" stroke-width="2.2"/>
+    <path d="M190 62 l3 8 l8 3 l-8 3 l-3 8 l-3 -8 l-8 -3 l8 -3 Z" fill="#c0a057" stroke="#c0a057" stroke-width="1.4"/>
+  </g>
+</svg>
