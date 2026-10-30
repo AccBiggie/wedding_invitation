@@ -1,5 +1,5 @@
 import mongoose from 'mongoose';
-import { imageCategories, uploadImage, getImage, getImageUrl, openImage, deleteImage, replaceImage, storageDeleteKey } from '../services/imageStorageService.js';
+import { imageCategories, uploadImage, getImage, getImageUrl, openImage, deleteImage, replaceImage, storageDeleteKey, thumbnail, thumbnailWidths } from '../services/imageStorageService.js';
 import Godparent from '../models/Godparent.js';
 import GiftProduct from '../models/GiftProduct.js';
 import StoreCategory from '../models/StoreCategory.js';
@@ -36,6 +36,12 @@ export async function show(req, res, next) {
     if (!mongoose.isValidObjectId(req.params.id)) return bad(res, 400, 'Identificador inválido.');
     const image = await getImage(req.params.id);
     if (!image || !image.entityId || !['godparent', 'gift', 'storeCategory', 'invitationCard'].includes(image.entityType) || !await isReferenced(image)) return bad(res, 404, 'Imagem não encontrada.');
+    const width = Number(req.query.w);
+    if (req.query.w !== undefined) {
+      if (!thumbnailWidths.includes(width)) return bad(res, 400, 'Largura de miniatura inválida.');
+      res.set({ 'Content-Type': 'image/webp', 'Cache-Control': 'no-store', 'X-Content-Type-Options': 'nosniff' });
+      return res.send(await thumbnail(image, width));
+    }
     if (env.r2.publicBaseUrl) {
       const base = new URL(env.r2.publicBaseUrl);
       if (base.protocol !== 'https:' || base.hostname.endsWith('.r2.dev')) return bad(res, 503, 'Domínio público de imagens inválido.');
