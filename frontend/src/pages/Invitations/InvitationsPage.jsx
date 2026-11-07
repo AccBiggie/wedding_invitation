@@ -66,10 +66,11 @@ export function InvitationsPage() {
   const [notification, setNotification] = useState(null);
   const notify = (type, message) => setNotification({ type, message });
   const [card, setCard] = useState(null);
+  // Modelo padrao escolhido em "Configuracoes do convite": vale para imprimir e para o link.
+  const layoutName = INVITE_LAYOUTS.find(item => item.layout === card?.layout)?.name || '';
   const [cardOpen, setCardOpen] = useState(false);
   const [printJob, setPrintJob] = useState(null);
   const [rowMenu, setRowMenu] = useState(null);
-  const [batchMenu, setBatchMenu] = useState(null);
   const [selected, setSelected] = useState(() => new Map());
   const [preparing, setPreparing] = useState(false);
   useEffect(() => { api.get('/invitation-card').then(response => setCard(response.data.data)).catch(() => notify('danger', 'Não foi possível carregar as configurações do convite.')); }, []);
@@ -158,8 +159,7 @@ export function InvitationsPage() {
     {selected.size > 0 && <Paper sx={{ p: 1.5, mb: 2, display: 'flex', flexWrap: 'wrap', alignItems: 'center', gap: 1 }} role="region" aria-label="Convites selecionados">
       <Typography sx={{ mr: 'auto' }}>{selected.size === 1 ? '1 convite selecionado' : `${selected.size} convites selecionados`}</Typography>
       <Button onClick={() => setSelected(new Map())}>Limpar seleção</Button>
-      <Button variant="contained" startIcon={preparing ? <CircularProgress size={16} color="inherit" /> : <PrintOutlined />} endIcon={<ExpandMore />} disabled={preparing} aria-haspopup="menu" aria-expanded={Boolean(batchMenu)} onClick={event => setBatchMenu(event.currentTarget)}>Imprimir em lote</Button>
-      <Menu anchorEl={batchMenu} open={Boolean(batchMenu)} onClose={() => setBatchMenu(null)}>{INVITE_LAYOUTS.map(({ layout, name }) => <MenuItem key={layout} onClick={() => { setBatchMenu(null); void startPrint(layout, selectedInOrder()); }}><ListItemIcon><PrintOutlined fontSize="small" /></ListItemIcon><ListItemText>Imprimir — {name}</ListItemText></MenuItem>)}</Menu>
+      <Button variant="contained" startIcon={preparing ? <CircularProgress size={16} color="inherit" /> : <PrintOutlined />} disabled={preparing || !card} onClick={() => void startPrint(card.layout, selectedInOrder())}>Imprimir em lote{layoutName ? ` — ${layoutName}` : ''}</Button>
     </Paper>}
     <Paper><TableContainer><Table aria-label="Convites"><TableHead><TableRow><TableCell padding="checkbox"><Checkbox checked={pageSelected} indeterminate={!pageSelected && items.some(item => selected.has(item._id))} disabled={!items.length} onChange={togglePage} slotProps={{ input: { 'aria-label': 'Selecionar os convites desta página' } }} /></TableCell>{['Código', 'Nome', 'Tipo', 'Descrição', 'Data de criação', 'Status', 'Data de confirmação', 'Ações'].map(label => <TableCell key={label}>{label}</TableCell>)}</TableRow></TableHead><TableBody>
       {loading ? <TableRow><TableCell colSpan={9} align="center"><CircularProgress size={28} aria-label="Carregando convites" /></TableCell></TableRow> : !items.length ? <TableRow><TableCell colSpan={9} align="center" sx={{ py: 6 }}>Nenhum convite encontrado.</TableCell></TableRow> : items.map(item => <Fragment key={item._id}>
@@ -177,7 +177,7 @@ export function InvitationsPage() {
       <MenuItem onClick={() => rowAction(item => navigate(`/convites/${item._id}/editar`))}><ListItemIcon><EditOutlined fontSize="small" /></ListItemIcon><ListItemText>Editar</ListItemText></MenuItem>
       <MenuItem onClick={() => rowAction(setDeleting)} sx={{ color: 'error.main' }}><ListItemIcon><DeleteOutlined fontSize="small" color="error" /></ListItemIcon><ListItemText>Excluir</ListItemText></MenuItem>
       <Divider />
-      {INVITE_LAYOUTS.map(({ layout, name }) => <MenuItem key={layout} disabled={preparing} onClick={() => rowAction(item => void startPrint(layout, [item]))}><ListItemIcon><PrintOutlined fontSize="small" /></ListItemIcon><ListItemText>Imprimir — {name}</ListItemText></MenuItem>)}
+      <MenuItem disabled={preparing || !card} onClick={() => rowAction(item => void startPrint(card.layout, [item]))}><ListItemIcon><PrintOutlined fontSize="small" /></ListItemIcon><ListItemText secondary={layoutName ? `Modelo ${layoutName}` : undefined}>Imprimir convite</ListItemText></MenuItem>
     </Menu>
     <Stack direction="row" spacing={1} useFlexGap sx={{ flexWrap: 'wrap', px: 2, pt: 2 }}>{[[summary.total, 'Convites'], [summary.inPerson, 'Presenciais'], [summary.virtual, 'Online'], [summary.people, 'Pessoas'], [summary.confirmed, 'Confirmados'], [summary.unconfirmed, 'Não confirmados']].map(([value, label]) => <Chip key={label} variant="outlined" label={`${label}: ${value}`} />)}</Stack>
     <TablePagination component="div" count={pagination.total} page={pagination.page - 1} rowsPerPage={pagination.limit} onPageChange={(_, page) => setPagination(current => ({ ...current, page: page + 1 }))} onRowsPerPageChange={event => setPagination(current => ({ ...current, limit: Number(event.target.value), page: 1 }))} rowsPerPageOptions={[10, 20, 50, 100, 200]} labelRowsPerPage="Por página:" labelDisplayedRows={({ from, to, count }) => `${from}–${to} de ${count}`} getItemAriaLabel={type => type === 'next' ? 'Próxima página' : 'Página anterior'} />

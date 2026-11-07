@@ -1,13 +1,14 @@
 import { useState, type FormEvent } from 'react';
 import axios from 'axios';
-import { Alert, Box, Button, DialogActions, Stack, TextField, Typography } from '@mui/material';
+import { Alert, Box, Button, DialogActions, MenuItem, Stack, TextField, Typography } from '@mui/material';
 import { CrudDialog } from '../../components/common/CrudDialog';
 import { ImageUpload } from '../../components/common/ImageUpload';
 import api from '../../services/api';
 import type { InvitationCard } from '../../invite-print/inviteData';
+import { INVITE_LAYOUTS, type InviteLayout } from '../../invite-print/convite';
 
-type Editable = Pick<InvitationCard, 'siteUrl' | 'greeting' | 'intro' | 'place' | 'address' | 'qrText' | 'photo'>;
-const FIELDS: { key: Exclude<keyof Editable, 'photo'>; label: string; max: number; help?: string; multiline?: boolean }[] = [
+type Editable = Pick<InvitationCard, 'siteUrl' | 'greeting' | 'intro' | 'place' | 'address' | 'qrText' | 'photo' | 'layout'>;
+const FIELDS: { key: Exclude<keyof Editable, 'photo' | 'layout'>; label: string; max: number; help?: string; multiline?: boolean }[] = [
   { key: 'siteUrl', label: 'Endereço do site', max: 200, help: 'Domínio usado nos links e QR codes dos convites, como https://seu-site.com.br. Um link já impresso usa o domínio da época da impressão.' },
   { key: 'greeting', label: 'Saudação', max: 60, help: 'Vem antes do nome do convite, como "Querido(a) Família Silva".' },
   { key: 'intro', label: 'Texto do convite', max: 400, multiline: true },
@@ -17,7 +18,7 @@ const FIELDS: { key: Exclude<keyof Editable, 'photo'>; label: string; max: numbe
 ];
 
 export function InvitationCardSettingsDialog({ card, onClose, onSaved }: { card: InvitationCard; onClose: () => void; onSaved: (card: InvitationCard) => void }) {
-  const [form, setForm] = useState<Editable>({ siteUrl: card.siteUrl, greeting: card.greeting, intro: card.intro, place: card.place, address: card.address, qrText: card.qrText, photo: card.photo });
+  const [form, setForm] = useState<Editable>({ siteUrl: card.siteUrl, greeting: card.greeting, intro: card.intro, place: card.place, address: card.address, qrText: card.qrText, photo: card.photo, layout: card.layout });
   const [saving, setSaving] = useState(false);
   const [uploading, setUploading] = useState(false);
   const [error, setError] = useState('');
@@ -40,6 +41,11 @@ export function InvitationCardSettingsDialog({ card, onClose, onSaved }: { card:
   return <CrudDialog title="Configurações do convite" busy={saving} onClose={onClose}>
     <Box component="form" onSubmit={submit}><Stack spacing={2} sx={{ pt: 1 }}>
       {error && <Alert severity="error">{error}</Alert>}
+      <TextField select fullWidth label="Modelo do convite" value={String(form.layout)}
+        onChange={event => setForm({ ...form, layout: INVITE_LAYOUTS.find(item => String(item.layout) === event.target.value)!.layout as InviteLayout })}
+        error={Boolean(fieldErrors.layout)} helperText={fieldErrors.layout?.[0] || 'Modelo padrão: é o que sai na impressão e o que o convidado vê ao abrir o link ou o QR code.'}>
+        {INVITE_LAYOUTS.map(item => <MenuItem key={item.layout} value={String(item.layout)}>{item.name}</MenuItem>)}
+      </TextField>
       <Alert severity="info">Noivos, data e horário vêm do cadastro do casamento: {card.bride} & {card.groom} · {date} · {card.time}.</Alert>
       {FIELDS.map(field => <TextField key={field.key} required fullWidth label={field.label} value={form[field.key]} multiline={field.multiline} minRows={field.multiline ? 3 : undefined}
         onChange={event => setForm({ ...form, [field.key]: event.target.value })} slotProps={{ htmlInput: { maxLength: field.max } }}
