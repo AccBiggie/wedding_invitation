@@ -1,9 +1,11 @@
 import { resolveImageUrl } from '../services/images.service';
-import type { InviteData } from './convite';
+import type { InviteData, InviteLayout } from './convite';
 
 export interface InvitationCard {
   bride: string; groom: string; date: { dia: number; mes: number; ano: number }; time: string;
   siteUrl: string; greeting: string; intro: string; place: string; address: string; qrText: string; photo: string;
+  // Modelo padrao: usado na impressao e no convite online.
+  layout: InviteLayout;
 }
 export interface PrintableInvitation { _id: string; name: string; code?: string }
 

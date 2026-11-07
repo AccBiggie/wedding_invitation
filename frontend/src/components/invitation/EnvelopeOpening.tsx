@@ -1,5 +1,7 @@
-import { useEffect, useRef, useState } from 'react';
-import type { KeyboardEvent } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
+import type { CSSProperties, KeyboardEvent } from 'react';
+import type { InviteData, InviteLayout, SheetLayout } from '../../invite-print/convite';
+import { inviteCardDocument, prepareInviteFrame } from '../../invite-print/printDocument';
 import './abertura-envelope.css';
 
 // Abertura do convite online (componente ConviteOnline do design system): envelope vertical
@@ -11,8 +13,43 @@ const TEMPO_ABERTURA = 2900;
 
 const reducedMotion = () => window.matchMedia?.('(prefers-reduced-motion: reduce)').matches ?? false;
 
+export interface OnlineInvite { layout: InviteLayout; data: InviteData }
+
 // Modelo Igreja em tres camadas: fundo-convite.png (no CSS) + nomes em ouro + borda dupla metalica.
-const Convite = () => <div className="cv-ouro"><img src="/textos-convite-ouro.svg" alt="" /><img src="/borda-dupla-ouro.svg" alt="" /></div>;
+const ConviteIgreja = () => <div className="cv-ouro"><img src="/textos-convite-ouro.svg" alt="" /><img src="/borda-dupla-ouro.svg" alt="" /></div>;
+
+// Modelos 5, 9 e 10: o mesmo convite da impressao (210 x 148 mm, com o nome e o QR code do
+// convidado), num iframe para o CSS de impressao nao vazar para o site, escalado para a largura da caixa.
+const FOLHA_PX = 210 * 96 / 25.4;
+function ConviteFolha({ layout, data }: { layout: SheetLayout; data: InviteData }) {
+  const box = useRef<HTMLDivElement>(null);
+  const frame = useRef<HTMLIFrameElement>(null);
+  const [scale, setScale] = useState(0);
+  const [ready, setReady] = useState(false);
+  const key = JSON.stringify(data);
+  const html = useMemo(() => inviteCardDocument(layout, data), [layout, key]);
+  useEffect(() => {
+    if (!box.current) return;
+    const observer = new ResizeObserver(([entry]) => setScale(entry.contentRect.width / FOLHA_PX));
+    observer.observe(box.current);
+    return () => observer.disconnect();
+  }, []);
+  // Espera fontes e foto (e ajusta nomes longos) antes de mostrar.
+  const onLoad = () => { if (frame.current) void prepareInviteFrame(frame.current, layout === 9 && data.foto ? [data.foto] : []).catch(() => undefined).finally(() => setReady(true)); };
+  return <div ref={box} className="cv-folha">
+    <iframe ref={frame} title="Convite" aria-hidden="true" tabIndex={-1} srcDoc={html} onLoad={onLoad}
+      style={{ width: FOLHA_PX, height: FOLHA_PX * 148 / 210, transform: `scale(${scale})`, opacity: ready ? 1 : 0 }} />
+  </div>;
+}
+
+const Convite = ({ invite }: { invite?: OnlineInvite | null }) =>
+  !invite || invite.layout === 'igreja' ? <ConviteIgreja /> : <ConviteFolha layout={invite.layout} data={invite.data} />;
+
+const descricao = (invite?: OnlineInvite | null) => {
+  if (!invite) return ALT;
+  const { noiva, noivo, data, hora, local } = invite.data;
+  return `Convite de casamento de ${noiva} e ${noivo}: ${String(data.dia).padStart(2, '0')}/${String(data.mes).padStart(2, '0')}/${data.ano}, às ${hora}, ${local}`;
+};
 
 // laco-cetim.svg inline: alcas, no e pontas sao grupos animados pelo CSS.
 const Laco = () => <svg viewBox="0 0 300 260" aria-hidden="true">
@@ -35,7 +72,7 @@ const Laco = () => <svg viewBox="0 0 300 260" aria-hidden="true">
 
 const Coracao = () => <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 21s-7.5-4.6-9.6-9.3C.9 8.4 3 5 6.4 5c2.1 0 3.6 1.2 4.6 2.7h2C14 6.2 15.5 5 17.6 5 21 5 23.1 8.4 21.6 11.7 19.5 16.4 12 21 12 21z" /></svg>;
 
-export function EnvelopeOpening({ autoOpen, onConfirm }: { autoOpen?: boolean; onConfirm: () => void }) {
+export function EnvelopeOpening({ invite, autoOpen, onConfirm }: { invite?: OnlineInvite | null; autoOpen?: boolean; onConfirm: () => void }) {
   const [stage, setStage] = useState<'fechado' | 'aberto' | 'saiu'>('fechado');
   const [leaving, setLeaving] = useState(false);
   const button = useRef<HTMLButtonElement>(null);
@@ -66,11 +103,13 @@ export function EnvelopeOpening({ autoOpen, onConfirm }: { autoOpen?: boolean; o
   const open = () => { if (stage === 'fechado') setStage('aberto'); };
   const openByKey = (event: KeyboardEvent) => { if (event.key === 'Enter' || event.key === ' ') { event.preventDefault(); open(); } };
 
-  return <main className={`ec${stage !== 'fechado' ? ' aberto' : ''}${stage === 'saiu' ? ' saiu' : ''}${leaving ? ' saindo' : ''}`}>
+  // Proporcao do convite: Igreja (665,8 x 502,9 pt) ou folha dos outros modelos (210 x 148 mm).
+  const ratio = { '--ar': !invite || invite.layout === 'igreja' ? 665.8 / 502.9 : 210 / 148 } as CSSProperties;
+  return <main className={`ec${stage !== 'fechado' ? ' aberto' : ''}${stage === 'saiu' ? ' saiu' : ''}${leaving ? ' saindo' : ''}`} style={ratio}>
     <div className="env" role="button" tabIndex={stage === 'fechado' ? 0 : -1} aria-label="Abrir o convite de Stéfani e André"
       aria-hidden={stage === 'saiu' || undefined} onClick={open} onKeyDown={openByKey}>
       <div className="costas" />
-      <div className="carta"><Convite /></div>
+      <div className="carta"><Convite invite={invite} /></div>
       <div className="frente" />
       <div className="sombra-aba" />
       <div className="aba"><div className="face f1" /><div className="face f2" /></div>
@@ -79,7 +118,7 @@ export function EnvelopeOpening({ autoOpen, onConfirm }: { autoOpen?: boolean; o
       <div className="laco"><Laco /></div>
     </div>
     <div className="final" aria-hidden={stage !== 'saiu' || undefined}>
-      <div className="conv" role="img" aria-label={ALT}><Convite /></div>
+      <div className="conv" role="img" aria-label={descricao(invite)}><Convite invite={invite} /></div>
       <button ref={button} type="button" className="bt" tabIndex={stage === 'saiu' ? 0 : -1} onClick={() => setLeaving(true)}>
         <span aria-hidden="true">♥</span>Confirmar presença
       </button>

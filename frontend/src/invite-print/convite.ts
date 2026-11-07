@@ -3,13 +3,13 @@
 // que convite.css se aplique sem mudanças.
 import qrcode from './qrcode.js';
 
-type SheetLayout = 5 | 9 | 10;
+export type SheetLayout = 5 | 9 | 10;
 export type InviteLayout = SheetLayout | 'igreja';
 export const INVITE_LAYOUTS: { layout: InviteLayout; name: string }[] = [
   { layout: 5, name: 'Monograma clássico' },
   { layout: 9, name: 'Foto do casal' },
   { layout: 10, name: 'Calendário' },
-  { layout: 'igreja', name: 'Modelo Igreja' }
+  { layout: 'igreja', name: 'Igreja' }
 ];
 
 export interface InviteData {
