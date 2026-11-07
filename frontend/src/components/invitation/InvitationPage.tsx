@@ -29,9 +29,9 @@ const Tile = ({ href, external, icon, title, detail }: { href?: string; external
     : <div className="tile">{body}</div>;
 };
 
-export function InvitationPage({ wedding, guests, selected, onToggle, onConfirm, confirming, status, deadline }: {
+export function InvitationPage({ wedding, guests, selected, onToggle, onConfirm, confirming, status, deadline, onViewInvite }: {
   wedding: InvitationPageWedding; guests: Guest[]; selected: string[]; onToggle: (id: string) => void; onConfirm: () => void;
-  confirming: boolean; status: Status | null; deadline: string | null;
+  confirming: boolean; status: Status | null; deadline: string | null; onViewInvite?: () => void;
 }) {
   const [bride, groom] = wedding.couple;
   const address = wedding.contact?.address;
@@ -54,6 +54,7 @@ export function InvitationPage({ wedding, guests, selected, onToggle, onConfirm,
           </label>)}
         </div>
         <button type="button" className="bt" disabled={confirming} onClick={onConfirm}><span className="co" aria-hidden="true">♥</span>{confirming ? 'Atualizando...' : 'Atualizar confirmação'}</button>
+        {onViewInvite && <button type="button" className="bt bt-ver" onClick={onViewInvite}><svg className="ic" viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="6" width="18" height="13" rx="1.5" /><path d="M3 7l9 6.5L21 7" /></svg>Visualizar convite</button>}
         <div className={`ok${status ? ' on' : ''}${status?.error ? ' erro' : ''}`} role="status">{status?.text}</div>
       </div>
     </div>
