@@ -12,6 +12,7 @@ import { Ceremony } from './components/ceremony/Ceremony';
 import { Guestbook } from './components/guestbook/Guestbook';
 import { InvitationPage } from './components/invitation/InvitationPage';
 import { EnvelopeOpening } from './components/invitation/EnvelopeOpening';
+import { inviteData, inviteLink } from './invite-print/inviteData';
 import './components/footer/rodape.css';
 import './components/footer/rodape-celular.css';
 import { FetechAnimatedLogo } from './components/footer/FetechAnimatedLogo';
@@ -648,6 +649,9 @@ function Public() {
     const request = byCode ? api.get('/public/invitations/code/' + encodeURIComponent(id || '')) : api.get('/public/invitations/' + id + '/' + name, { params: { token } });
     request.then(response => setItem(response.data.data)).catch(() => setError(true));
   }, [byCode, id, name]);
+  // Modelo padrao e textos do convite (painel > Configuracoes do convite); sem eles, o envelope usa o modelo Igreja.
+  const [card, setCard] = useState();
+  useEffect(() => { api.get('/public/invitations/card').then(response => setCard(response.data.data)).catch(() => setCard(null)); }, []);
   useEffect(() => { if (item?.guests) setSelectedGuestIds(item.guests.filter(guest => guest.confirmed).map(guest => String(guest._id))); }, [item?._id]);
   // Convite valido: guarda o caminho para a landing saber a qual convite voltar.
   useEffect(() => { if (item) inviteStore.set(location.pathname + location.search); }, [item?._id]);
@@ -665,14 +669,16 @@ function Public() {
     <p>Confira se o link está completo ou aponte a câmera de novo para o QR code do convite. Se continuar assim, fale com os noivos pelo contato no rodapé.</p>
     <a className="wed-btn" href="/casamento">Ver o site do casamento</a>
   </div></WeddingShell>;
-  if (!item || !wedding) return <WeddingShell><div className="wed-state">Carregando...</div></WeddingShell>;
+  if (!item || !wedding || card === undefined) return <WeddingShell><div className="wed-state">Carregando...</div></WeddingShell>;
   const toggleGuest = guestId => {
     setStatus(null);
     setSelectedGuestIds(current => current.includes(guestId) ? current.filter(idValue => idValue !== guestId) : [...current, guestId]);
   };
   const guests = item.guests || [];
   const deadline = item.confirmationDeadline ? new Date(item.confirmationDeadline).toLocaleDateString('pt-BR', { timeZone: 'UTC' }) : null;
-  if (stage === 'envelope') return <EnvelopeOpening autoOpen={reopened} onConfirm={showConfirmation} />;
+  // O convite do envelope traz o nome e o QR code deste convidado, como o impresso.
+  const invite = card && { layout: card.layout, data: { ...inviteData(card, { _id: item._id, name: item.name, code: '' }), link: byCode ? inviteLink(card, String(id).toUpperCase()) : location.href } };
+  if (stage === 'envelope') return <EnvelopeOpening invite={invite} autoOpen={reopened} onConfirm={showConfirmation} />;
   return <WeddingShell wedding={wedding}>
     <main className="pc-main pc-entra">
       <InvitationPage wedding={wedding} guests={guests} selected={selectedGuestIds} onToggle={toggleGuest} onConfirm={confirm} confirming={confirming} status={status} deadline={deadline} onViewInvite={showEnvelope} />

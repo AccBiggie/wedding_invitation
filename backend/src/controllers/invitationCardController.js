@@ -5,6 +5,10 @@ import { bindImages, imageIds, removeUnusedImages, validateImageReferences } fro
 
 const EDITABLE = ['siteUrl', 'greeting', 'intro', 'place', 'address', 'qrText', 'photo'];
 const LIMITS = { siteUrl: 200, greeting: 60, intro: 400, place: 120, address: 160, qrText: 120, photo: 300 };
+// Modelos de convite: Igreja e os layouts 5, 9 e 10 do design system. O padrao vale para impressao e link.
+const LAYOUTS = ['igreja', '5', '9', '10'];
+const DEFAULT_LAYOUT = 'igreja';
+const layoutOut = value => value === 'igreja' ? value : Number(value);
 
 export const cardDefaults = () => ({
   siteUrl: new URL(env.frontendUrl).origin,
@@ -25,7 +29,7 @@ const fixed = () => {
 export async function loadCard() {
   const stored = await InvitationCardSettings.findOne({ singleton: 'default' }).lean();
   const defaults = cardDefaults();
-  return { ...fixed(), ...Object.fromEntries(EDITABLE.map(key => [key, stored?.[key] || defaults[key]])) };
+  return { ...fixed(), ...Object.fromEntries(EDITABLE.map(key => [key, stored?.[key] || defaults[key]])), layout: layoutOut(stored?.layout || DEFAULT_LAYOUT) };
 }
 
 export async function getCard(req, res, next) {
@@ -41,6 +45,8 @@ export async function saveCard(req, res, next) {
       data[key] = value.trim();
       if (data[key].length > LIMITS[key]) errors[key] = [`Use no máximo ${LIMITS[key]} caracteres.`];
     }
+    data.layout = String(req.body.layout ?? '');
+    if (!LAYOUTS.includes(data.layout)) errors.layout = ['Escolha o modelo do convite.'];
     if (!errors.siteUrl) {
       try {
         const url = new URL(data.siteUrl);

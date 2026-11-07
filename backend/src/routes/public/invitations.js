@@ -1,2 +1,2 @@
-import { Router } from 'express'; import { confirmLimit, publicReadLimit } from '../../middlewares/rateLimits.js'; import * as c from '../../controllers/invitationController.js';
-const r=Router(); r.get('/code/:code',publicReadLimit,c.publicGetByCode); r.get('/:id/:name',publicReadLimit,c.publicGet); r.post('/:id/confirm',confirmLimit,c.confirm); export default r;
+import { Router } from 'express'; import { confirmLimit, publicReadLimit } from '../../middlewares/rateLimits.js'; import * as c from '../../controllers/invitationController.js'; import { getCard } from '../../controllers/invitationCardController.js';
+const r=Router(); r.get('/card',publicReadLimit,getCard); /* textos e modelo do convite para a pagina do link */ r.get('/code/:code',publicReadLimit,c.publicGetByCode); r.get('/:id/:name',publicReadLimit,c.publicGet); r.post('/:id/confirm',confirmLimit,c.confirm); export default r;
