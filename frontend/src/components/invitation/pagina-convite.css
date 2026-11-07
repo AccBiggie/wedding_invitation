@@ -26,6 +26,9 @@
 .cv9 .bt:hover { background: #1b3424; } .cv9 .bt:active { transform: scale(.99); }
 .cv9 .bt .co { color: var(--ouro-claro); }
 .cv9 .bt[disabled] { opacity: .7; cursor: wait; }
+.cv9 .bt-ver { min-height: 48px; background: transparent; border: 1.5px solid var(--verde); color: var(--verde); font-size: 18px; }
+.cv9 .bt-ver:hover { background: var(--verde-claro); }
+.cv9 .bt-ver .ic { width: 20px; height: 20px; stroke: currentColor; }
 .cv9 .ok { display: none; align-items: center; gap: 10px; padding: 12px 14px; border-radius: 12px; background: var(--verde-claro); color: var(--verde); font-size: 17px; }
 .cv9 .ok.on { display: flex; animation: cv9-aparece .35s ease; }
 .cv9 .ok.erro { background: #f6e3df; color: #8a2f22; }
