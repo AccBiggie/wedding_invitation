@@ -3,11 +3,13 @@
 // que convite.css se aplique sem mudanças.
 import qrcode from './qrcode.js';
 
-export type InviteLayout = 5 | 9 | 10;
+type SheetLayout = 5 | 9 | 10;
+export type InviteLayout = SheetLayout | 'igreja';
 export const INVITE_LAYOUTS: { layout: InviteLayout; name: string }[] = [
   { layout: 5, name: 'Monograma clássico' },
   { layout: 9, name: 'Foto do casal' },
-  { layout: 10, name: 'Calendário' }
+  { layout: 10, name: 'Calendário' },
+  { layout: 'igreja', name: 'Modelo Igreja' }
 ];
 
 export interface InviteData {
@@ -21,7 +23,7 @@ const MESES = ['janeiro', 'fevereiro', 'março', 'abril', 'maio', 'junho', 'julh
 
 const esc = (t: string) => String(t).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' })[c]!);
 
-function qrSvg(link: string) {
+export function qrSvg(link: string) {
   const q = qrcode(0, 'M'); q.addData(link); q.make();
   return q.createSvgTag({ cellSize: 4, margin: 0, scalable: true });
 }
@@ -53,7 +55,7 @@ const nomes = (d: InviteData, cls: string, sep: string) => '<h1 class="nomes' + 
 const lateral = (p: Partes, extra = '') => '<div class="lateral">' + extra + p.qr + '</div>';
 const data = (p: Partes) => '<p class="data">' + p.dataCurta + '</p>';
 
-const T: Record<InviteLayout, (d: InviteData, p: Partes) => string> = {
+const T: Record<SheetLayout, (d: InviteData, p: Partes) => string> = {
   5: (d, p) => '<div class="moldura"></div><i class="divisor"></i><div class="miolo">' + p.pessoal + p.intro + nomes(d, '', 'e') + data(p) + p.local + '</div>' +
     lateral(p, '<div class="mono">' + esc(d.noiva.charAt(0)) + '<i>&amp;</i>' + esc(d.noivo.charAt(0)) + '</div>'),
   9: (d, p) => '<div class="foto' + (d.foto ? '' : ' sem-foto') + '"' + (d.foto ? ' style="background-image:url(\'' + esc(d.foto) + '\')"' : '') + '></div>' +
@@ -62,7 +64,7 @@ const T: Record<InviteLayout, (d: InviteData, p: Partes) => string> = {
     '<div class="lateral">' + calendario(d.data) + '<p class="hora">' + esc(d.hora) + '</p></div>'
 };
 
-export const renderInvite = (layout: InviteLayout, d: InviteData) => '<article class="cv cv-' + layout + '">' + T[layout](d, partes(d)) + '</article>';
+export const renderInvite = (layout: SheetLayout, d: InviteData) => '<article class="cv cv-' + layout + '">' + T[layout](d, partes(d)) + '</article>';
 
 // Folha A4 em pé com 2 convites deitados, um em cima do outro, e a linha de corte no meio.
 export const SHEET_CSS = '@page { size: A4; margin: 0; }' +
@@ -71,7 +73,7 @@ export const SHEET_CSS = '@page { size: A4; margin: 0; }' +
   '.folha-cv .vazio { width: 210mm; height: 148mm; }' +
   '.folha-cv .corte { position: absolute; top: 148.35mm; left: 0; right: 0; border-top: .3mm dashed #9a9a9a; z-index: 2; }';
 
-export function renderSheets(layout: InviteLayout, list: InviteData[]) {
+export function renderSheets(layout: SheetLayout, list: InviteData[]) {
   let html = '';
   for (let i = 0; i < list.length; i += 2) {
     html += '<section class="folha-cv">' + renderInvite(layout, list[i]) +

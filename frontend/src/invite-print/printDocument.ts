@@ -1,5 +1,7 @@
 import conviteCss from './convite.css?raw';
+import conviteIgrejaCss from './conviteIgreja.css?raw';
 import { renderSheets, SHEET_CSS, type InviteData, type InviteLayout } from './convite';
+import { renderIgrejaSheets } from './conviteIgreja';
 
 const FONTS_URL = 'https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400&family=Great+Vibes&family=Jost:wght@300;400;500&family=Cinzel:wght@400;600&display=swap';
 const FACES = ['400 16px "Cormorant Garamond"', '600 16px "Cormorant Garamond"', 'italic 400 16px "Cormorant Garamond"', '400 16px "Great Vibes"', '300 16px Jost', '500 16px Jost', '600 16px Jost', '400 16px Cinzel'];
@@ -17,10 +19,12 @@ export const SHEET_SCREEN_PADDING = 24;
 
 const escTitle = (value: string) => value.replace(/[&<>]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;' })[c]!);
 
-export const inviteDocument = (title: string, layout: InviteLayout, list: InviteData[]) =>
-  `<!doctype html><html lang="pt-BR"><head><meta charset="utf-8"><title>${escTitle(title)}</title>` +
-  `<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link rel="stylesheet" href="${FONTS_URL}">` +
-  `<style>${conviteCss}${SHEET_CSS}${PAGE_CSS}</style></head><body>${renderSheets(layout, list)}</body></html>`;
+export const inviteDocument = (title: string, layout: InviteLayout, list: InviteData[]) => {
+  const igreja = layout === 'igreja';
+  return `<!doctype html><html lang="pt-BR"><head><meta charset="utf-8"><title>${escTitle(title)}</title>` +
+    (igreja ? '' : `<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link rel="stylesheet" href="${FONTS_URL}">`) +
+    `<style>${igreja ? conviteIgrejaCss : conviteCss + SHEET_CSS + PAGE_CSS}</style></head><body>${igreja ? renderIgrejaSheets(list) : renderSheets(layout, list)}</body></html>`;
+};
 
 const loadImage = (win: Window, src: string) => new Promise<boolean>(resolve => {
   const image = new (win as Window & typeof globalThis).Image();
@@ -29,16 +33,20 @@ const loadImage = (win: Window, src: string) => new Promise<boolean>(resolve => 
   image.src = src;
 });
 
-// Espera fontes e foto e so entao ajusta os nomes longos: o PDF so pode sair depois disso.
-export async function prepareInviteFrame(frame: HTMLIFrameElement, photo: string) {
+// Aguarda as imagens do modelo antes de liberar a impressão.
+export async function prepareInviteFrame(frame: HTMLIFrameElement, images: string[], igreja = false) {
   const doc = frame.contentDocument, win = frame.contentWindow;
   if (!doc || !win) throw new Error('Prévia indisponível.');
   void doc.body.offsetHeight;
-  const [photoOk] = await Promise.all([photo ? loadImage(win, photo) : Promise.resolve(true), ...FACES.map(face => doc.fonts.load(face, 'Querido(a) Stéfani & André ç ã é'))]);
-  await doc.fonts.ready;
-  doc.querySelectorAll<HTMLElement>('.cv .pessoal').forEach(line => {
-    let size = parseFloat(win.getComputedStyle(line).fontSize);
-    while (line.scrollWidth > line.clientWidth + .5 && size > MIN_NAME_PX) { size -= .25; line.style.fontSize = `${size}px`; }
-  });
-  return { photoOk, height: doc.documentElement.scrollHeight };
+  const imageResults = await Promise.all(images.map(src => loadImage(win, src)));
+  const embeddedImagesOk = igreja ? (await Promise.all(Array.from(doc.images, image => image.decode().then(() => true, () => false)))).every(Boolean) : true;
+  if (!igreja) {
+    await Promise.all(FACES.map(face => doc.fonts.load(face, 'Querido(a) Stéfani & André ç ã é')));
+    await doc.fonts.ready;
+    doc.querySelectorAll<HTMLElement>('.cv .pessoal').forEach(line => {
+      let size = parseFloat(win.getComputedStyle(line).fontSize);
+      while (line.scrollWidth > line.clientWidth + .5 && size > MIN_NAME_PX) { size -= .25; line.style.fontSize = `${size}px`; }
+    });
+  }
+  return { imagesOk: imageResults.every(Boolean) && embeddedImagesOk, height: doc.documentElement.scrollHeight };
 }
