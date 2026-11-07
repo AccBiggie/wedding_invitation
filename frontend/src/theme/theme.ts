@@ -1,4 +1,6 @@
 import { createTheme, type Shadows } from '@mui/material/styles';
+import { ptBR as coreptBR } from '@mui/material/locale';
+import { ptBR as dataGridptBR } from '@mui/x-data-grid/locales';
 
 export const theme = createTheme({
   palette: { primary: { main: '#214938' }, secondary: { main: '#ae8a47' }, background: { default: '#f7f8f5', paper: '#fff' }, success: { main: '#2e7d53' }, error: { main: '#b74445' } },
@@ -11,4 +13,4 @@ export const theme = createTheme({
     MuiPaper: { styleOverrides: { root: { backgroundImage: 'none' } } },
     MuiCard: { defaultProps: { elevation: 0 }, styleOverrides: { root: { border: '1px solid #e6ebe6' } } }
   }
-});
+}, dataGridptBR, coreptBR);
