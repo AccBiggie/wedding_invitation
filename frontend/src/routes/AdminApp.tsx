@@ -40,10 +40,10 @@ export function AdminApp({ user, onLogout }: { user: { email: string }; onLogout
   };
   return <ThemeProvider theme={theme}><CssBaseline /><Suspense fallback={<div role="status">Carregando...</div>}><Routes><Route element={<AdminLayout email={user.email} onLogout={onLogout} onCustomize={open} />}>
     <Route path="/" element={<Navigate to="/dashboard" replace />} /><Route path="/dashboard" element={<DashboardPage />} />
-    <Route element={<InvitationsPage />}><Route path="/convites" /><Route path="/convites/novo" /><Route path="/convites/:id/editar" /></Route>
-    <Route element={<GodparentsPage />}><Route path="/padrinhos" /><Route path="/padrinhos/novo" /><Route path="/padrinhos/:id/editar" /></Route>
-    <Route element={<GiftsPage />}><Route path="/presentes" /><Route path="/presentes/novo" /><Route path="/presentes/:id/editar" /></Route>
-    <Route element={<StoreCategoriesPage />}><Route path="/categorias-loja" /><Route path="/categorias-loja/nova" /><Route path="/categorias-loja/:id/editar" /></Route>
+    <Route element={<InvitationsPage />}><Route path="/convites" element={null} /><Route path="/convites/novo" element={null} /><Route path="/convites/:id/editar" element={null} /></Route>
+    <Route element={<GodparentsPage />}><Route path="/padrinhos" element={null} /><Route path="/padrinhos/novo" element={null} /><Route path="/padrinhos/:id/editar" element={null} /></Route>
+    <Route element={<GiftsPage />}><Route path="/presentes" element={null} /><Route path="/presentes/novo" element={null} /><Route path="/presentes/:id/editar" element={null} /></Route>
+    <Route element={<StoreCategoriesPage />}><Route path="/categorias-loja" element={null} /><Route path="/categorias-loja/nova" element={null} /><Route path="/categorias-loja/:id/editar" element={null} /></Route>
     <Route path="/pix" element={<PixPage />} /><Route path="*" element={<Navigate to="/dashboard" replace />} />
   </Route></Routes></Suspense><AppearanceDrawer open={customizing} settings={draft} onChange={change} onClose={close} onSave={save} busy={busy} ready={ready} error={error} savedNotice={savedNotice} /></ThemeProvider>;
 }
