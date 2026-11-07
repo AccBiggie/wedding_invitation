@@ -11,6 +11,7 @@ import { NavFlower } from './components/decor/NavFlower';
 import { Ceremony } from './components/ceremony/Ceremony';
 import { Guestbook } from './components/guestbook/Guestbook';
 import { InvitationPage } from './components/invitation/InvitationPage';
+import { EnvelopeOpening } from './components/invitation/EnvelopeOpening';
 import './components/footer/rodape.css';
 import './components/footer/rodape-celular.css';
 import { FetechAnimatedLogo } from './components/footer/FetechAnimatedLogo';
@@ -635,6 +636,13 @@ function Public() {
   // Mesma prova usada para abrir o convite: o backend exige ela de novo ao confirmar.
   const token = new URLSearchParams(location.search).get('token');
   const wedding = useWedding();
+  // Abertura com envelope antes da confirmacao; ?confirmar=1 ou #confirmar (links de
+  // "alterar confirmacao") vao direto para a confirmacao.
+  const [stage, setStage] = useState(() => new URLSearchParams(location.search).get('confirmar') === '1' || location.hash === '#confirmar' ? 'confirmacao' : 'envelope');
+  const showConfirmation = useCallback(() => { setStage('confirmacao'); window.scrollTo(0, 0); }, []);
+  // "Visualizar convite" volta ao envelope ja abrindo (autoOpen).
+  const [reopened, setReopened] = useState(false);
+  const showEnvelope = () => { setReopened(true); setStage('envelope'); };
   const [item, setItem] = useState(); const [error, setError] = useState(false); const [confirming, setConfirming] = useState(false); const [status, setStatus] = useState(null); const [selectedGuestIds, setSelectedGuestIds] = useState([]);
   useEffect(() => {
     const request = byCode ? api.get('/public/invitations/code/' + encodeURIComponent(id || '')) : api.get('/public/invitations/' + id + '/' + name, { params: { token } });
@@ -664,9 +672,10 @@ function Public() {
   };
   const guests = item.guests || [];
   const deadline = item.confirmationDeadline ? new Date(item.confirmationDeadline).toLocaleDateString('pt-BR', { timeZone: 'UTC' }) : null;
+  if (stage === 'envelope') return <EnvelopeOpening autoOpen={reopened} onConfirm={showConfirmation} />;
   return <WeddingShell wedding={wedding}>
-    <main className="pc-main">
-      <InvitationPage wedding={wedding} guests={guests} selected={selectedGuestIds} onToggle={toggleGuest} onConfirm={confirm} confirming={confirming} status={status} deadline={deadline} />
+    <main className="pc-main pc-entra">
+      <InvitationPage wedding={wedding} guests={guests} selected={selectedGuestIds} onToggle={toggleGuest} onConfirm={confirm} confirming={confirming} status={status} deadline={deadline} onViewInvite={showEnvelope} />
     </main>
   </WeddingShell>;
 }
