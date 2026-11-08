@@ -15,7 +15,7 @@ export const cardDefaults = () => ({
   greeting: 'Querido(a)',
   intro: 'Com a bênção de Deus e de nossos pais, convidamos você para celebrar conosco o nosso casamento.',
   place: wedding.ceremony.name,
-  address: wedding.ceremony.lines.join(' · '),
+  address: wedding.ceremony.lines.join(', '),
   qrText: 'Aponte a câmera para confirmar sua presença',
   photo: wedding.photo
 });

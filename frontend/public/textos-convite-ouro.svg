@@ -1,24 +1,25 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="665.8pt" height="502.9pt" viewBox="26.6 26.9 665.8 502.9">
 <defs>
+<filter id="elevar-50" x="-5%" y="-60%" width="110%" height="220%"><feGaussianBlur stdDeviation="1.1"/></filter>
 <filter id="sombra-qr" x="-10%" y="-60%" width="120%" height="220%"><feGaussianBlur stdDeviation="1.4"/></filter>
 <linearGradient id="ouro-nomes" gradientUnits="userSpaceOnUse" x1="150" y1="225" x2="565" y2="285"><stop offset="0" stop-color="#7f5f22"/><stop offset="0.18" stop-color="#c4a052"/><stop offset="0.36" stop-color="#8d6b2a"/><stop offset="0.54" stop-color="#d2b366"/><stop offset="0.72" stop-color="#94722e"/><stop offset="0.88" stop-color="#c9a75a"/><stop offset="1" stop-color="#8a6927"/></linearGradient>
-<linearGradient id="ouro-nomes-1" gradientUnits="userSpaceOnUse" x1="-5.543" y1="-39.347" x2="409.457" y2="20.653"><stop offset="0" stop-color="#7f5f22"/><stop offset="0.18" stop-color="#c4a052"/><stop offset="0.36" stop-color="#8d6b2a"/><stop offset="0.54" stop-color="#d2b366"/><stop offset="0.72" stop-color="#94722e"/><stop offset="0.88" stop-color="#c9a75a"/><stop offset="1" stop-color="#8a6927"/></linearGradient>
-<linearGradient id="ouro-nomes-2" gradientUnits="userSpaceOnUse" x1="-38.896" y1="-39.347" x2="376.104" y2="20.653"><stop offset="0" stop-color="#7f5f22"/><stop offset="0.18" stop-color="#c4a052"/><stop offset="0.36" stop-color="#8d6b2a"/><stop offset="0.54" stop-color="#d2b366"/><stop offset="0.72" stop-color="#94722e"/><stop offset="0.88" stop-color="#c9a75a"/><stop offset="1" stop-color="#8a6927"/></linearGradient>
-<linearGradient id="ouro-nomes-3" gradientUnits="userSpaceOnUse" x1="-53.540" y1="-39.347" x2="361.460" y2="20.653"><stop offset="0" stop-color="#7f5f22"/><stop offset="0.18" stop-color="#c4a052"/><stop offset="0.36" stop-color="#8d6b2a"/><stop offset="0.54" stop-color="#d2b366"/><stop offset="0.72" stop-color="#94722e"/><stop offset="0.88" stop-color="#c9a75a"/><stop offset="1" stop-color="#8a6927"/></linearGradient>
-<linearGradient id="ouro-nomes-4" gradientUnits="userSpaceOnUse" x1="-71.954" y1="-39.347" x2="343.046" y2="20.653"><stop offset="0" stop-color="#7f5f22"/><stop offset="0.18" stop-color="#c4a052"/><stop offset="0.36" stop-color="#8d6b2a"/><stop offset="0.54" stop-color="#d2b366"/><stop offset="0.72" stop-color="#94722e"/><stop offset="0.88" stop-color="#c9a75a"/><stop offset="1" stop-color="#8a6927"/></linearGradient>
-<linearGradient id="ouro-nomes-5" gradientUnits="userSpaceOnUse" x1="-85.414" y1="-39.347" x2="329.586" y2="20.653"><stop offset="0" stop-color="#7f5f22"/><stop offset="0.18" stop-color="#c4a052"/><stop offset="0.36" stop-color="#8d6b2a"/><stop offset="0.54" stop-color="#d2b366"/><stop offset="0.72" stop-color="#94722e"/><stop offset="0.88" stop-color="#c9a75a"/><stop offset="1" stop-color="#8a6927"/></linearGradient>
-<linearGradient id="ouro-nomes-6" gradientUnits="userSpaceOnUse" x1="-107.157" y1="-39.347" x2="307.843" y2="20.653"><stop offset="0" stop-color="#7f5f22"/><stop offset="0.18" stop-color="#c4a052"/><stop offset="0.36" stop-color="#8d6b2a"/><stop offset="0.54" stop-color="#d2b366"/><stop offset="0.72" stop-color="#94722e"/><stop offset="0.88" stop-color="#c9a75a"/><stop offset="1" stop-color="#8a6927"/></linearGradient>
-<linearGradient id="ouro-nomes-7" gradientUnits="userSpaceOnUse" x1="-131.561" y1="-39.347" x2="283.439" y2="20.653"><stop offset="0" stop-color="#7f5f22"/><stop offset="0.18" stop-color="#c4a052"/><stop offset="0.36" stop-color="#8d6b2a"/><stop offset="0.54" stop-color="#d2b366"/><stop offset="0.72" stop-color="#94722e"/><stop offset="0.88" stop-color="#c9a75a"/><stop offset="1" stop-color="#8a6927"/></linearGradient>
-<linearGradient id="ouro-nomes-8" gradientUnits="userSpaceOnUse" x1="-145.760" y1="-39.347" x2="269.240" y2="20.653"><stop offset="0" stop-color="#7f5f22"/><stop offset="0.18" stop-color="#c4a052"/><stop offset="0.36" stop-color="#8d6b2a"/><stop offset="0.54" stop-color="#d2b366"/><stop offset="0.72" stop-color="#94722e"/><stop offset="0.88" stop-color="#c9a75a"/><stop offset="1" stop-color="#8a6927"/></linearGradient>
-<linearGradient id="ouro-nomes-9" gradientUnits="userSpaceOnUse" x1="-158.259" y1="-39.347" x2="256.741" y2="20.653"><stop offset="0" stop-color="#7f5f22"/><stop offset="0.18" stop-color="#c4a052"/><stop offset="0.36" stop-color="#8d6b2a"/><stop offset="0.54" stop-color="#d2b366"/><stop offset="0.72" stop-color="#94722e"/><stop offset="0.88" stop-color="#c9a75a"/><stop offset="1" stop-color="#8a6927"/></linearGradient>
-<linearGradient id="ouro-nomes-10" gradientUnits="userSpaceOnUse" x1="-203.231" y1="-39.347" x2="211.769" y2="20.653"><stop offset="0" stop-color="#7f5f22"/><stop offset="0.18" stop-color="#c4a052"/><stop offset="0.36" stop-color="#8d6b2a"/><stop offset="0.54" stop-color="#d2b366"/><stop offset="0.72" stop-color="#94722e"/><stop offset="0.88" stop-color="#c9a75a"/><stop offset="1" stop-color="#8a6927"/></linearGradient>
-<linearGradient id="ouro-nomes-11" gradientUnits="userSpaceOnUse" x1="-215.730" y1="-39.347" x2="199.270" y2="20.653"><stop offset="0" stop-color="#7f5f22"/><stop offset="0.18" stop-color="#c4a052"/><stop offset="0.36" stop-color="#8d6b2a"/><stop offset="0.54" stop-color="#d2b366"/><stop offset="0.72" stop-color="#94722e"/><stop offset="0.88" stop-color="#c9a75a"/><stop offset="1" stop-color="#8a6927"/></linearGradient>
-<linearGradient id="ouro-nomes-12" gradientUnits="userSpaceOnUse" x1="-228.237" y1="-39.347" x2="186.763" y2="20.653"><stop offset="0" stop-color="#7f5f22"/><stop offset="0.18" stop-color="#c4a052"/><stop offset="0.36" stop-color="#8d6b2a"/><stop offset="0.54" stop-color="#d2b366"/><stop offset="0.72" stop-color="#94722e"/><stop offset="0.88" stop-color="#c9a75a"/><stop offset="1" stop-color="#8a6927"/></linearGradient>
-<linearGradient id="ouro-nomes-13" gradientUnits="userSpaceOnUse" x1="-285.034" y1="-39.347" x2="129.966" y2="20.653"><stop offset="0" stop-color="#7f5f22"/><stop offset="0.18" stop-color="#c4a052"/><stop offset="0.36" stop-color="#8d6b2a"/><stop offset="0.54" stop-color="#d2b366"/><stop offset="0.72" stop-color="#94722e"/><stop offset="0.88" stop-color="#c9a75a"/><stop offset="1" stop-color="#8a6927"/></linearGradient>
-<linearGradient id="ouro-nomes-14" gradientUnits="userSpaceOnUse" x1="-309.438" y1="-39.347" x2="105.562" y2="20.653"><stop offset="0" stop-color="#7f5f22"/><stop offset="0.18" stop-color="#c4a052"/><stop offset="0.36" stop-color="#8d6b2a"/><stop offset="0.54" stop-color="#d2b366"/><stop offset="0.72" stop-color="#94722e"/><stop offset="0.88" stop-color="#c9a75a"/><stop offset="1" stop-color="#8a6927"/></linearGradient>
-<linearGradient id="ouro-nomes-15" gradientUnits="userSpaceOnUse" x1="-331.181" y1="-39.347" x2="83.819" y2="20.653"><stop offset="0" stop-color="#7f5f22"/><stop offset="0.18" stop-color="#c4a052"/><stop offset="0.36" stop-color="#8d6b2a"/><stop offset="0.54" stop-color="#d2b366"/><stop offset="0.72" stop-color="#94722e"/><stop offset="0.88" stop-color="#c9a75a"/><stop offset="1" stop-color="#8a6927"/></linearGradient>
-<linearGradient id="ouro-nomes-16" gradientUnits="userSpaceOnUse" x1="-351.297" y1="-39.347" x2="63.703" y2="20.653"><stop offset="0" stop-color="#7f5f22"/><stop offset="0.18" stop-color="#c4a052"/><stop offset="0.36" stop-color="#8d6b2a"/><stop offset="0.54" stop-color="#d2b366"/><stop offset="0.72" stop-color="#94722e"/><stop offset="0.88" stop-color="#c9a75a"/><stop offset="1" stop-color="#8a6927"/></linearGradient>
+<linearGradient id="ouro-nomes-1" gradientUnits="userSpaceOnUse" x1="-2.994" y1="-38.822" x2="406.473" y2="20.378"><stop offset="0" stop-color="#7f5f22"/><stop offset="0.18" stop-color="#c4a052"/><stop offset="0.36" stop-color="#8d6b2a"/><stop offset="0.54" stop-color="#d2b366"/><stop offset="0.72" stop-color="#94722e"/><stop offset="0.88" stop-color="#c9a75a"/><stop offset="1" stop-color="#8a6927"/></linearGradient>
+<linearGradient id="ouro-nomes-2" gradientUnits="userSpaceOnUse" x1="-36.347" y1="-38.822" x2="373.120" y2="20.378"><stop offset="0" stop-color="#7f5f22"/><stop offset="0.18" stop-color="#c4a052"/><stop offset="0.36" stop-color="#8d6b2a"/><stop offset="0.54" stop-color="#d2b366"/><stop offset="0.72" stop-color="#94722e"/><stop offset="0.88" stop-color="#c9a75a"/><stop offset="1" stop-color="#8a6927"/></linearGradient>
+<linearGradient id="ouro-nomes-3" gradientUnits="userSpaceOnUse" x1="-50.990" y1="-38.822" x2="358.476" y2="20.378"><stop offset="0" stop-color="#7f5f22"/><stop offset="0.18" stop-color="#c4a052"/><stop offset="0.36" stop-color="#8d6b2a"/><stop offset="0.54" stop-color="#d2b366"/><stop offset="0.72" stop-color="#94722e"/><stop offset="0.88" stop-color="#c9a75a"/><stop offset="1" stop-color="#8a6927"/></linearGradient>
+<linearGradient id="ouro-nomes-4" gradientUnits="userSpaceOnUse" x1="-69.405" y1="-38.822" x2="340.062" y2="20.378"><stop offset="0" stop-color="#7f5f22"/><stop offset="0.18" stop-color="#c4a052"/><stop offset="0.36" stop-color="#8d6b2a"/><stop offset="0.54" stop-color="#d2b366"/><stop offset="0.72" stop-color="#94722e"/><stop offset="0.88" stop-color="#c9a75a"/><stop offset="1" stop-color="#8a6927"/></linearGradient>
+<linearGradient id="ouro-nomes-5" gradientUnits="userSpaceOnUse" x1="-82.864" y1="-38.822" x2="326.602" y2="20.378"><stop offset="0" stop-color="#7f5f22"/><stop offset="0.18" stop-color="#c4a052"/><stop offset="0.36" stop-color="#8d6b2a"/><stop offset="0.54" stop-color="#d2b366"/><stop offset="0.72" stop-color="#94722e"/><stop offset="0.88" stop-color="#c9a75a"/><stop offset="1" stop-color="#8a6927"/></linearGradient>
+<linearGradient id="ouro-nomes-6" gradientUnits="userSpaceOnUse" x1="-104.607" y1="-38.822" x2="304.860" y2="20.378"><stop offset="0" stop-color="#7f5f22"/><stop offset="0.18" stop-color="#c4a052"/><stop offset="0.36" stop-color="#8d6b2a"/><stop offset="0.54" stop-color="#d2b366"/><stop offset="0.72" stop-color="#94722e"/><stop offset="0.88" stop-color="#c9a75a"/><stop offset="1" stop-color="#8a6927"/></linearGradient>
+<linearGradient id="ouro-nomes-7" gradientUnits="userSpaceOnUse" x1="-129.012" y1="-38.822" x2="280.455" y2="20.378"><stop offset="0" stop-color="#7f5f22"/><stop offset="0.18" stop-color="#c4a052"/><stop offset="0.36" stop-color="#8d6b2a"/><stop offset="0.54" stop-color="#d2b366"/><stop offset="0.72" stop-color="#94722e"/><stop offset="0.88" stop-color="#c9a75a"/><stop offset="1" stop-color="#8a6927"/></linearGradient>
+<linearGradient id="ouro-nomes-8" gradientUnits="userSpaceOnUse" x1="-143.211" y1="-38.822" x2="266.256" y2="20.378"><stop offset="0" stop-color="#7f5f22"/><stop offset="0.18" stop-color="#c4a052"/><stop offset="0.36" stop-color="#8d6b2a"/><stop offset="0.54" stop-color="#d2b366"/><stop offset="0.72" stop-color="#94722e"/><stop offset="0.88" stop-color="#c9a75a"/><stop offset="1" stop-color="#8a6927"/></linearGradient>
+<linearGradient id="ouro-nomes-9" gradientUnits="userSpaceOnUse" x1="-155.710" y1="-38.822" x2="253.757" y2="20.378"><stop offset="0" stop-color="#7f5f22"/><stop offset="0.18" stop-color="#c4a052"/><stop offset="0.36" stop-color="#8d6b2a"/><stop offset="0.54" stop-color="#d2b366"/><stop offset="0.72" stop-color="#94722e"/><stop offset="0.88" stop-color="#c9a75a"/><stop offset="1" stop-color="#8a6927"/></linearGradient>
+<linearGradient id="ouro-nomes-10" gradientUnits="userSpaceOnUse" x1="-200.682" y1="-38.822" x2="208.785" y2="20.378"><stop offset="0" stop-color="#7f5f22"/><stop offset="0.18" stop-color="#c4a052"/><stop offset="0.36" stop-color="#8d6b2a"/><stop offset="0.54" stop-color="#d2b366"/><stop offset="0.72" stop-color="#94722e"/><stop offset="0.88" stop-color="#c9a75a"/><stop offset="1" stop-color="#8a6927"/></linearGradient>
+<linearGradient id="ouro-nomes-11" gradientUnits="userSpaceOnUse" x1="-213.180" y1="-38.822" x2="196.286" y2="20.378"><stop offset="0" stop-color="#7f5f22"/><stop offset="0.18" stop-color="#c4a052"/><stop offset="0.36" stop-color="#8d6b2a"/><stop offset="0.54" stop-color="#d2b366"/><stop offset="0.72" stop-color="#94722e"/><stop offset="0.88" stop-color="#c9a75a"/><stop offset="1" stop-color="#8a6927"/></linearGradient>
+<linearGradient id="ouro-nomes-12" gradientUnits="userSpaceOnUse" x1="-225.687" y1="-38.822" x2="183.779" y2="20.378"><stop offset="0" stop-color="#7f5f22"/><stop offset="0.18" stop-color="#c4a052"/><stop offset="0.36" stop-color="#8d6b2a"/><stop offset="0.54" stop-color="#d2b366"/><stop offset="0.72" stop-color="#94722e"/><stop offset="0.88" stop-color="#c9a75a"/><stop offset="1" stop-color="#8a6927"/></linearGradient>
+<linearGradient id="ouro-nomes-13" gradientUnits="userSpaceOnUse" x1="-282.484" y1="-38.822" x2="126.983" y2="20.378"><stop offset="0" stop-color="#7f5f22"/><stop offset="0.18" stop-color="#c4a052"/><stop offset="0.36" stop-color="#8d6b2a"/><stop offset="0.54" stop-color="#d2b366"/><stop offset="0.72" stop-color="#94722e"/><stop offset="0.88" stop-color="#c9a75a"/><stop offset="1" stop-color="#8a6927"/></linearGradient>
+<linearGradient id="ouro-nomes-14" gradientUnits="userSpaceOnUse" x1="-306.889" y1="-38.822" x2="102.578" y2="20.378"><stop offset="0" stop-color="#7f5f22"/><stop offset="0.18" stop-color="#c4a052"/><stop offset="0.36" stop-color="#8d6b2a"/><stop offset="0.54" stop-color="#d2b366"/><stop offset="0.72" stop-color="#94722e"/><stop offset="0.88" stop-color="#c9a75a"/><stop offset="1" stop-color="#8a6927"/></linearGradient>
+<linearGradient id="ouro-nomes-15" gradientUnits="userSpaceOnUse" x1="-328.631" y1="-38.822" x2="80.835" y2="20.378"><stop offset="0" stop-color="#7f5f22"/><stop offset="0.18" stop-color="#c4a052"/><stop offset="0.36" stop-color="#8d6b2a"/><stop offset="0.54" stop-color="#d2b366"/><stop offset="0.72" stop-color="#94722e"/><stop offset="0.88" stop-color="#c9a75a"/><stop offset="1" stop-color="#8a6927"/></linearGradient>
+<linearGradient id="ouro-nomes-16" gradientUnits="userSpaceOnUse" x1="-348.747" y1="-38.822" x2="60.720" y2="20.378"><stop offset="0" stop-color="#7f5f22"/><stop offset="0.18" stop-color="#c4a052"/><stop offset="0.36" stop-color="#8d6b2a"/><stop offset="0.54" stop-color="#d2b366"/><stop offset="0.72" stop-color="#94722e"/><stop offset="0.88" stop-color="#c9a75a"/><stop offset="1" stop-color="#8a6927"/></linearGradient>
 <filter id="filter-remove-color" x="0%" y="0%" width="100%" height="100%">
 <feColorMatrix color-interpolation-filters="sRGB" values="0 0 0 0 1 0 0 0 0 1 0 0 0 0 1 0 0 0 1 0" />
 </filter>
@@ -777,46 +778,46 @@
 </g>
 </g>
 <g fill="url(#ouro-nomes)" fill-opacity="1">
-<use xlink:href="#glyph-0-0" x="155.543231" y="264.346593" fill="url(#ouro-nomes-1)"/>
+<use xlink:href="#glyph-0-0" transform="translate(153.0341 264.3466) scale(1.013514)" fill="url(#ouro-nomes-1)"/>
 </g>
 <g fill="url(#ouro-nomes)" fill-opacity="1">
-<use xlink:href="#glyph-0-1" x="188.896346" y="264.346593" fill="url(#ouro-nomes-2)"/>
-<use xlink:href="#glyph-0-2" x="203.53984" y="264.346593" fill="url(#ouro-nomes-3)"/>
+<use xlink:href="#glyph-0-1" transform="translate(186.8380 264.3466) scale(1.013514)" fill="url(#ouro-nomes-2)"/>
+<use xlink:href="#glyph-0-2" transform="translate(201.6793 264.3466) scale(1.013514)" fill="url(#ouro-nomes-3)"/>
 </g>
 <g fill="url(#ouro-nomes)" fill-opacity="1">
-<use xlink:href="#glyph-0-3" x="221.954315" y="264.346593" fill="url(#ouro-nomes-4)"/>
+<use xlink:href="#glyph-0-3" transform="translate(220.3427 264.3466) scale(1.013514)" fill="url(#ouro-nomes-4)"/>
 </g>
 <g fill="url(#ouro-nomes)" fill-opacity="1">
-<use xlink:href="#glyph-0-4" x="235.413813" y="264.346593" fill="url(#ouro-nomes-5)"/>
+<use xlink:href="#glyph-0-4" transform="translate(233.9840 264.3466) scale(1.013514)" fill="url(#ouro-nomes-5)"/>
 </g>
 <g fill="url(#ouro-nomes)" fill-opacity="1">
-<use xlink:href="#glyph-0-5" x="257.156574" y="264.346593" fill="url(#ouro-nomes-6)"/>
+<use xlink:href="#glyph-0-5" transform="translate(256.0206 264.3466) scale(1.013514)" fill="url(#ouro-nomes-6)"/>
 </g>
 <g fill="url(#ouro-nomes)" fill-opacity="1">
-<use xlink:href="#glyph-0-6" x="281.561399" y="264.346593" fill="url(#ouro-nomes-7)"/>
+<use xlink:href="#glyph-0-6" transform="translate(280.7552 264.3466) scale(1.013514)" fill="url(#ouro-nomes-7)"/>
 </g>
 <g fill="url(#ouro-nomes)" fill-opacity="1">
-<use xlink:href="#glyph-0-7" x="295.760468" y="264.346593" fill="url(#ouro-nomes-8)"/>
-<use xlink:href="#glyph-0-8" x="308.259208" y="264.346593" fill="url(#ouro-nomes-9)"/>
+<use xlink:href="#glyph-0-7" transform="translate(295.1462 264.3466) scale(1.013514)" fill="url(#ouro-nomes-8)"/>
+<use xlink:href="#glyph-0-8" transform="translate(307.8138 264.3466) scale(1.013514)" fill="url(#ouro-nomes-9)"/>
 </g>
 <g fill="url(#ouro-nomes)" fill-opacity="1">
-<use xlink:href="#glyph-0-7" x="353.231196" y="264.346593" fill="url(#ouro-nomes-10)"/>
-<use xlink:href="#glyph-0-7" x="365.729936" y="264.346593" fill="url(#ouro-nomes-11)"/>
+<use xlink:href="#glyph-0-7" transform="translate(353.3936 264.3466) scale(1.013514)" fill="url(#ouro-nomes-10)"/>
+<use xlink:href="#glyph-0-7" transform="translate(366.0612 264.3466) scale(1.013514)" fill="url(#ouro-nomes-11)"/>
 </g>
 <g fill="url(#ouro-nomes)" fill-opacity="1">
-<use xlink:href="#glyph-0-9" x="378.236929" y="264.346593" fill="url(#ouro-nomes-12)"/>
+<use xlink:href="#glyph-0-9" transform="translate(378.7372 264.3466) scale(1.013514)" fill="url(#ouro-nomes-12)"/>
 </g>
 <g fill="url(#ouro-nomes)" fill-opacity="1">
-<use xlink:href="#glyph-0-5" x="435.033645" y="264.346593" fill="url(#ouro-nomes-13)"/>
+<use xlink:href="#glyph-0-5" transform="translate(436.3014 264.3466) scale(1.013514)" fill="url(#ouro-nomes-13)"/>
 </g>
 <g fill="url(#ouro-nomes)" fill-opacity="1">
-<use xlink:href="#glyph-0-10" x="459.438494" y="264.346593" fill="url(#ouro-nomes-14)"/>
+<use xlink:href="#glyph-0-10" transform="translate(461.0361 264.3466) scale(1.013514)" fill="url(#ouro-nomes-14)"/>
 </g>
 <g fill="url(#ouro-nomes)" fill-opacity="1">
-<use xlink:href="#glyph-0-11" x="481.18084" y="264.346593" fill="url(#ouro-nomes-15)"/>
+<use xlink:href="#glyph-0-11" transform="translate(483.0722 264.3466) scale(1.013514)" fill="url(#ouro-nomes-15)"/>
 </g>
 <g fill="url(#ouro-nomes)" fill-opacity="1">
-<use xlink:href="#glyph-0-2" x="501.296522" y="264.346593" fill="url(#ouro-nomes-16)"/>
+<use xlink:href="#glyph-0-2" transform="translate(503.4598 264.3466) scale(1.013514)" fill="url(#ouro-nomes-16)"/>
 </g>
 <g>
 <use xlink:href="#source-24" transform="matrix(0.239786, 0, 0, 0.239786, 225.097295, 303.961317)"/>
@@ -1867,7 +1868,100 @@
 <use xlink:href="#glyph-5-4" x="521.079234" y="185.441855"/>
 </g>
 <g>
-<use xlink:href="#source-66" transform="matrix(0.239786, 0, 0, 0.239786, 219.821993, 96.306228)"/>
+</g>
+<g id="elevar-verso" filter="url(#elevar-50)" fill="rgb(0%, 0%, 0%)" opacity="0.5" transform="translate(0 0.6)">
+<use xlink:href="#glyph-1-21" x="223.468746" y="107.178546"/>
+<use xlink:href="#glyph-1-22" x="226.665899" y="107.178546"/>
+<use xlink:href="#glyph-1-12" x="233.149991" y="107.178546"/>
+<use xlink:href="#glyph-1-18" x="238.405481" y="107.178546"/>
+<use xlink:href="#glyph-1-17" x="245.089397" y="107.178546"/>
+<use xlink:href="#glyph-1-8" x="249.495654" y="107.178546"/>
+<use xlink:href="#glyph-1-23" x="252.682669" y="107.178546"/>
+<use xlink:href="#glyph-1-8" x="257.938159" y="107.178546"/>
+<use xlink:href="#glyph-1-6" x="261.125174" y="107.178546"/>
+<use xlink:href="#glyph-1-7" x="266.710072" y="107.178546"/>
+<use xlink:href="#glyph-1-1" x="275.992061" y="107.178546"/>
+<use xlink:href="#glyph-1-10" x="281.836884" y="107.178546"/>
+<use xlink:href="#glyph-1-24" x="286.472626" y="107.178546"/>
+<use xlink:href="#glyph-1-8" x="287.771466" y="107.178546"/>
+<use xlink:href="#glyph-1-12" x="290.958871" y="107.178546"/>
+<use xlink:href="#glyph-1-8" x="296.213971" y="107.178546"/>
+<use xlink:href="#glyph-1-6" x="299.401375" y="107.178546"/>
+<use xlink:href="#glyph-1-25" x="304.986274" y="107.178546"/>
+<use xlink:href="#glyph-1-18" x="311.060971" y="107.178546"/>
+<use xlink:href="#glyph-1-12" x="317.744887" y="107.178546"/>
+<use xlink:href="#glyph-1-13" x="323.000376" y="107.178546"/>
+<use xlink:href="#glyph-1-12" x="326.267403" y="107.178546"/>
+<use xlink:href="#glyph-1-8" x="331.522503" y="107.178546"/>
+<use xlink:href="#glyph-1-25" x="334.709908" y="107.178546"/>
+<use xlink:href="#glyph-1-18" x="340.784605" y="107.178546"/>
+<use xlink:href="#glyph-1-12" x="347.46852" y="107.178546"/>
+<use xlink:href="#glyph-1-8" x="352.723621" y="107.178546"/>
+<use xlink:href="#glyph-1-9" x="355.911025" y="107.178546"/>
+<use xlink:href="#glyph-1-12" x="361.805785" y="107.178546"/>
+<use xlink:href="#glyph-1-10" x="367.060885" y="107.178546"/>
+<use xlink:href="#glyph-1-7" x="371.697017" y="107.178546"/>
+<use xlink:href="#glyph-1-6" x="380.978615" y="107.178546"/>
+<use xlink:href="#glyph-1-2" x="386.563514" y="107.178546"/>
+<use xlink:href="#glyph-1-12" x="393.057769" y="107.178546"/>
+<use xlink:href="#glyph-1-11" x="398.313258" y="107.178546"/>
+<use xlink:href="#glyph-1-12" x="403.288913" y="107.178546"/>
+<use xlink:href="#glyph-1-8" x="408.544013" y="107.178546"/>
+<use xlink:href="#glyph-1-2" x="411.731418" y="107.178546"/>
+<use xlink:href="#glyph-1-1" x="418.225283" y="107.178546"/>
+<use xlink:href="#glyph-1-8" x="424.070081" y="107.178546"/>
+<use xlink:href="#glyph-1-6" x="427.257485" y="107.178546"/>
+<use xlink:href="#glyph-1-7" x="432.842383" y="107.178546"/>
+<use xlink:href="#glyph-1-1" x="442.123982" y="107.178546"/>
+<use xlink:href="#glyph-1-10" x="447.96878" y="107.178546"/>
+<use xlink:href="#glyph-1-9" x="223.60962" y="121.420864"/>
+<use xlink:href="#glyph-1-12" x="229.50438" y="121.420864"/>
+<use xlink:href="#glyph-1-10" x="234.75987" y="121.420864"/>
+<use xlink:href="#glyph-1-7" x="239.396002" y="121.420864"/>
+<use xlink:href="#glyph-1-6" x="248.677991" y="121.420864"/>
+<use xlink:href="#glyph-1-2" x="254.263279" y="121.420864"/>
+<use xlink:href="#glyph-1-12" x="260.75751" y="121.420864"/>
+<use xlink:href="#glyph-1-11" x="266.013" y="121.420864"/>
+<use xlink:href="#glyph-1-12" x="270.989044" y="121.420864"/>
+<use xlink:href="#glyph-1-8" x="276.244534" y="121.420864"/>
+<use xlink:href="#glyph-1-12" x="279.431938" y="121.420864"/>
+<use xlink:href="#glyph-1-7" x="284.687428" y="121.420864"/>
+<use xlink:href="#glyph-1-8" x="293.969027" y="121.420864"/>
+<use xlink:href="#glyph-1-22" x="297.156431" y="121.420864"/>
+<use xlink:href="#glyph-1-12" x="303.640913" y="121.420864"/>
+<use xlink:href="#glyph-1-18" x="308.896403" y="121.420864"/>
+<use xlink:href="#glyph-1-17" x="315.58071" y="121.420864"/>
+<use xlink:href="#glyph-1-8" x="319.986967" y="121.420864"/>
+<use xlink:href="#glyph-1-12" x="323.174372" y="121.420864"/>
+<use xlink:href="#glyph-1-8" x="328.429862" y="121.420864"/>
+<use xlink:href="#glyph-1-22" x="331.617266" y="121.420864"/>
+<use xlink:href="#glyph-1-12" x="338.101748" y="121.420864"/>
+<use xlink:href="#glyph-1-18" x="343.357238" y="121.420864"/>
+<use xlink:href="#glyph-1-17" x="350.041154" y="121.420864"/>
+<use xlink:href="#glyph-1-24" x="354.447412" y="121.420864"/>
+<use xlink:href="#glyph-1-8" x="355.746643" y="121.420864"/>
+<use xlink:href="#glyph-1-2" x="358.934047" y="121.420864"/>
+<use xlink:href="#glyph-1-12" x="365.428278" y="121.420864"/>
+<use xlink:href="#glyph-1-13" x="370.683768" y="121.420864"/>
+<use xlink:href="#glyph-1-12" x="373.951184" y="121.420864"/>
+<use xlink:href="#glyph-1-26" x="379.206674" y="121.420864"/>
+<use xlink:href="#glyph-1-27" x="380.835704" y="121.420864"/>
+<use xlink:href="#glyph-1-8" x="384.032857" y="121.420864"/>
+<use xlink:href="#glyph-1-28" x="387.220261" y="121.420864"/>
+<use xlink:href="#glyph-1-29" x="390.877162" y="121.420864"/>
+<use xlink:href="#glyph-1-1" x="393.425297" y="121.420864"/>
+<use xlink:href="#glyph-1-16" x="399.270095" y="121.420864"/>
+<use xlink:href="#glyph-1-1" x="404.855383" y="121.420864"/>
+<use xlink:href="#glyph-1-8" x="410.700571" y="121.420864"/>
+<use xlink:href="#glyph-1-30" x="413.887976" y="121.420864"/>
+<use xlink:href="#glyph-1-31" x="420.092647" y="121.420864"/>
+<use xlink:href="#glyph-1-32" x="422.790277" y="121.420864"/>
+<use xlink:href="#glyph-1-33" x="427.865856" y="121.420864"/>
+<use xlink:href="#glyph-1-24" x="434.070917" y="121.420864"/>
+<use xlink:href="#glyph-1-32" x="435.369757" y="121.420864"/>
+<use xlink:href="#glyph-1-34" x="440.445336" y="121.420864"/>
+<use xlink:href="#glyph-1-35" x="446.650007" y="121.420864"/>
+<use xlink:href="#glyph-1-26" x="450.846693" y="121.420864"/>
 </g>
 <g fill="rgb(2.182007%, 1.994324%, 1.74408%)" fill-opacity="1">
 <use xlink:href="#glyph-1-21" x="223.468746" y="107.178546"/>

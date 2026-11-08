@@ -36,7 +36,7 @@ export function InvitationPage({ wedding, guests, selected, onToggle, onConfirm,
   const [bride, groom] = wedding.couple;
   const address = wedding.contact?.address;
   const ceremonyAddress = address?.street ? [address.street, address.city].filter(Boolean).join(', ') : wedding.ceremony.address || wedding.ceremony.name || '';
-  const party = wedding.party?.name ? [wedding.party.name, wedding.party.address].filter(Boolean).join(' · ') : 'Logo após, no mesmo local';
+  const party = wedding.party?.name ? [wedding.party.name, wedding.party.address].filter(Boolean).join(', ') : 'Logo após, no mesmo local';
   const mapQuery = wedding.ceremony.query || ceremonyAddress;
   return <section className="cv9" aria-label="Seu convite">
     <div className="hero">
