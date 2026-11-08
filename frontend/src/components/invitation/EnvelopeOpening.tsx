@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import type { CSSProperties, KeyboardEvent } from 'react';
-import type { InviteData, InviteLayout, SheetLayout } from '../../invite-print/convite';
+import { qrSvg, type InviteData, type InviteLayout, type SheetLayout } from '../../invite-print/convite';
 import { inviteCardDocument, prepareInviteFrame } from '../../invite-print/printDocument';
 import './abertura-envelope.css';
 
@@ -16,7 +16,15 @@ const reducedMotion = () => window.matchMedia?.('(prefers-reduced-motion: reduce
 export interface OnlineInvite { layout: InviteLayout; data: InviteData }
 
 // Modelo Igreja em tres camadas: fundo-convite.png (no CSS) + nomes em ouro + borda dupla metalica.
-const ConviteIgreja = () => <div className="cv-ouro"><img src="/textos-convite-ouro.svg" alt="" /><img src="/borda-dupla-ouro.svg" alt="" /></div>;
+// O QR code do convidado fica no mesmo ponto do impresso (conviteIgreja.css): centro, 395 pt do topo, 42,5 pt.
+function ConviteIgreja({ link }: { link?: string }) {
+  const qr = useMemo(() => link ? qrSvg(link) : '', [link]);
+  return <div className="cv-ouro">
+    <img className="cv-brilho cv-brilho-superior" src="/textos-convite-ouro.svg" alt="" />
+    <img className="cv-brilho cv-brilho-inferior" src="/textos-convite-ouro.svg" alt="" />
+    <img src="/textos-convite-ouro.svg" alt="" /><img src="/borda-dupla-ouro.svg" alt="" />
+    {qr && <div className="cv-qr" dangerouslySetInnerHTML={{ __html: qr }} />}</div>;
+}
 
 // Modelos 5, 9 e 10: o mesmo convite da impressao (210 x 148 mm, com o nome e o QR code do
 // convidado), num iframe para o CSS de impressao nao vazar para o site, escalado para a largura da caixa.
@@ -43,7 +51,7 @@ function ConviteFolha({ layout, data }: { layout: SheetLayout; data: InviteData 
 }
 
 const Convite = ({ invite }: { invite?: OnlineInvite | null }) =>
-  !invite || invite.layout === 'igreja' ? <ConviteIgreja /> : <ConviteFolha layout={invite.layout} data={invite.data} />;
+  !invite || invite.layout === 'igreja' ? <ConviteIgreja link={invite?.data.link} /> : <ConviteFolha layout={invite.layout} data={invite.data} />;
 
 const descricao = (invite?: OnlineInvite | null) => {
   if (!invite) return ALT;
