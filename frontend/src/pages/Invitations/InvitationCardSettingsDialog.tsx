@@ -46,7 +46,7 @@ export function InvitationCardSettingsDialog({ card, onClose, onSaved }: { card:
         error={Boolean(fieldErrors.layout)} helperText={fieldErrors.layout?.[0] || 'Modelo padrão: é o que sai na impressão e o que o convidado vê ao abrir o link ou o QR code.'}>
         {INVITE_LAYOUTS.map(item => <MenuItem key={item.layout} value={String(item.layout)}>{item.name}</MenuItem>)}
       </TextField>
-      <Alert severity="info">Noivos, data e horário vêm do cadastro do casamento: {card.bride} & {card.groom} · {date} · {card.time}.</Alert>
+      <Alert severity="info">Noivos, data e horário vêm do cadastro do casamento: {card.bride} e {card.groom}, {date}, às {card.time}.</Alert>
       {FIELDS.map(field => <TextField key={field.key} required fullWidth label={field.label} value={form[field.key]} multiline={field.multiline} minRows={field.multiline ? 3 : undefined}
         onChange={event => setForm({ ...form, [field.key]: event.target.value })} slotProps={{ htmlInput: { maxLength: field.max } }}
         error={Boolean(fieldErrors[field.key])} helperText={fieldErrors[field.key]?.[0] || field.help} />)}

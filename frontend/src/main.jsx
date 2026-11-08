@@ -262,13 +262,13 @@ function MobileFooter({ wedding, sectionHref, go, couple }) {
   const contact = wedding.contact || {};
   const address = contact.address || {};
   const credit = wedding.credit || {};
-  const fullAddress = [address.street?.replace(' · ', ', '), address.city, address.zip && `CEP ${address.zip}`].filter(Boolean).join(', ');
+  const fullAddress = [address.street, address.city, address.zip && `CEP ${address.zip}`].filter(Boolean).join(', ');
   const toTop = () => window.scrollTo({ top: 0, behavior: window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth' });
   return <footer className="rcm wed-foot">
     <div className="rcm-in">
       <div className="rcm-mono"><Monogram height={58} /></div>
       <p className="rcm-nomes">{wedding.couple[0]} &amp; {wedding.couple[1]}</p>
-      <p className="rcm-data">{wedding.date.join(' ')} · <span className="rcm-hora">{wedding.time.join('')}</span></p>
+      <p className="rcm-data">{wedding.date.join(' ')}, às <span className="rcm-hora">{wedding.time.join('')}</span></p>
       <div className="rcm-botoes">
         {contact.whatsapp && <a href={contact.whatsapp} target="_blank" rel="noopener noreferrer" aria-label={`WhatsApp ${contact.phone || ''}`.trim()}><MobileIcon name="whats" /></a>}
         {contact.email && <a href={`mailto:${contact.email}`} aria-label={`E-mail ${contact.email}`}><MobileIcon name="mail" /></a>}
@@ -317,7 +317,7 @@ function SiteFooter({ wedding, onLanding }) {
         <div className="col endereco"><h3>Endereço</h3>
           <ul>
             <li><FooterIcon name="pin" /><span>{address.street}<br />{address.city}{address.zip && <><br />CEP {address.zip}</>}</span></li>
-            <li><FooterIcon name="cal" /><span>{wedding.date.join(' ')} · {wedding.time.join('')}</span></li>
+            <li><FooterIcon name="cal" /><span>{wedding.date.join(' ')}, às {wedding.time.join('')}</span></li>
           </ul>
         </div>
       </div>
@@ -489,7 +489,7 @@ function Landing() {
         <p className="wed-lp-kicker">Vamos nos casar</p>
         {/* No celular os nomes quebram em duas linhas: "Stéfani &" / "André". */}
         <h1 className="wed-names"><span className="wed-lp-name">{wedding.couple[0]}<span className="wed-amp">&amp;</span></span> <span className="wed-lp-name">{wedding.couple[1]}</span></h1>
-        <p className="wed-lp-date">{wedding.date.join(' ')}<i aria-hidden="true">·</i><span className="wed-sr">, </span><span className="wed-lp-time">{wedding.time.join('')}</span></p>
+        <p className="wed-lp-date">{wedding.date.join(' ')}, às <span className="wed-lp-time">{wedding.time.join('')}</span></p>
         <Countdown target={target} />
         <a className="wed-lp-scroll" href="#sobre" onClick={event => scrollToSection(event, 'sobre')}>Conheça nossa história <span aria-hidden="true">↓</span></a>
       </section>
@@ -508,7 +508,7 @@ function Landing() {
 
         <Ceremony MapArt={MapArt} title={<ScrollReveal as="h2" className="wed-sec-title"><OliveGarland seed={79} />Cerimônia<OliveGarland seed={79} flip /></ScrollReveal>} data={{
           datetime: wedding.datetime, time: wedding.time[0],
-          celebration: { name: wedding.ceremony.name, address: wedding.ceremony.lines.join(' · '), query: wedding.ceremony.query, time: wedding.time[0] },
+          celebration: { name: wedding.ceremony.name, address: wedding.ceremony.lines.join(', '), query: wedding.ceremony.query, time: wedding.time[0] },
           party: { name: wedding.party.name, address: wedding.party.address, query: wedding.party.query, time: wedding.party.time }
         }} />
 

@@ -1,7 +1,7 @@
 /* Rodape no celular (design system Botanica Aquarela, componente RodapeCelular, layout 10 · Minimo).
    So abaixo de 720 px; no computador o rodape de sempre continua. Classes .rcm-* (as .rc-* do
    design system ja sao do mural de recados neste site). */
-.rcm { --rc-bg: #2f3130; --rc-bar: #252726; --rc-txt: #c9c3b6; --rc-suave: #9d978b; --rc-claro: #f2ede2; --rc-ouro: #c9ab78; --rc-linha: rgba(242,237,226,.12);
+.rcm { --rc-bg: #1f3428; --rc-bar: #182a20; --rc-txt: #c9c3b6; --rc-suave: #9d978b; --rc-claro: #f2ede2; --rc-ouro: #c9ab78; --rc-linha: rgba(242,237,226,.12);
   position: relative; z-index: 1; background: var(--rc-bg); color: var(--rc-txt); font-family: var(--wed-font, "Cormorant Garamond", Georgia, serif); text-align: center; }
 .rcm * { box-sizing: border-box; }
 .rcm p { margin: 0; }
