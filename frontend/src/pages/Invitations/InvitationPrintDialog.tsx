@@ -4,7 +4,7 @@ import PictureAsPdfOutlined from '@mui/icons-material/PictureAsPdfOutlined';
 import PrintOutlined from '@mui/icons-material/PrintOutlined';
 import { CrudDialog } from '../../components/common/CrudDialog';
 import { INVITE_LAYOUTS, type InviteLayout } from '../../invite-print/convite';
-import { IGREJA_FUNDO, IGREJA_TEXTOS } from '../../invite-print/conviteIgreja';
+import { IGREJA_BORDA, IGREJA_FUNDO, IGREJA_TEXTOS } from '../../invite-print/conviteIgreja';
 import { inviteDocument, prepareInviteFrame, SHEET_SCREEN_PADDING } from '../../invite-print/printDocument';
 import { displayName, inviteData, photoUrl, type InvitationCard, type PrintableInvitation } from '../../invite-print/inviteData';
 
@@ -37,7 +37,7 @@ export function InvitationPrintDialog({ job, card, onClose }: { job: PrintJob | 
 
   const onLoad = async () => {
     if (!frame.current || !card || !job) return;
-    const images = igreja ? [IGREJA_FUNDO, IGREJA_TEXTOS] : job.layout === 9 && photoUrl(card) ? [photoUrl(card)] : [];
+    const images = igreja ? [IGREJA_FUNDO, IGREJA_TEXTOS, IGREJA_BORDA] : job.layout === 9 && photoUrl(card) ? [photoUrl(card)] : [];
     const result = await prepareInviteFrame(frame.current, images, igreja);
     setState({ ready: true, height: result.height, imageFailed: !result.imagesOk });
   };
