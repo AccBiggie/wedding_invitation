@@ -1,6 +1,6 @@
 /* Rodapé (design system Botânica Aquarela), layout 5 sem a faixa "Você vem?". Responsivo por container. */
 .rd { container-type: inline-size; position: relative; overflow: hidden; font-family: var(--font-serifa, "Cormorant Garamond", Georgia, serif);
-  --rd-bg: #2f3130; --rd-bg2: #252726; --rd-tx: #e8e2d4; --rd-mut: #b8b2a4; --rd-tit: #ffffff; --rd-ac: #c9a96a; --rd-chip: #3d403e;
+  --rd-bg: #1f3428; --rd-bg2: #182a20; --rd-tx: #e8e2d4; --rd-mut: #b8b2a4; --rd-tit: #ffffff; --rd-ac: #c9a96a; --rd-chip: #2c4636;
   background: var(--rd-bg); color: var(--rd-tx); }
 .rd * { box-sizing: border-box; }
 .rd p, .rd h3, .rd ul { margin: 0; padding: 0; }

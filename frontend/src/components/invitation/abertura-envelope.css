@@ -83,7 +83,7 @@
 .ec .cv-ouro { position: absolute; inset: 0; background: #fff url(/fundo-convite.png) 0 0 / 100% 100% no-repeat; overflow: hidden; container-type: inline-size; }
 /* sombra suave dos textos, igual ao impresso (conviteIgreja.css), em proporção ao tamanho do convite */
 .ec .cv-ouro .cv-brilho { filter: blur(.135cqw); opacity: .55; }
-.ec .cv-ouro .cv-brilho-superior { clip-path: inset(13.92% 4.506% 60.05% 4.506%); }
+.ec .cv-ouro .cv-brilho-superior { clip-path: inset(25.85% 4.506% 60.05% 4.506%); }
 .ec .cv-ouro .cv-brilho-inferior { clip-path: inset(59.65% 4.506% 3.977% 4.506%); }
 .ec .cv-ouro img { position: absolute; inset: 0; width: 100%; height: 100%; display: block; }
 .ec .cv-ouro .cv-qr { position: absolute; left: 50%; top: 78.545%; width: 6.383%; aspect-ratio: 1; transform: translateX(-50%); }

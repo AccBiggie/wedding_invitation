@@ -39,7 +39,7 @@ export const wedding = {
     // Bloco "Cerimônia": nome, endereço curto, busca do mapa incorporado e horário.
     // TODO(noivos): conferir o endereço e o horário da festa.
     name: 'Igreja Luterana de Sussuí',
-    address: 'Sussuí · Eng. Beltrão/PR',
+    address: 'Sussuí, Eng. Beltrão/PR',
     query: 'Igreja Luterana de Sussuí, Engenheiro Beltrão - PR',
     time: 'Logo após a cerimônia'
   },
@@ -96,7 +96,7 @@ export const wedding = {
     whatsapp: 'https://wa.me/5544998833731',
     email: 'fetech.ferreira@gmail.com',
     // Endereço do rodapé, em linhas.
-    address: { street: 'R. Minas Gerais, 762-862 · Ivailândia', city: 'Eng. Beltrão - PR', zip: '87306-800' },
+    address: { street: 'R. Minas Gerais, 762-862, Ivailândia', city: 'Eng. Beltrão - PR', zip: '87306-800' },
     // TODO(noivos): preencher para os icones aparecerem no rodape.
     instagram: '',
     facebook: ''

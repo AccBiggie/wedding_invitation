@@ -26,7 +26,7 @@ const embed = (place: Place) => `https://www.google.com/maps?q=${encodeURICompon
 function longDate(datetime: string) {
   const [year, month, day] = datetime.slice(0, 10).split('-').map(Number);
   const weekday = WEEKDAYS[new Date(Date.UTC(year, month - 1, day)).getUTCDay()];
-  return `${weekday} · ${day} de ${MONTHS[month - 1]} de ${year}`;
+  return `${weekday}, ${day} de ${MONTHS[month - 1]} de ${year}`;
 }
 
 const TABS = [{ key: 'celebracao', label: 'Celebração' }, { key: 'festa', label: 'Festa' }] as const;
