@@ -4,8 +4,8 @@ html, body { margin: 0; }
 .folha { position: relative; width: 842.25pt; height: 595.5pt; overflow: hidden; background: #fff; break-after: page; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
 .folha:last-child { break-after: auto; }
 .cv { position: absolute; left: 27.3pt; top: 27.2pt; width: 665.8pt; height: 502.9pt; background: url(/fundo-convite.png) 0 0 / 100% 100% no-repeat; }
-.cv-textos { position: absolute; inset: 0; width: 100%; height: 100%; display: block; }
-/* Brilho do Canva nos textos; a área dos nomes e a borda ficam fora das cópias. */
+.cv-camada { position: absolute; inset: 0; width: 100%; height: 100%; display: block; }
+/* Sombra suave dos textos (efeito do Canva): cópias borradas por baixo; os nomes ficam fora. */
 .cv-brilho { filter: blur(.9pt); opacity: .55; }
 .cv-brilho-superior { clip-path: inset(70pt 30pt 302pt 30pt); }
 .cv-brilho-inferior { clip-path: inset(300pt 30pt 20pt 30pt); }
