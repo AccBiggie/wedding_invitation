@@ -7,7 +7,8 @@ html, body { margin: 0; }
 .cv-camada { position: absolute; inset: 0; width: 100%; height: 100%; display: block; }
 /* Sombra suave dos textos (efeito do Canva): cópias borradas por baixo; os nomes ficam fora. */
 .cv-brilho { filter: blur(.9pt); opacity: .55; }
-.cv-brilho-superior { clip-path: inset(70pt 30pt 302pt 30pt); }
+/* começa abaixo do verso, que tem o próprio efeito Elevar (intensidade 50) no SVG */
+.cv-brilho-superior { clip-path: inset(130pt 30pt 302pt 30pt); }
 .cv-brilho-inferior { clip-path: inset(300pt 30pt 20pt 30pt); }
 .cv-qr { position: absolute; left: 332.9pt; top: 395pt; width: 42.5pt; height: 42.5pt; transform: translateX(-50%); }
 .cv-qr svg, .cv-qr img, .cv-qr canvas { width: 100%; height: 100%; display: block; }
