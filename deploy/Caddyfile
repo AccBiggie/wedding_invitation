@@ -14,6 +14,16 @@ import /etc/caddy/sites/*.caddy
 	# Bloqueio pelo painel do Fetech: com /srv/bloqueios/painel/hosts/<dominio>, responde 503
 	# com a pagina de suspensao. Exige o 00-suspensao.caddy em /opt/caddy-sites.
 	import suspensao
+	# Log de acesso JSON, legivel (0644) para as estatisticas do painel do Fetech.
+	log {
+		output file /var/log/caddy/access.log {
+			roll_size 50MiB
+			roll_keep 10
+			roll_uncompressed
+			mode 0644
+		}
+		format json
+	}
 	encode zstd gzip
 	header {
 		# CSP: scripts so do site (o index.html nao tem script inline). Estilos precisam de

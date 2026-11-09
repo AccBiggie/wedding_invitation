@@ -49,6 +49,8 @@ if [[ "$REPO" == git@* ]]; then
   sudo -u deploy sh -c 'printf "Host github.com\n  IdentityFile ~/.ssh/github_deploy\n  IdentitiesOnly yes\n" > ~/.ssh/config && chmod 600 ~/.ssh/config && ssh-keyscan -t ed25519 github.com >> ~/.ssh/known_hosts 2>/dev/null'
 fi
 install -d -o deploy -g deploy "$APP_DIR"
+# Logs de acesso do Caddy (montados em /var/log/caddy); o painel do Fetech le daqui.
+install -d -m 755 /opt/caddy-logs
 
 echo
 if [[ "$REPO" == git@* ]]; then
