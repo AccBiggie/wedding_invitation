@@ -21,6 +21,11 @@ services:
       - caddy_config:/config
       # Sites de outros projetos da VPS (importados no fim do Caddyfile)
       - /opt/caddy-sites:/etc/caddy/sites:ro
+      # Bloqueio de clientes do Fetech: o trecho (suspensao) de /opt/caddy-sites confere
+      # /srv/bloqueios/painel/hosts/<dominio> e serve /srv/bloqueios/pagina com status 503.
+      - /opt/caddy-bloqueios:/srv/bloqueios:ro
+      # Logs de acesso JSON dos sites; o painel do Fetech le daqui para as estatisticas.
+      - /opt/caddy-logs:/var/log/caddy
     depends_on: [frontend]
     # Rede edge (com IPv6): o Caddy recebe o IP real de cada celular, tambem por IPv6.
     # Rede proxy: alcanca os sites dos outros projetos da VPS.
