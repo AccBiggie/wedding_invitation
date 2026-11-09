@@ -9,7 +9,8 @@ x-logging: &logging
 
 services:
   caddy:
-    image: caddy:2.8.4-alpine
+    # 2.9+: a opcao mode do log so funciona a partir dela (na 2.8 o arquivo sai 0600).
+    image: caddy:2.11.9-alpine
     restart: unless-stopped
     ports: ["80:80", "443:443", "443:443/udp"]
     environment:
