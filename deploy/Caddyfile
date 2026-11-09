@@ -3,7 +3,17 @@
 	email {$ACME_EMAIL}
 }
 
+# Outros sites da VPS (ex.: Fetech). Cada projeto grava o seu arquivo em /opt/caddy-sites
+# no proprio deploy e recarrega o Caddy; sem arquivos, o import e ignorado.
+# Fica antes do site do wedding porque traz o snippet (suspensao), de 00-suspensao.caddy,
+# usado abaixo. Nao importe esse arquivo de novo: o snippet ficaria declarado duas vezes.
+# A ordem dos blocos de site nao muda o roteamento do Caddy.
+import /etc/caddy/sites/*.caddy
+
 {$DOMAIN} {
+	# Bloqueio pelo painel do Fetech: com /srv/bloqueios/painel/hosts/<dominio>, responde 503
+	# com a pagina de suspensao. Exige o 00-suspensao.caddy em /opt/caddy-sites.
+	import suspensao
 	encode zstd gzip
 	header {
 		# CSP: scripts so do site (o index.html nao tem script inline). Estilos precisam de
@@ -18,7 +28,3 @@
 	}
 	reverse_proxy frontend:80
 }
-
-# Outros sites da VPS (ex.: Fetech). Cada projeto grava o seu arquivo em /opt/caddy-sites
-# no proprio deploy e recarrega o Caddy; sem arquivos, o import e ignorado.
-import /etc/caddy/sites/*.caddy
