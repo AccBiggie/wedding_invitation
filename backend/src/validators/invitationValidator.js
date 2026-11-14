@@ -38,6 +38,12 @@ export function validateInvitation(body, { partial = false } = {}) {
     if (typeof body.table !== 'string' || body.table.trim().length > 50) errors.table = ['A mesa deve ter no máximo 50 caracteres.'];
     else fields.table = body.table.trim();
   }
+  if (body.whatsapp !== undefined) {
+    // Guarda so os digitos: DDD + numero (10 ou 11), com ou sem o 55 do Brasil na frente.
+    const digits = typeof body.whatsapp === 'string' ? body.whatsapp.replace(/\D/g, '') : null;
+    if (digits === null || (digits && !/^(55)?[1-9]{2}9?\d{8}$/.test(digits))) errors.whatsapp = ['Informe o WhatsApp com DDD, ex.: (44) 99883-3731.'];
+    else fields.whatsapp = digits.length > 11 ? digits.slice(2) : digits;
+  }
   if (body.description !== undefined) {
     if (typeof body.description !== 'string' || body.description.length > 1000) errors.description = ['A descrição deve ter no máximo 1.000 caracteres.'];
     else fields.description = body.description.trim();

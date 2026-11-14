@@ -43,6 +43,8 @@ const schema = new mongoose.Schema({
   relationship: { type: String, enum: [...INVITATION_RELATIONSHIPS, null], default: null },
   // Mesa da festa: texto livre ("12", "Mesa dos noivos", "A3").
   table: { type: String, trim: true, maxlength: 50, default: '' },
+  // WhatsApp de contato do convite, so os digitos com DDD (ex.: 44998833731).
+  whatsapp: { type: String, trim: true, maxlength: 13, default: '' },
   status: { type: String, enum: INVITATION_STATUSES, default: 'not_viewed' },
   // Primeira vez que o link (ou o QR code) foi aberto.
   viewedAt: { type: Date, default: null },

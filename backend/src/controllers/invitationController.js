@@ -83,7 +83,7 @@ async function markViewed(item) {
 
 // Colunas que o painel pode ordenar. Texto ordena em ordem alfabetica do portugues, sem diferenciar
 // maiusculas e acentos, e numeros dentro do texto pelo valor (mesa "2" antes de "10").
-const SORT_FIELDS = ['side', 'relationship', 'name', 'type', 'table', 'description', 'createdAt', 'updatedAt', 'status', 'confirmedAt'];
+const SORT_FIELDS = ['side', 'relationship', 'name', 'type', 'table', 'whatsapp', 'description', 'createdAt', 'updatedAt', 'status', 'confirmedAt'];
 // Campos guardados como codigo ordenam pelo texto exibido no painel.
 const SORT_LABELS = {
   side: { groom: 'Noivo', bride: 'Noiva' },
@@ -142,6 +142,62 @@ export async function list(req, res, next) {
   } catch (error) { next(error); }
 }
 
+// Dia (AAAA-MM-DD) no fuso do casamento, para agrupar convites e confirmacoes por data.
+const dayOf = new Intl.DateTimeFormat('en-CA', { timeZone: 'America/Sao_Paulo' });
+const countBy = (map, key, amount = 1) => { map[key] = (map[key] || 0) + amount; };
+
+// Numeros do dashboard: todos os convites, sem filtro. Pessoas contam pela resposta de cada uma.
+export async function stats(req, res, next) {
+  try {
+    const invitations = await Invitation.find().select('name side relationship table type status guests createdAt').lean();
+    const result = {
+      invitations: { total: invitations.length, byType: {}, byStatus: Object.fromEntries(INVITATION_STATUSES.map(status => [status, 0])), bySide: {}, byRelationship: {} },
+      people: {
+        total: 0, byResponse: { yes: 0, no: 0, maybe: 0, none: 0 },
+        byCategory: Object.fromEntries([...GUEST_CATEGORIES, 'unknown'].map(category => [category, { total: 0, yes: 0 }])),
+        bySide: {}, byRelationship: {}
+      },
+      tables: [],
+      timeline: { invited: {}, confirmed: {} }
+    };
+    const tables = new Map();
+    for (const invitation of invitations) {
+      const guests = guestView(invitation);
+      const yes = guests.filter(guest => guestResponse(guest) === 'yes').length;
+      const side = invitation.side || 'none';
+      const relationship = invitation.relationship || 'none';
+      countBy(result.invitations.byType, invitation.type || 'in_person');
+      countBy(result.invitations.byStatus, invitation.status || 'not_viewed');
+      countBy(result.invitations.bySide, side);
+      countBy(result.invitations.byRelationship, relationship);
+      for (const [map, key] of [[result.people.bySide, side], [result.people.byRelationship, relationship]]) {
+        map[key] = map[key] || { total: 0, yes: 0 };
+        map[key].total += guests.length;
+        map[key].yes += yes;
+      }
+      const table = (invitation.table || '').trim();
+      const row = tables.get(table) || { table, invitations: 0, people: 0, yes: 0 };
+      row.invitations += 1; row.people += guests.length; row.yes += yes;
+      tables.set(table, row);
+      if (invitation.createdAt) countBy(result.timeline.invited, dayOf.format(invitation.createdAt), guests.length);
+      result.people.total += guests.length;
+      for (const guest of guests) {
+        const response = guestResponse(guest);
+        result.people.byResponse[response || 'none'] += 1;
+        const category = result.people.byCategory[guest.category] ? guest.category : 'unknown';
+        result.people.byCategory[category].total += 1;
+        if (response === 'yes') {
+          result.people.byCategory[category].yes += 1;
+          if (guest.confirmedAt) countBy(result.timeline.confirmed, dayOf.format(guest.confirmedAt));
+        }
+      }
+    }
+    // Mesas em ordem natural ("2" antes de "10"); convites sem mesa por ultimo, com table vazio.
+    result.tables = [...tables.values()].sort((a, b) => !a.table ? 1 : !b.table ? -1 : a.table.localeCompare(b.table, 'pt', { numeric: true, sensitivity: 'base' }));
+    ok(res, result);
+  } catch (error) { next(error); }
+}
+
 export async function getById(req, res, next) {
   try { if (!idOrFail(req.params.id, res)) return; const item = await Invitation.findById(req.params.id); if (!item) return fail(res, 404, 'Convite nao encontrado.'); ok(res, item); } catch (error) { next(error); }
 }
@@ -151,7 +207,7 @@ export async function create(req, res, next) {
     const { errors, fields: data } = validateInvitation(req.body);
     if (Object.keys(errors).length) return fail(res, 422, 'Os dados informados sao invalidos.', errors);
     const guests = data.guests.map(({ name, category }) => ({ name, category }));
-    const fields = { name: guests.map(guest => guest.name).join('; '), side: data.side, relationship: data.relationship, table: data.table || '', description: data.description || '', type: data.type || 'in_person', confirmationDeadline: data.confirmationDeadline || defaultDeadline(), guests, publicToken: crypto.randomBytes(32).toString('hex') };
+    const fields = { name: guests.map(guest => guest.name).join('; '), side: data.side, relationship: data.relationship, table: data.table || '', whatsapp: data.whatsapp || '', description: data.description || '', type: data.type || 'in_person', confirmationDeadline: data.confirmationDeadline || defaultDeadline(), guests, publicToken: crypto.randomBytes(32).toString('hex') };
     let item;
     for (let attempt = 0; !item; attempt++) {
       try { item = await Invitation.create({ ...fields, code: newCode() }); } catch (error) { if (!isDuplicate(error) || attempt >= 4) throw error; }
@@ -175,6 +231,7 @@ export async function update(req, res, next) {
     if (fields.side) item.side = fields.side;
     if (fields.relationship) item.relationship = fields.relationship;
     if (fields.table !== undefined) item.table = fields.table;
+    if (fields.whatsapp !== undefined) item.whatsapp = fields.whatsapp;
     applyStatus(item);
     await item.save(); ok(res, item, 'Convite atualizado com sucesso.');
   } catch (error) { next(error); }

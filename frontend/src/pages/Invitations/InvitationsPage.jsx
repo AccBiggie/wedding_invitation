@@ -1,13 +1,14 @@
 import { Fragment, useEffect, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { alpha } from '@mui/material/styles';
-import { Alert, Box, Button, Checkbox, Chip, CircularProgress, Collapse, Divider, IconButton, List, ListItem, ListItemButton, ListItemIcon, ListItemText, Menu, MenuItem, Pagination, Paper, Popover, Snackbar, Stack, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, TableSortLabel, TextField, ToggleButton, ToggleButtonGroup, Typography } from '@mui/material';
+import { Alert, Box, Button, Checkbox, Chip, CircularProgress, Collapse, Divider, IconButton, InputAdornment, Link, List, ListItem, ListItemButton, ListItemIcon, ListItemText, Menu, MenuItem, Pagination, Paper, Popover, Snackbar, Stack, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, TableSortLabel, TextField, ToggleButton, ToggleButtonGroup, Typography } from '@mui/material';
 import Add from '@mui/icons-material/Add';
 import PersonAddAlt1Outlined from '@mui/icons-material/PersonAddAlt1Outlined';
 import EditOutlined from '@mui/icons-material/EditOutlined';
 import DeleteOutlined from '@mui/icons-material/DeleteOutlined';
 import VisibilityOutlined from '@mui/icons-material/VisibilityOutlined';
 import ContentCopyOutlined from '@mui/icons-material/ContentCopyOutlined';
+import WhatsApp from '@mui/icons-material/WhatsApp';
 import PrintOutlined from '@mui/icons-material/PrintOutlined';
 import SettingsOutlined from '@mui/icons-material/SettingsOutlined';
 import ExpandMore from '@mui/icons-material/ExpandMore';
@@ -30,6 +31,14 @@ import { InvitationPrintDialog } from './InvitationPrintDialog';
 import { InvitationCardSettingsDialog } from './InvitationCardSettingsDialog';
 
 const typeLabel = type => type === 'virtual' ? 'Virtual' : 'Presencial';
+// WhatsApp: guardado so com digitos; na tela, (44) 99883-3731 (a mascara vai se formando ao digitar).
+const whatsappMask = value => {
+  const digits = String(value || '').replace(/\D/g, '').slice(0, 11);
+  if (digits.length <= 2) return digits ? `(${digits}` : '';
+  const rest = digits.slice(2), split = digits.length === 11 ? 5 : 4;
+  return `(${digits.slice(0, 2)}) ${rest.length > split ? `${rest.slice(0, split)}-${rest.slice(split)}` : rest}`;
+};
+const whatsappValid = value => { const digits = String(value || '').replace(/\D/g, ''); return !digits || /^[1-9]{2}9?\d{8}$/.test(digits); };
 // Tipos de pessoa do convite (mesmos valores do backend: GUEST_CATEGORIES).
 const ADULT_CATEGORIES = [{ value: 'man', label: 'Homem' }, { value: 'woman', label: 'Mulher' }];
 const CHILD_CATEGORIES = [{ value: 'girl_0_5', label: 'Menina até 5 anos' }, { value: 'boy_0_5', label: 'Menino até 5 anos' }, { value: 'girl_6_10', label: 'Menina de 6 a 10 anos' }, { value: 'boy_6_10', label: 'Menino de 6 a 10 anos' }, { value: 'over_10', label: 'Maior de 10 anos' }];
@@ -94,6 +103,7 @@ const COLUMNS = [
   </Box> },
   { id: 'type', label: 'Tipo', render: item => typeLabel(item.type) },
   { id: 'table', label: 'Mesa', render: item => item.table || '-' },
+  { id: 'whatsapp', label: 'WhatsApp', hidden: true, render: item => item.whatsapp ? <Link href={`https://wa.me/55${item.whatsapp}`} target="_blank" rel="noopener noreferrer" underline="hover">{whatsappMask(item.whatsapp)}</Link> : '-' },
   { id: 'description', label: 'Descrição', render: item => item.description || '-' },
   { id: 'createdAt', label: 'Data de criação', hidden: true, render: item => new Date(item.createdAt).toLocaleDateString('pt-BR') },
   { id: 'status', label: 'Status', hidden: true, render: (item, row) => <StatusChip status={STATUSES[item.status] || STATUSES.not_viewed} onClick={row.toggle} expanded={row.expanded} label={`${(STATUSES[item.status] || STATUSES.not_viewed).label}: ${row.expanded ? 'ocultar' : 'ver'} as pessoas de ${item.name}`} /> },
@@ -225,7 +235,12 @@ function InvitationFormModal({ editing, form, setForm, saving, error, deadlineLi
         <TextField select required label="Parentesco" value={form.relationship} disabled={saving} onChange={event => setForm({ ...form, relationship: event.target.value })}>{RELATIONSHIPS.map(item => <MenuItem key={item.value} value={item.value}>{item.label}</MenuItem>)}</TextField>
         <TextField label="Mesa" value={form.table} disabled={saving} onChange={event => setForm({ ...form, table: event.target.value })} placeholder="Ex.: 12" slotProps={{ htmlInput: { maxLength: 50 } }} />
       </Box>
-      <TextField select label="Tipo do convite" value={form.type} onChange={event => setForm({ ...form, type: event.target.value })}><MenuItem value="in_person">Presencial</MenuItem><MenuItem value="virtual">Virtual</MenuItem></TextField>
+      <Box sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr', sm: '1fr 1fr' }, gap: 2 }}>
+        <TextField select label="Tipo do convite" value={form.type} disabled={saving} onChange={event => setForm({ ...form, type: event.target.value })}><MenuItem value="in_person">Presencial</MenuItem><MenuItem value="virtual">Virtual</MenuItem></TextField>
+        <TextField label="WhatsApp" value={form.whatsapp} disabled={saving} onChange={event => setForm({ ...form, whatsapp: whatsappMask(event.target.value) })} placeholder="(44) 99883-3731"
+          error={!whatsappValid(form.whatsapp)} helperText={whatsappValid(form.whatsapp) ? undefined : 'Informe o número com DDD.'}
+          slotProps={{ htmlInput: { inputMode: 'tel', autoComplete: 'tel-national', maxLength: 15 }, input: { startAdornment: <InputAdornment position="start"><WhatsApp fontSize="small" sx={{ color: '#25d366' }} /></InputAdornment> } }} />
+      </Box>
       <DateField label="Data limite para confirmação" value={form.confirmationDeadline} maxDate={deadlineLimit || undefined} disabled={saving} onChange={value => setForm(current => ({ ...current, confirmationDeadline: value }))}
         helperText={deadlineLimit ? `Aparece no convite para os convidados. Deve ser até ${brDate(deadlineLimit)}; em branco, usa ${brDate(deadlineLimit)}.` : 'Aparece no convite para os convidados.'} />
       <TextField label="Descrição" multiline minRows={3} value={form.description} onChange={event => setForm({ ...form, description: event.target.value })} slotProps={{ htmlInput: { maxLength: 1000 } }} />
@@ -234,7 +249,7 @@ function InvitationFormModal({ editing, form, setForm, saving, error, deadlineLi
   </CrudDialog>;
 }
 
-const emptyForm = deadline => ({ side: '', relationship: '', table: '', guests: [guestRow('adult')], removed: [], viewed: false, description: '', type: 'in_person', confirmationDeadline: deadline });
+const emptyForm = deadline => ({ side: '', relationship: '', table: '', whatsapp: '', guests: [guestRow('adult')], removed: [], viewed: false, description: '', type: 'in_person', confirmationDeadline: deadline });
 
 export function InvitationsPage() {
   const route = useLocation(); const navigate = useNavigate();
@@ -362,7 +377,7 @@ export function InvitationsPage() {
   const setAlphabetical = order => { setPagination(current => ({ ...current, page: 1 })); setSort(order ? { by: 'name', order } : { by: 'createdAt', order: 'desc' }); };
   const applyFilter = values => { setPagination(current => ({ ...current, page: 1 })); setFilters(current => ({ ...current, ...values })); };
   const openNew = () => { setEditing(null); setForm(emptyForm(deadlineLimit)); setFormError(''); setFormOpen(true); };
-  const openEdit = item => { setEditing(item); setForm({ side: item.side || '', relationship: item.relationship || '', table: item.table || '', guests: guestRows(item), removed: [], viewed: Boolean(item.status) && item.status !== 'not_viewed', description: item.description || '', type: item.type || 'in_person', confirmationDeadline: item.confirmationDeadline ? item.confirmationDeadline.slice(0, 10) : deadlineLimit }); setFormError(''); setFormOpen(true); };
+  const openEdit = item => { setEditing(item); setForm({ side: item.side || '', relationship: item.relationship || '', table: item.table || '', whatsapp: whatsappMask(item.whatsapp), guests: guestRows(item), removed: [], viewed: Boolean(item.status) && item.status !== 'not_viewed', description: item.description || '', type: item.type || 'in_person', confirmationDeadline: item.confirmationDeadline ? item.confirmationDeadline.slice(0, 10) : deadlineLimit }); setFormError(''); setFormOpen(true); };
   // Convite novo ou antigo sem data: o campo vem com a data padrao, mesmo que ela chegue depois do formulario abrir.
   useEffect(() => { if (deadlineLimit && formOpen) setForm(current => current.confirmationDeadline ? current : { ...current, confirmationDeadline: deadlineLimit }); }, [deadlineLimit]);
   useEffect(() => {
@@ -381,11 +396,12 @@ export function InvitationsPage() {
     if (!form.side || !form.relationship) { setFormError('Selecione a parte e o parentesco do convite.'); return; }
     if (!form.guests.length) { setFormError('Adicione pelo menos uma pessoa ao convite.'); return; }
     if (form.guests.some(guest => !guest.name.trim() || !guest.category)) { setFormError('Informe o nome e o tipo de cada convidado.'); return; }
+    if (!whatsappValid(form.whatsapp)) { setFormError('Informe o WhatsApp com DDD, ex.: (44) 99883-3731.'); return; }
     if (deadlineLimit && form.confirmationDeadline > deadlineLimit) { setFormError(`A data limite deve ser até ${brDate(deadlineLimit)}.`); return; }
     setSaving(true); setFormError('');
     // Adultos primeiro e depois os filhos: e a ordem dos nomes no convite.
     const guests = ['adult', 'child'].flatMap(group => form.guests.filter(guest => guest.group === group)).map(({ _id, name, category }) => ({ ...(_id && { _id }), name: name.trim(), category }));
-    const payload = { side: form.side, relationship: form.relationship, table: form.table.trim(), guests, description: form.description, type: form.type, confirmationDeadline: form.confirmationDeadline };
+    const payload = { side: form.side, relationship: form.relationship, table: form.table.trim(), whatsapp: form.whatsapp.replace(/\D/g, ''), guests, description: form.description, type: form.type, confirmationDeadline: form.confirmationDeadline };
     try {
       const response = editing ? await api.put('/invitations/' + editing._id, payload) : await api.post('/invitations', payload);
       setFormOpen(false); setEditing(null); navigate('/convites'); load();

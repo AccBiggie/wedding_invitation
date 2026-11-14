@@ -37,6 +37,13 @@ assert.deepEqual(errors,{});assert.deepEqual(fields.guests,[{_id:'6add8554d73ef6
 assert.equal(fields.confirmationDeadline.toISOString(),'2027-03-07T23:59:59.999Z');assert.equal(fields.table,'Mesa 3');assert.equal(fields.side,'bride');
 assert.ok(validateInvitation({guests:[{name:'A',category:'man'}],confirmationDeadline:'2027-02-31'}).errors.confirmationDeadline);
 assert.deepEqual(validateInvitation({description:'x'},{partial:true}).errors,{});});
+test('whatsapp do convite guarda só os dígitos e rejeita número inválido', ()=>{
+assert.equal(validateInvitation({whatsapp:'(44) 99883-3731'},{partial:true}).fields.whatsapp,'44998833731');
+assert.equal(validateInvitation({whatsapp:'+55 44 3222-1111'},{partial:true}).fields.whatsapp,'4432221111');
+assert.equal(validateInvitation({whatsapp:''},{partial:true}).fields.whatsapp,'');
+assert.ok(validateInvitation({whatsapp:'12345'},{partial:true}).errors.whatsapp);
+assert.ok(validateInvitation({whatsapp:'(04) 99883-3731'},{partial:true}).errors.whatsapp);
+assert.ok(validateInvitation({whatsapp:123},{partial:true}).errors.whatsapp);});
 test('convite sem parte e parentesco é rejeitado', async()=>{const r=await request(app).post('/api/invitations').set('Authorization',bearer).send({guests:[{name:'Marco',category:'man'}]});assert.equal(r.status,422);assert.ok(r.body.errors.side);assert.ok(r.body.errors.relationship);});
 test('status do convite segue as respostas de cada pessoa', ()=>{
 const g=(...responses)=>responses.map(response=>({response}));
@@ -48,3 +55,4 @@ assert.equal(invitationStatus({viewedAt:new Date(),guests:g('yes',null)}),'parti
 assert.equal(invitationStatus({viewedAt:new Date(),guests:g('yes','yes')}),'confirmed');
 assert.equal(invitationStatus({viewedAt:new Date(),guests:g('no','no')}),'declined');
 assert.equal(invitationStatus({guests:[{confirmed:true},{confirmed:true}]}),'confirmed');});
+test('estatísticas do dashboard exigem login', async()=>{const r=await request(app).get('/api/invitations/stats');assert.equal(r.status,401);});
