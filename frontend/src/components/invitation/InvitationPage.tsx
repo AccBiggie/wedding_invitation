@@ -5,7 +5,10 @@ import './pagina-convite.css';
 // design system: foto e confirmacao lado a lado e seis blocos de informacao. Carregar o
 // convite e salvar a confirmacao continuam no Public() (main.jsx); aqui so a apresentacao.
 
-export interface Guest { _id: string; name: string; confirmed: boolean }
+export type GuestResponse = 'yes' | 'no' | 'maybe';
+export interface Guest { _id: string; name: string; confirmed: boolean; response: GuestResponse | null }
+// Resposta de cada pessoa no convite.
+const CHOICES: { value: GuestResponse; label: string }[] = [{ value: 'yes', label: 'Sim' }, { value: 'no', label: 'Não' }, { value: 'maybe', label: 'Não sei' }];
 interface Place { name?: string; address?: string; query?: string }
 export interface InvitationPageWedding {
   couple: [string, string]; verse: string; photo: string; datetime: string; time: string[];
@@ -29,8 +32,8 @@ const Tile = ({ href, external, icon, title, detail }: { href?: string; external
     : <div className="tile">{body}</div>;
 };
 
-export function InvitationPage({ wedding, guests, selected, onToggle, onConfirm, confirming, status, deadline, onViewInvite }: {
-  wedding: InvitationPageWedding; guests: Guest[]; selected: string[]; onToggle: (id: string) => void; onConfirm: () => void;
+export function InvitationPage({ wedding, guests, responses, onChoose, onConfirm, confirming, status, deadline, onViewInvite }: {
+  wedding: InvitationPageWedding; guests: Guest[]; responses: Record<string, GuestResponse | null>; onChoose: (id: string, response: GuestResponse) => void; onConfirm: () => void;
   confirming: boolean; status: Status | null; deadline: string | null; onViewInvite?: () => void;
 }) {
   const [bride, groom] = wedding.couple;
@@ -45,15 +48,21 @@ export function InvitationPage({ wedding, guests, selected, onToggle, onConfirm,
         <h1 className="nm">{bride} <em>&amp;</em> {groom}</h1>
         <p className="bencao">{wedding.verse}</p>
         {deadline && <p className="prazo">Confirme sua presença até {deadline}.</p>}
-        <div className="lista" role="group" aria-label="Quem vai">
-          {guests.map(guest => <label key={guest._id}>
-            <input type="checkbox" checked={selected.includes(String(guest._id))} onChange={() => onToggle(String(guest._id))} />
-            <span className="cx" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M5 12.5l4.5 4.5L19 7.5" /></svg></span>
-            <span className="nome">{guest.name}</span>
-            {guest.confirmed && <span className="selo">✓ Confirmado</span>}
-          </label>)}
+        <div className="lista" role="list" aria-label="Quem vai">
+          {guests.map(guest => {
+            const id = String(guest._id);
+            return <div className="pessoa" role="listitem" key={id}>
+              <span className="nome" id={`convidado-${id}`}>{guest.name}</span>
+              <div className="resp" role="radiogroup" aria-labelledby={`convidado-${id}`}>
+                {CHOICES.map(choice => <label key={choice.value} className={`r-${choice.value}`}>
+                  <input type="radio" name={`resposta-${id}`} value={choice.value} checked={responses[id] === choice.value} onChange={() => onChoose(id, choice.value)} />
+                  <span>{choice.label}</span>
+                </label>)}
+              </div>
+            </div>;
+          })}
         </div>
-        <button type="button" className="bt" disabled={confirming} onClick={onConfirm}><span className="co" aria-hidden="true">♥</span>{confirming ? 'Atualizando...' : 'Atualizar confirmação'}</button>
+        <button type="button" className="bt" disabled={confirming} onClick={onConfirm}><span className="co" aria-hidden="true">♥</span>{confirming ? 'Enviando...' : 'Enviar resposta'}</button>
         {onViewInvite && <button type="button" className="bt bt-ver" onClick={onViewInvite}><svg className="ic" viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="6" width="18" height="13" rx="1.5" /><path d="M3 7l9 6.5L21 7" /></svg>Visualizar convite</button>}
         <div className={`ok${status ? ' on' : ''}${status?.error ? ' erro' : ''}`} role="status">{status?.text}</div>
       </div>

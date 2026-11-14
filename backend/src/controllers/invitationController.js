@@ -1,7 +1,8 @@
 import crypto from 'node:crypto';
 import mongoose from 'mongoose';
-import Invitation, { GUEST_CATEGORIES } from '../models/Invitation.js';
+import Invitation, { GUEST_CATEGORIES, GUEST_RESPONSES, INVITATION_STATUSES, guestResponse, invitationStatus } from '../models/Invitation.js';
 import { defaultDeadline, validateInvitation } from '../validators/invitationValidator.js';
+import { escapeRegex } from '../validators/catalogValidator.js';
 
 const ok = (res, data, message) => res.json({ success: true, ...(message && { message }), data });
 const fail = (res, status, message, errors) => res.status(status).json({ success: false, message, ...(errors && { errors }) });
@@ -28,7 +29,7 @@ export const mayConfirm = (item, req) =>
   sameSecret(typeof req.query?.token === 'string' ? req.query.token : '', item.publicToken);
 
 // Convite sem data propria mostra a data padrao: o convidado sempre ve ate quando confirmar.
-const publicView = item => ({ _id: item._id, name: item.name, status: item.status, confirmedAt: item.confirmedAt, confirmationDeadline: item.confirmationDeadline || defaultDeadline(), guests: item.guests.map(guest => ({ _id: guest._id, name: guest.name, confirmed: guest.confirmed })) });
+const publicView = item => ({ _id: item._id, name: item.name, status: item.status, confirmedAt: item.confirmedAt, confirmationDeadline: item.confirmationDeadline || defaultDeadline(), guests: item.guests.map(guest => ({ _id: guest._id, name: guest.name, response: guestResponse(guest), confirmed: guestResponse(guest) === 'yes' })) });
 
 async function assignCode(id) {
   for (let attempt = 0; attempt < 5; attempt++) {
@@ -60,41 +61,83 @@ function syncGuests(invitation, guests) {
     const old = _id && !used.has(_id) ? oldGuests.get(_id) : null;
     if (!old) return { name, category };
     used.add(_id);
-    return { _id: old._id, name, category, confirmed: old.confirmed, confirmedAt: old.confirmedAt };
+    return { _id: old._id, name, category, response: old.response, respondedAt: old.respondedAt, confirmed: old.confirmed, confirmedAt: old.confirmedAt };
   });
   invitation.name = guests.map(guest => guest.name).join('; ');
 }
+
+// Status e data de confirmacao do convite seguem as respostas das pessoas.
+function applyStatus(item) {
+  item.status = invitationStatus(item);
+  const dates = item.guests.filter(guest => guestResponse(guest) === 'yes').map(guest => guest.confirmedAt).filter(Boolean).sort((a, b) => a - b);
+  item.confirmedAt = dates[0] || null;
+}
+
+// Primeira abertura do link: o convite deixa de ser "Nao visualizado".
+async function markViewed(item) {
+  if (item.viewedAt) return;
+  item.viewedAt = new Date();
+  applyStatus(item);
+  await item.save();
+}
+
+// Colunas que o painel pode ordenar. Texto ordena em ordem alfabetica do portugues, sem diferenciar
+// maiusculas e acentos, e numeros dentro do texto pelo valor (mesa "2" antes de "10").
+const SORT_FIELDS = ['side', 'relationship', 'name', 'type', 'table', 'description', 'createdAt', 'updatedAt', 'status', 'confirmedAt'];
+// Campos guardados como codigo ordenam pelo texto exibido no painel.
+const SORT_LABELS = {
+  side: { groom: 'Noivo', bride: 'Noiva' },
+  relationship: { relative: 'Parente', friends: 'Amigos', family: 'Família', parents: 'Pais', organization: 'Organização' },
+  type: { in_person: 'Presencial', virtual: 'Virtual' },
+  status: { not_viewed: 'Não visualizado', unconfirmed: 'Não confirmado', partial: 'Confirmado parcial', confirmed: 'Confirmado', declined: 'Não vai' }
+};
+const sortValue = field => SORT_LABELS[field]
+  ? { $switch: { branches: Object.entries(SORT_LABELS[field]).map(([value, label]) => ({ case: { $eq: ['$' + field, value] }, then: label })), default: '' } }
+  : '$' + field;
 
 export async function list(req, res, next) {
   try {
     const { name, status, startDate, endDate, type } = req.query;
     const page = Math.max(1, Number(req.query.page) || 1);
     const limit = Math.min(200, Math.max(1, Number(req.query.limit) || 20));
-    const allowedSort = ['createdAt', 'updatedAt', 'name', 'status'];
-    const sortBy = allowedSort.includes(req.query.sortBy) ? req.query.sortBy : 'createdAt';
+    const sortBy = SORT_FIELDS.includes(req.query.sortBy) ? req.query.sortBy : 'createdAt';
     const sortOrder = req.query.sortOrder === 'asc' ? 1 : -1;
     const query = {};
-    if (name) query.name = { $regex: name, $options: 'i' };
-    if (['confirmed', 'unconfirmed'].includes(status)) query.status = status;
+    if (name) query.name = { $regex: escapeRegex(String(name)), $options: 'i' };
+    if (INVITATION_STATUSES.includes(status)) query.status = status;
     if (['in_person', 'virtual'].includes(type)) query.type = type;
     if (startDate || endDate) { query.createdAt = {}; if (startDate) query.createdAt.$gte = new Date(`${startDate}T00:00:00.000Z`); if (endDate) query.createdAt.$lte = new Date(`${endDate}T23:59:59.999Z`); }
 
     const [data, total, allInvitations] = await Promise.all([
-      Invitation.find(query).sort({ [sortBy]: sortOrder }).skip((page - 1) * limit).limit(limit),
+      // _id desempata: a ordem fica estavel entre as paginas.
+      Invitation.aggregate([
+        { $match: query },
+        { $addFields: { sortValue: sortValue(sortBy) } },
+        { $sort: { sortValue: sortOrder, _id: sortOrder } },
+        { $skip: (page - 1) * limit }, { $limit: limit },
+        { $project: { sortValue: 0 } }
+      ]).collation({ locale: 'pt', strength: 1, numericOrdering: true }),
       Invitation.countDocuments(query),
-      Invitation.find(query).select('name guests type')
+      Invitation.find(query).select('name guests type status')
     ]);
     // categories: pessoas por tipo (homens, mulheres, criancas); "unknown" sao as cadastradas antes do campo.
     const categories = Object.fromEntries([...GUEST_CATEGORIES, 'unknown'].map(category => [category, 0]));
     const summary = allInvitations.reduce((result, invitation) => {
       const guests = guestView(invitation);
       result.people += guests.length;
-      result.confirmed += guests.filter(guest => guest.confirmed).length;
       result[invitation.type === 'virtual' ? 'virtual' : 'inPerson'] += 1;
-      guests.forEach(guest => { result.categories[guest.category || 'unknown'] += 1; });
+      result.statuses[invitation.status] = (result.statuses[invitation.status] || 0) + 1;
+      guests.forEach(guest => {
+        result.categories[guest.category || 'unknown'] += 1;
+        const response = guestResponse(guest);
+        if (response === 'yes') result.confirmed += 1;
+        else if (response === 'no') result.declined += 1;
+        else if (response === 'maybe') result.maybe += 1;
+      });
       return result;
-    }, { people: 0, confirmed: 0, inPerson: 0, virtual: 0, categories });
-    summary.unconfirmed = summary.people - summary.confirmed;
+    }, { people: 0, confirmed: 0, declined: 0, maybe: 0, inPerson: 0, virtual: 0, categories, statuses: {} });
+    // Ainda sem decisao: quem nao respondeu ou respondeu "nao sei".
+    summary.unconfirmed = summary.people - summary.confirmed - summary.declined;
     ok(res, { data, pagination: { page, limit, total, totalPages: Math.ceil(total / limit) }, summary: { total, ...summary } });
   } catch (error) { next(error); }
 }
@@ -132,9 +175,7 @@ export async function update(req, res, next) {
     if (fields.side) item.side = fields.side;
     if (fields.relationship) item.relationship = fields.relationship;
     if (fields.table !== undefined) item.table = fields.table;
-    const confirmedGuests = item.guests.filter(guest => guest.confirmed);
-    item.status = confirmedGuests.length ? 'confirmed' : 'unconfirmed';
-    item.confirmedAt = confirmedGuests.length ? confirmedGuests[0].confirmedAt : null;
+    applyStatus(item);
     await item.save(); ok(res, item, 'Convite atualizado com sucesso.');
   } catch (error) { next(error); }
 }
@@ -161,6 +202,7 @@ export async function publicGet(req, res, next) {
     const item = await Invitation.findById(req.params.id).select('-__v');
     if (!item || normalize(item.name) !== decodeURIComponent(req.params.name) || req.query.token !== item.publicToken) return fail(res, 404, 'Convite nao encontrado.');
     await ensureGuests(item);
+    await markViewed(item);
     ok(res, publicView(item));
   } catch (error) { next(error); }
 }
@@ -172,6 +214,7 @@ export async function publicGetByCode(req, res, next) {
     const item = await Invitation.findOne({ code });
     if (!item) return fail(res, 404, 'Convite nao encontrado.');
     await ensureGuests(item);
+    await markViewed(item);
     ok(res, publicView(item));
   } catch (error) { next(error); }
 }
@@ -185,21 +228,26 @@ export async function confirm(req, res, next) {
     // Mesma resposta para convite inexistente e para prova errada: nao confirma se o id existe.
     if (!item || !mayConfirm(item, req)) return fail(res, 404, 'Convite nao encontrado.');
     await ensureGuests(item);
-    const selectedIds = Array.isArray(req.body.guestIds) ? req.body.guestIds : item.guests.map(guest => String(guest._id));
-    const selected = new Set(selectedIds.map(String));
+    // responses: { [guestId]: 'yes' | 'no' | 'maybe' | null }. guestIds (formato antigo): marcados = sim, demais sem resposta.
+    const legacyIds = Array.isArray(req.body?.guestIds) ? req.body.guestIds.map(String) : [];
+    const responses = req.body?.responses && typeof req.body.responses === 'object' && !Array.isArray(req.body.responses)
+      ? req.body.responses
+      : Object.fromEntries(item.guests.map(guest => [String(guest._id), legacyIds.includes(String(guest._id)) ? 'yes' : null]));
     const now = new Date();
     item.guests.forEach(guest => {
-      if (selected.has(String(guest._id))) {
-        if (!guest.confirmed) { guest.confirmed = true; guest.confirmedAt = now; }
-      } else {
-        guest.confirmed = false;
-        guest.confirmedAt = null;
-      }
+      const id = String(guest._id);
+      if (!Object.hasOwn(responses, id)) return;
+      const response = GUEST_RESPONSES.includes(responses[id]) ? responses[id] : null;
+      if (response === guestResponse(guest)) return;
+      if (response === 'yes' && !guest.confirmed) guest.confirmedAt = now;
+      if (response !== 'yes') guest.confirmedAt = null;
+      guest.response = response;
+      guest.respondedAt = response ? now : null;
+      guest.confirmed = response === 'yes';
     });
-    const confirmedGuests = item.guests.filter(guest => guest.confirmed);
-    item.status = confirmedGuests.length ? 'confirmed' : 'unconfirmed';
-    item.confirmedAt = confirmedGuests.length ? confirmedGuests[0].confirmedAt : null;
+    if (!item.viewedAt) item.viewedAt = now;
+    applyStatus(item);
     await item.save();
-    ok(res, publicView(item), selected.size ? 'Confirmacao atualizada com sucesso!' : 'Nenhuma pessoa foi selecionada.');
+    ok(res, publicView(item), 'Resposta registrada com sucesso!');
   } catch (error) { next(error); }
 }

@@ -18,5 +18,5 @@ export interface PublicStoreCategoryPage { category: PublicStoreCategory; produc
 export interface PixSettings { _id: string; keyType: 'cpf' | 'cnpj' | 'email' | 'phone' | 'random'; pixKey: string; receiverName: string; receiverCity: string; description: string; active: boolean; createdAt: string; updatedAt: string }
 export type PixInput = Omit<PixSettings, '_id' | 'createdAt' | 'updatedAt'>;
 export interface PixGenerated { amount: number; payload: string; qrCode: string }
-export interface Invitation { _id: string; name: string; status: 'confirmed' | 'unconfirmed'; guests: { confirmed: boolean }[] }
+export interface Invitation { _id: string; name: string; status: 'not_viewed' | 'unconfirmed' | 'partial' | 'confirmed' | 'declined'; guests: { confirmed: boolean; response?: 'yes' | 'no' | 'maybe' | null }[] }
 export interface InvitationListData extends ListData<Invitation> { summary: { total: number; people: number; confirmed: number; unconfirmed: number } }

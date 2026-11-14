@@ -1,6 +1,7 @@
 import test from 'node:test'; import assert from 'node:assert/strict'; import request from 'supertest'; import app from '../src/app.js'; import { signToken } from '../src/controllers/authController.js';
 import { mayConfirm, newCode } from '../src/controllers/invitationController.js';
 import { validateInvitation } from '../src/validators/invitationValidator.js';
+import { invitationStatus } from '../src/models/Invitation.js';
 const bearer = 'Bearer ' + signToken({ _id: 'test-admin', name: 'Administrador', email: 'accbiggie@gmail.com', role: 'admin' });
 test('health endpoint', async()=>{const r=await request(app).get('/api/health');assert.equal(r.status,200);assert.equal(r.body.success,true);});
 test('cadastro sem nome é rejeitado', async()=>{const r=await request(app).post('/api/invitations').set('Authorization',bearer).send({description:'x'});assert.equal(r.status,422);assert.equal(r.body.success,false);});
@@ -37,3 +38,13 @@ assert.equal(fields.confirmationDeadline.toISOString(),'2027-03-07T23:59:59.999Z
 assert.ok(validateInvitation({guests:[{name:'A',category:'man'}],confirmationDeadline:'2027-02-31'}).errors.confirmationDeadline);
 assert.deepEqual(validateInvitation({description:'x'},{partial:true}).errors,{});});
 test('convite sem parte e parentesco é rejeitado', async()=>{const r=await request(app).post('/api/invitations').set('Authorization',bearer).send({guests:[{name:'Marco',category:'man'}]});assert.equal(r.status,422);assert.ok(r.body.errors.side);assert.ok(r.body.errors.relationship);});
+test('status do convite segue as respostas de cada pessoa', ()=>{
+const g=(...responses)=>responses.map(response=>({response}));
+assert.equal(invitationStatus({guests:g(null,null)}),'not_viewed');
+assert.equal(invitationStatus({viewedAt:new Date(),guests:g(null,null)}),'unconfirmed');
+assert.equal(invitationStatus({viewedAt:new Date(),guests:g('maybe','no')}),'unconfirmed');
+assert.equal(invitationStatus({viewedAt:new Date(),guests:g('yes','maybe','no')}),'partial');
+assert.equal(invitationStatus({viewedAt:new Date(),guests:g('yes',null)}),'partial');
+assert.equal(invitationStatus({viewedAt:new Date(),guests:g('yes','yes')}),'confirmed');
+assert.equal(invitationStatus({viewedAt:new Date(),guests:g('no','no')}),'declined');
+assert.equal(invitationStatus({guests:[{confirmed:true},{confirmed:true}]}),'confirmed');});

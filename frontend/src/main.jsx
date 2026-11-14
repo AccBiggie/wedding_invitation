@@ -644,7 +644,7 @@ function Public() {
   // "Visualizar convite" volta ao envelope ja abrindo (autoOpen).
   const [reopened, setReopened] = useState(false);
   const showEnvelope = () => { setReopened(true); setStage('envelope'); };
-  const [item, setItem] = useState(); const [error, setError] = useState(false); const [confirming, setConfirming] = useState(false); const [status, setStatus] = useState(null); const [selectedGuestIds, setSelectedGuestIds] = useState([]);
+  const [item, setItem] = useState(); const [error, setError] = useState(false); const [confirming, setConfirming] = useState(false); const [status, setStatus] = useState(null); const [responses, setResponses] = useState({});
   useEffect(() => {
     const request = byCode ? api.get('/public/invitations/code/' + encodeURIComponent(id || '')) : api.get('/public/invitations/' + id + '/' + name, { params: { token } });
     request.then(response => setItem(response.data.data)).catch(() => setError(true));
@@ -652,15 +652,16 @@ function Public() {
   // Modelo padrao e textos do convite (painel > Configuracoes do convite); sem eles, o envelope usa o modelo Igreja.
   const [card, setCard] = useState();
   useEffect(() => { api.get('/public/invitations/card').then(response => setCard(response.data.data)).catch(() => setCard(null)); }, []);
-  useEffect(() => { if (item?.guests) setSelectedGuestIds(item.guests.filter(guest => guest.confirmed).map(guest => String(guest._id))); }, [item?._id]);
+  // Resposta salva de cada pessoa (sim, nao, nao sei); quem ainda nao respondeu comeca sem opcao marcada.
+  useEffect(() => { if (item?.guests) setResponses(Object.fromEntries(item.guests.map(guest => [String(guest._id), guest.response || null]))); }, [item?._id]);
   // Convite valido: guarda o caminho para a landing saber a qual convite voltar.
   useEffect(() => { if (item) inviteStore.set(location.pathname + location.search); }, [item?._id]);
   const confirm = async () => {
     setConfirming(true); setStatus(null);
     try {
-      const response = await api.post('/public/invitations/' + item._id + '/confirm', { guestIds: selectedGuestIds, ...(byCode && { code: id }) }, byCode ? undefined : { params: { token } });
+      const response = await api.post('/public/invitations/' + item._id + '/confirm', { responses, ...(byCode && { code: id }) }, byCode ? undefined : { params: { token } });
       setItem(response.data.data);
-      setStatus({ error: false, text: 'Confirmação atualizada! Obrigado, estamos ansiosos para ver vocês.' });
+      setStatus({ error: false, text: 'Resposta enviada! Obrigado por nos avisar.' });
     } catch { setStatus({ error: true, text: 'Não foi possível atualizar a confirmação. Tente de novo em instantes.' }); }
     finally { setConfirming(false); }
   };
@@ -670,10 +671,7 @@ function Public() {
     <a className="wed-btn" href="/casamento">Ver o site do casamento</a>
   </div></WeddingShell>;
   if (!item || !wedding || card === undefined) return <WeddingShell><div className="wed-state">Carregando...</div></WeddingShell>;
-  const toggleGuest = guestId => {
-    setStatus(null);
-    setSelectedGuestIds(current => current.includes(guestId) ? current.filter(idValue => idValue !== guestId) : [...current, guestId]);
-  };
+  const chooseResponse = (guestId, value) => { setStatus(null); setResponses(current => ({ ...current, [guestId]: value })); };
   const guests = item.guests || [];
   const deadline = item.confirmationDeadline ? new Date(item.confirmationDeadline).toLocaleDateString('pt-BR', { timeZone: 'UTC' }) : null;
   // O convite do envelope traz o nome e o QR code deste convidado, como o impresso.
@@ -681,7 +679,7 @@ function Public() {
   if (stage === 'envelope') return <EnvelopeOpening invite={invite} autoOpen={reopened} onConfirm={showConfirmation} />;
   return <WeddingShell wedding={wedding}>
     <main className="pc-main pc-entra">
-      <InvitationPage wedding={wedding} guests={guests} selected={selectedGuestIds} onToggle={toggleGuest} onConfirm={confirm} confirming={confirming} status={status} deadline={deadline} onViewInvite={showEnvelope} />
+      <InvitationPage wedding={wedding} guests={guests} responses={responses} onChoose={chooseResponse} onConfirm={confirm} confirming={confirming} status={status} deadline={deadline} onViewInvite={showEnvelope} />
     </main>
   </WeddingShell>;
 }
