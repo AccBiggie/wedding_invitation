@@ -1,6 +1,7 @@
 import crypto from 'node:crypto';
 import mongoose from 'mongoose';
-import Invitation from '../models/Invitation.js';
+import Invitation, { GUEST_CATEGORIES } from '../models/Invitation.js';
+import { defaultDeadline, validateInvitation } from '../validators/invitationValidator.js';
 
 const ok = (res, data, message) => res.json({ success: true, ...(message && { message }), data });
 const fail = (res, status, message, errors) => res.status(status).json({ success: false, message, ...(errors && { errors }) });
@@ -26,7 +27,8 @@ export const mayConfirm = (item, req) =>
   sameSecret(typeof req.body?.code === 'string' ? req.body.code.trim().toUpperCase() : '', item.code) ||
   sameSecret(typeof req.query?.token === 'string' ? req.query.token : '', item.publicToken);
 
-const publicView = item => ({ _id: item._id, name: item.name, status: item.status, confirmedAt: item.confirmedAt, confirmationDeadline: item.confirmationDeadline, guests: item.guests.map(guest => ({ _id: guest._id, name: guest.name, confirmed: guest.confirmed })) });
+// Convite sem data propria mostra a data padrao: o convidado sempre ve ate quando confirmar.
+const publicView = item => ({ _id: item._id, name: item.name, status: item.status, confirmedAt: item.confirmedAt, confirmationDeadline: item.confirmationDeadline || defaultDeadline(), guests: item.guests.map(guest => ({ _id: guest._id, name: guest.name, confirmed: guest.confirmed })) });
 
 async function assignCode(id) {
   for (let attempt = 0; attempt < 5; attempt++) {
@@ -50,12 +52,17 @@ async function ensureGuests(invitation) {
   return invitation;
 }
 
-function syncGuests(invitation, name) {
-  const oldGuests = new Map((invitation.guests || []).map(guest => [guest.name.trim().toLowerCase(), guest]));
-  invitation.guests = guestNames(name).map(guestName => {
-    const old = oldGuests.get(guestName.toLowerCase());
-    return old ? { _id: old._id, name: guestName, confirmed: old.confirmed, confirmedAt: old.confirmedAt } : { name: guestName };
+// Troca a lista de pessoas mantendo a confirmacao de quem continua no convite (pelo _id).
+function syncGuests(invitation, guests) {
+  const oldGuests = new Map((invitation.guests || []).map(guest => [String(guest._id), guest]));
+  const used = new Set();
+  invitation.guests = guests.map(({ _id, name, category }) => {
+    const old = _id && !used.has(_id) ? oldGuests.get(_id) : null;
+    if (!old) return { name, category };
+    used.add(_id);
+    return { _id: old._id, name, category, confirmed: old.confirmed, confirmedAt: old.confirmedAt };
   });
+  invitation.name = guests.map(guest => guest.name).join('; ');
 }
 
 export async function list(req, res, next) {
@@ -77,13 +84,16 @@ export async function list(req, res, next) {
       Invitation.countDocuments(query),
       Invitation.find(query).select('name guests type')
     ]);
+    // categories: pessoas por tipo (homens, mulheres, criancas); "unknown" sao as cadastradas antes do campo.
+    const categories = Object.fromEntries([...GUEST_CATEGORIES, 'unknown'].map(category => [category, 0]));
     const summary = allInvitations.reduce((result, invitation) => {
       const guests = guestView(invitation);
       result.people += guests.length;
       result.confirmed += guests.filter(guest => guest.confirmed).length;
       result[invitation.type === 'virtual' ? 'virtual' : 'inPerson'] += 1;
+      guests.forEach(guest => { result.categories[guest.category || 'unknown'] += 1; });
       return result;
-    }, { people: 0, confirmed: 0, inPerson: 0, virtual: 0 });
+    }, { people: 0, confirmed: 0, inPerson: 0, virtual: 0, categories });
     summary.unconfirmed = summary.people - summary.confirmed;
     ok(res, { data, pagination: { page, limit, total, totalPages: Math.ceil(total / limit) }, summary: { total, ...summary } });
   } catch (error) { next(error); }
@@ -95,16 +105,10 @@ export async function getById(req, res, next) {
 
 export async function create(req, res, next) {
   try {
-    const errors = {};
-    if (typeof req.body.name !== 'string' || !req.body.name.trim()) errors.name = ['O nome dos convidados e obrigatorio.'];
-    if (req.body.description?.length > 1000) errors.description = ['A descricao deve ter no maximo 1.000 caracteres.'];
-    if (req.body.type !== undefined && !['in_person', 'virtual'].includes(req.body.type)) errors.type = ['O tipo deve ser in_person ou virtual.'];
+    const { errors, fields: data } = validateInvitation(req.body);
     if (Object.keys(errors).length) return fail(res, 422, 'Os dados informados sao invalidos.', errors);
-    const name = req.body.name.trim();
-    const confirmationDeadline = req.body.confirmationDeadline ? new Date(`${req.body.confirmationDeadline}T23:59:59.999Z`) : null;
-    if (confirmationDeadline && Number.isNaN(confirmationDeadline.getTime())) errors.confirmationDeadline = ['A data limite e invalida.'];
-    if (Object.keys(errors).length) return fail(res, 422, 'Os dados informados sao invalidos.', errors);
-    const fields = { name, description: (req.body.description || '').trim(), type: req.body.type || 'in_person', confirmationDeadline, guests: guestNames(name).map(guestName => ({ name: guestName })), publicToken: crypto.randomBytes(32).toString('hex') };
+    const guests = data.guests.map(({ name, category }) => ({ name, category }));
+    const fields = { name: guests.map(guest => guest.name).join('; '), side: data.side, relationship: data.relationship, table: data.table || '', description: data.description || '', type: data.type || 'in_person', confirmationDeadline: data.confirmationDeadline || defaultDeadline(), guests, publicToken: crypto.randomBytes(32).toString('hex') };
     let item;
     for (let attempt = 0; !item; attempt++) {
       try { item = await Invitation.create({ ...fields, code: newCode() }); } catch (error) { if (!isDuplicate(error) || attempt >= 4) throw error; }
@@ -116,17 +120,18 @@ export async function create(req, res, next) {
 export async function update(req, res, next) {
   try {
     if (!idOrFail(req.params.id, res)) return;
+    const { errors, fields } = validateInvitation(req.body, { partial: true });
+    if (Object.keys(errors).length) return fail(res, 422, 'Os dados informados sao invalidos.', errors);
     const item = await Invitation.findById(req.params.id);
     if (!item) return fail(res, 404, 'Convite nao encontrado.');
     await ensureGuests(item);
-    if (req.body.name !== undefined) { item.name = req.body.name.trim(); syncGuests(item, item.name); }
-    if (req.body.description !== undefined) item.description = req.body.description.trim();
-    if (req.body.confirmationDeadline !== undefined) {
-      const deadline = req.body.confirmationDeadline ? new Date(`${req.body.confirmationDeadline}T23:59:59.999Z`) : null;
-      if (deadline && Number.isNaN(deadline.getTime())) return fail(res, 422, 'Os dados informados sao invalidos.', { confirmationDeadline: ['A data limite e invalida.'] });
-      item.confirmationDeadline = deadline;
-    }
-    if (req.body.type !== undefined) { if (!['in_person', 'virtual'].includes(req.body.type)) return fail(res, 422, 'Os dados informados sao invalidos.', { type: ['O tipo deve ser in_person ou virtual.'] }); item.type = req.body.type; }
+    if (fields.guests) syncGuests(item, fields.guests);
+    if (fields.description !== undefined) item.description = fields.description;
+    if (fields.confirmationDeadline !== undefined) item.confirmationDeadline = fields.confirmationDeadline || defaultDeadline();
+    if (fields.type) item.type = fields.type;
+    if (fields.side) item.side = fields.side;
+    if (fields.relationship) item.relationship = fields.relationship;
+    if (fields.table !== undefined) item.table = fields.table;
     const confirmedGuests = item.guests.filter(guest => guest.confirmed);
     item.status = confirmedGuests.length ? 'confirmed' : 'unconfirmed';
     item.confirmedAt = confirmedGuests.length ? confirmedGuests[0].confirmedAt : null;

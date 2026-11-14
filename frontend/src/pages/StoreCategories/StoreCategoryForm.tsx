@@ -52,8 +52,10 @@ export function StoreCategoryForm({ id, onClose, onSaved }: { id?: string; onClo
     } finally { setSaving(false); }
   };
   const external = form.image && !form.image.startsWith('/api/images/') ? form.image : '';
-  return <CrudDialog busy={saving} onClose={onClose} title={id ? 'Editar categoria' : 'Adicionar categoria'}>
-    {loading ? <CircularProgress aria-label="Carregando cadastro" /> : loadFailed ? <Alert severity="error">{error}</Alert> : <Box sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr', md: 'minmax(0, 2fr) minmax(200px, 1fr)' }, gap: 3 }}><Paper component="form" onSubmit={submit} noValidate elevation={0} sx={{ py: 1 }}><Stack spacing={2}>
+  const ready = !loading && !loadFailed;
+  return <CrudDialog busy={saving} onClose={onClose} title={id ? 'Editar categoria' : 'Adicionar categoria'} onSubmit={submit} noValidate
+    actions={ready ? <><Button onClick={onClose} disabled={saving || uploading}>Cancelar</Button><Button type="submit" variant="contained" startIcon={<SaveOutlined />} disabled={saving || uploading}>{saving ? 'Salvando...' : 'Salvar'}</Button></> : undefined}>
+    {loading ? <CircularProgress aria-label="Carregando cadastro" /> : loadFailed ? <Alert severity="error">{error}</Alert> : <Box sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr', md: 'minmax(0, 2fr) minmax(200px, 1fr)' }, gap: 3 }}><Paper elevation={0} sx={{ py: 1 }}><Stack spacing={2}>
       {error && <Alert severity="error">{error}</Alert>}
       <Box sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr', md: '2fr 1fr' }, gap: 2 }}>
         <TextField autoFocus label="Nome" required value={form.name} onChange={e => changeName(e.target.value)} error={Boolean(errors.name)} helperText={errors.name} slotProps={{ htmlInput: { maxLength: 80 } }} />
@@ -66,7 +68,6 @@ export function StoreCategoryForm({ id, onClose, onSaved }: { id?: string; onClo
       <TextField label="Imagem (URL)" value={external} onChange={e => change('image', e.target.value)} error={Boolean(errors.image)} helperText={errors.image || 'Opcional se houver ícone. Informe uma URL pública ou envie uma imagem abaixo; ela prevalece sobre o ícone. Prefira imagens quadradas.'} />
       <ImageUpload value={form.image ? [form.image] : []} category="storeCategory" disabled={saving} onBusyChange={setUploading} onChange={images => change('image', images[0] || '')} />
       <FormControlLabel control={<Switch checked={form.active} onChange={e => change('active', e.target.checked)} />} label="Ativa (exibida na landing page)" />
-      <Stack direction="row" spacing={1} sx={{ justifyContent: 'flex-end', pt: 2 }}><Button onClick={onClose} disabled={saving || uploading}>Cancelar</Button><Button type="submit" variant="contained" startIcon={<SaveOutlined />} disabled={saving || uploading}>{saving ? 'Salvando...' : 'Salvar'}</Button></Stack>
     </Stack></Paper><Card sx={{ alignSelf: 'start' }}><Typography sx={{ p: 2, fontWeight: 600 }}>Prévia na landing</Typography><CardContent sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 1.2 }}>
       <Box sx={{ width: 112, height: 112, p: '5px', borderRadius: '50%', border: '1px solid #e7ddc4', bgcolor: '#fffdf9', boxShadow: '0 4px 14px rgba(150,120,50,.12)' }}>{preview ? <Box component="img" src={preview} alt={form.name || 'Imagem da categoria'} sx={{ width: '100%', height: '100%', objectFit: 'cover', borderRadius: '50%', display: 'block' }} /> : <Box sx={{ width: '100%', height: '100%', borderRadius: '50%', bgcolor: '#f4f0e7' }} />}</Box>
       <Typography sx={{ fontFamily: '"Cormorant Garamond", Georgia, serif', fontSize: 20, color: '#1f4536' }}>{form.name || 'Nome da categoria'}</Typography>

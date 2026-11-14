@@ -1,5 +1,6 @@
 import test from 'node:test'; import assert from 'node:assert/strict'; import request from 'supertest'; import app from '../src/app.js'; import { signToken } from '../src/controllers/authController.js';
 import { mayConfirm, newCode } from '../src/controllers/invitationController.js';
+import { validateInvitation } from '../src/validators/invitationValidator.js';
 const bearer = 'Bearer ' + signToken({ _id: 'test-admin', name: 'Administrador', email: 'accbiggie@gmail.com', role: 'admin' });
 test('health endpoint', async()=>{const r=await request(app).get('/api/health');assert.equal(r.status,200);assert.equal(r.body.success,true);});
 test('cadastro sem nome é rejeitado', async()=>{const r=await request(app).post('/api/invitations').set('Authorization',bearer).send({description:'x'});assert.equal(r.status,422);assert.equal(r.body.success,false);});
@@ -26,3 +27,13 @@ assert.equal(mayConfirm(item,{body:{},query:{token:'token-errado'}}),false);
 assert.equal(mayConfirm(item,{body:{code:'ABC123XYZ'},query:{}}),false);
 assert.equal(mayConfirm(item,{body:{code:' abc123xyz9 '},query:{}}),true);
 assert.equal(mayConfirm(item,{body:{},query:{token:'token-secreto-do-convite'}}),true);});
+test('convidado sem tipo é rejeitado', async()=>{const r=await request(app).post('/api/invitations').set('Authorization',bearer).send({guests:[{name:'Marco',category:'man'},{name:'Jakeline'}]});assert.equal(r.status,422);assert.ok(r.body.errors.guests);});
+test('convite sem convidados é rejeitado', async()=>{const r=await request(app).post('/api/invitations').set('Authorization',bearer).send({guests:[]});assert.equal(r.status,422);assert.ok(r.body.errors.guests);});
+test('data limite depois de 07/03/2027 é rejeitada', async()=>{const r=await request(app).post('/api/invitations').set('Authorization',bearer).send({side:'groom',relationship:'friends',guests:[{name:'Marco',category:'man'}],confirmationDeadline:'2027-03-08'});assert.equal(r.status,422);assert.match(r.body.errors.confirmationDeadline[0],/07\/03\/2027/);});
+test('validação do convite normaliza os convidados e aceita a data limite', ()=>{
+const {errors,fields}=validateInvitation({side:'bride',relationship:'family',table:' Mesa 3 ',guests:[{_id:'6add8554d73ef6b703fdf5e9',name:' Marco ',category:'man'},{name:'Ana',category:'girl_0_5'}],confirmationDeadline:'2027-03-07',type:'virtual'});
+assert.deepEqual(errors,{});assert.deepEqual(fields.guests,[{_id:'6add8554d73ef6b703fdf5e9',name:'Marco',category:'man'},{_id:undefined,name:'Ana',category:'girl_0_5'}]);
+assert.equal(fields.confirmationDeadline.toISOString(),'2027-03-07T23:59:59.999Z');assert.equal(fields.table,'Mesa 3');assert.equal(fields.side,'bride');
+assert.ok(validateInvitation({guests:[{name:'A',category:'man'}],confirmationDeadline:'2027-02-31'}).errors.confirmationDeadline);
+assert.deepEqual(validateInvitation({description:'x'},{partial:true}).errors,{});});
+test('convite sem parte e parentesco é rejeitado', async()=>{const r=await request(app).post('/api/invitations').set('Authorization',bearer).send({guests:[{name:'Marco',category:'man'}]});assert.equal(r.status,422);assert.ok(r.body.errors.side);assert.ok(r.body.errors.relationship);});
