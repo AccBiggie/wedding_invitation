@@ -3,6 +3,7 @@ import { alpha, createTheme, type Shadows } from '@mui/material/styles';
 import KeyboardArrowDownRounded from '@mui/icons-material/KeyboardArrowDownRounded';
 import { ptBR as coreptBR } from '@mui/material/locale';
 import { ptBR as dataGridptBR } from '@mui/x-data-grid/locales';
+import type {} from '@mui/x-data-grid/themeAugmentation';
 
 // Painel com toque feminino: rosé (cor principal), champanhe (apoio), fundo blush bem claro,
 // titulos em Inter/Arial negrito (como antes); texto em Nunito (carregada no index.html).
@@ -68,6 +69,10 @@ export const theme = createTheme({
     MuiTableRow: { styleOverrides: { root: { '&.MuiTableRow-hover:hover': { backgroundColor: alpha(PANEL.rose, .035) }, '&.Mui-selected, &.Mui-selected:hover': { backgroundColor: alpha(PANEL.rose, .07) } } } },
     MuiTooltip: { styleOverrides: { tooltip: { backgroundColor: PANEL.ink, borderRadius: 8, fontSize: 12 }, arrow: { color: PANEL.ink } } },
     MuiAlert: { styleOverrides: { root: { borderRadius: 14 } } },
+    // O CSS do Tabler (carregado para o site publico) da margem inferior a todo <p>: zera nos textos da paginacao.
+    MuiTablePagination: { styleOverrides: { selectLabel: { margin: 0 }, displayedRows: { margin: 0 } } },
+    // Coluna de acoes (so botoes): centralizada na altura da linha, alinhada com o texto das outras celulas.
+    MuiDataGrid: { styleOverrides: { cell: { '&[data-field="actions"]': { display: 'flex', alignItems: 'center' } } } },
     MuiPaginationItem: { styleOverrides: { root: { borderRadius: 10 } } }
   }
 }, dataGridptBR, coreptBR);

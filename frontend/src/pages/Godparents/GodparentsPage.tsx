@@ -21,15 +21,15 @@ export function GodparentsPage() {
   const changeFilter = (patch: GodparentFilters) => { setPagination(current => ({ ...current, page: 0 })); setFilters(current => ({ ...current, ...patch })); };
   const remove = async () => { if (!deleting) return; setBusy(true); try { await godparentsService.remove(deleting._id); setNotice('Padrinho excluído com sucesso.'); setDeleting(null); setRefresh(value => value + 1); } catch { setError('Não foi possível excluir o padrinho.'); } finally { setBusy(false); } };
   const columns: GridColDef<Godparent>[] = [
-    { field: '_id', headerName: 'Código', width: 100, sortable: false, valueFormatter: value => String(value).slice(-6) },
-    { field: 'image', headerName: 'Fotos', width: 130, sortable: false, renderCell: params => <AvatarGroup max={2} sx={{ my: .8, '& .MuiAvatar-root': { width: 38, height: 38, fontSize: 13 } }}>{[params.row.image, ...(params.row.images || [])].filter(Boolean).slice(0, 2).length ? [params.row.image, ...(params.row.images || [])].filter(Boolean).slice(0, 2).map((photo, index) => <Avatar key={index} src={resolveImageUrl(photo)} alt={`${params.row.name} ${index + 1}`} />) : <Avatar>{params.row.name.charAt(0)}</Avatar>}</AvatarGroup> },
-    { field: 'name', headerName: 'Nomes no card', flex: 1, minWidth: 190, renderCell: params => [params.row.name, params.row.partnerName].filter(Boolean).join(' & ') },
-    { field: 'role', headerName: 'Legenda do card', width: 180, renderCell: params => params.row.cardRole || roleName[params.row.role] },
-    { field: 'phone', headerName: 'Telefone', width: 145, sortable: false },
-    { field: 'active', headerName: 'Status', width: 100, valueFormatter: value => value ? 'Ativo' : 'Inativo' },
-    { field: 'order', headerName: 'Ordem', width: 90 },
-    { field: 'createdAt', headerName: 'Cadastro', width: 125, valueFormatter: value => new Date(String(value)).toLocaleDateString('pt-BR') },
-    { field: 'actions', headerName: 'Ações', width: 110, sortable: false, renderCell: params => <><Tooltip title="Editar"><IconButton aria-label={`Editar ${params.row.name}`} onClick={() => navigate(`/padrinhos/${params.row._id}/editar`)}><EditOutlined fontSize="small" /></IconButton></Tooltip><Tooltip title="Excluir"><IconButton aria-label={`Excluir ${params.row.name}`} onClick={() => setDeleting(params.row)}><DeleteOutline fontSize="small" /></IconButton></Tooltip></> }
+    { field: '_id', headerName: 'Código', width: 90, sortable: false, valueFormatter: value => String(value).slice(-6) },
+    { field: 'image', headerName: 'Fotos', width: 110, sortable: false, renderCell: params => <AvatarGroup max={2} sx={{ my: .8, '& .MuiAvatar-root': { width: 38, height: 38, fontSize: 13 } }}>{[params.row.image, ...(params.row.images || [])].filter(Boolean).slice(0, 2).length ? [params.row.image, ...(params.row.images || [])].filter(Boolean).slice(0, 2).map((photo, index) => <Avatar key={index} src={resolveImageUrl(photo)} alt={`${params.row.name} ${index + 1}`} />) : <Avatar>{params.row.name.charAt(0)}</Avatar>}</AvatarGroup> },
+    { field: 'name', headerName: 'Nomes no card', flex: 1, minWidth: 180, renderCell: params => [params.row.name, params.row.partnerName].filter(Boolean).join(' & ') },
+    { field: 'role', headerName: 'Legenda do card', width: 170, renderCell: params => params.row.cardRole || roleName[params.row.role] },
+    { field: 'phone', headerName: 'Telefone', width: 135, sortable: false },
+    { field: 'active', headerName: 'Status', width: 90, valueFormatter: value => value ? 'Ativo' : 'Inativo' },
+    { field: 'order', headerName: 'Ordem', width: 120 },
+    { field: 'createdAt', headerName: 'Cadastro', width: 115, valueFormatter: value => new Date(String(value)).toLocaleDateString('pt-BR') },
+    { field: 'actions', headerName: 'Ações', width: 104, sortable: false, renderCell: params => <><Tooltip title="Editar"><IconButton aria-label={`Editar ${params.row.name}`} onClick={() => navigate(`/padrinhos/${params.row._id}/editar`)}><EditOutlined fontSize="small" /></IconButton></Tooltip><Tooltip title="Excluir"><IconButton aria-label={`Excluir ${params.row.name}`} onClick={() => setDeleting(params.row)}><DeleteOutline fontSize="small" /></IconButton></Tooltip></> }
   ];
   const formOpen = location.pathname === '/padrinhos/novo' || Boolean(id);
   const closeForm = () => navigate('/padrinhos');

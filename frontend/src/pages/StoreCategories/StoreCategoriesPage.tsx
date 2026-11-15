@@ -29,12 +29,12 @@ export function StoreCategoriesPage() {
     } finally { setBusy(false); }
   };
   const columns: GridColDef<StoreCategory>[] = [
-    { field: 'image', headerName: 'Imagem', width: 80, sortable: false, renderCell: params => <Box component="img" src={categoryImageUrl(params.row)} loading="lazy" alt="" sx={{ width: 44, height: 44, objectFit: 'cover', borderRadius: '50%', border: '1px solid #e7ddc4', verticalAlign: 'middle' }} /> },
+    { field: 'image', headerName: 'Imagem', width: 96, sortable: false, renderCell: params => <Box component="img" src={categoryImageUrl(params.row)} loading="lazy" alt="" sx={{ width: 44, height: 44, objectFit: 'cover', borderRadius: '50%', border: '1px solid #e7ddc4', verticalAlign: 'middle' }} /> },
     { field: 'name', headerName: 'Nome', width: 170 },
     { field: 'description', headerName: 'Descrição', flex: 1, minWidth: 200, sortable: false },
     { field: 'productCount', headerName: 'Produtos', width: 120, sortable: false, renderCell: params => params.row.productCount ? <Link component={RouterLink} to={`/presentes?categoryId=${params.row._id}`} underline="hover">{products(params.row.productCount)}</Link> : <Box component="span" sx={{ color: 'text.secondary' }}>Nenhum</Box> },
     { field: 'active', headerName: 'Status', width: 95, valueFormatter: value => value ? 'Ativa' : 'Inativa' },
-    { field: 'order', headerName: 'Ordem', width: 85 },
+    { field: 'order', headerName: 'Ordem', width: 120 },
     { field: 'createdAt', headerName: 'Cadastro', width: 120, valueFormatter: value => new Date(String(value)).toLocaleDateString('pt-BR') },
     { field: 'actions', headerName: 'Ações', width: 110, sortable: false, renderCell: params => <><Tooltip title="Editar"><IconButton aria-label={`Editar ${params.row.name}`} onClick={() => navigate(`/categorias-loja/${params.row._id}/editar`)}><EditOutlined fontSize="small" /></IconButton></Tooltip><Tooltip title="Excluir"><IconButton aria-label={`Excluir ${params.row.name}`} onClick={() => askRemove(params.row)}><DeleteOutline fontSize="small" /></IconButton></Tooltip></> }
   ];
