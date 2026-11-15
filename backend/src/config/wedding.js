@@ -8,6 +8,9 @@ export const wedding = {
   // da landing page e calculado a partir deste campo.
   datetime: '2027-04-10T17:00:00-03:00',
   date: ['10 de abril', 'de 2027'],
+  // Ultimo dia para confirmar presenca (AAAA-MM-DD). E o maximo aceito no cadastro do
+  // convite e a data mostrada aos convidados quando o convite nao tem data propria.
+  rsvpDeadline: '2027-03-07',
   time: ['16h00'],
   about: {
     title: 'Sobre nós',

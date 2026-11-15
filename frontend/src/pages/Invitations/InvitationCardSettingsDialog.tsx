@@ -1,6 +1,6 @@
 import { useState, type FormEvent } from 'react';
 import axios from 'axios';
-import { Alert, Box, Button, DialogActions, MenuItem, Stack, TextField, Typography } from '@mui/material';
+import { Alert, Box, Button, MenuItem, Stack, TextField, Typography } from '@mui/material';
 import { CrudDialog } from '../../components/common/CrudDialog';
 import { ImageUpload } from '../../components/common/ImageUpload';
 import api from '../../services/api';
@@ -38,8 +38,9 @@ export function InvitationCardSettingsDialog({ card, onClose, onSaved }: { card:
     } finally { setSaving(false); }
   };
 
-  return <CrudDialog title="Configurações do convite" busy={saving} onClose={onClose}>
-    <Box component="form" onSubmit={submit}><Stack spacing={2} sx={{ pt: 1 }}>
+  return <CrudDialog title="Configurações do convite" busy={saving} onClose={onClose} onSubmit={submit}
+    actions={<><Button disabled={saving} onClick={onClose}>Cancelar</Button><Button type="submit" variant="contained" disabled={saving || uploading}>{saving ? 'Salvando...' : 'Salvar configurações'}</Button></>}>
+    <Stack spacing={2} sx={{ pt: 1 }}>
       {error && <Alert severity="error">{error}</Alert>}
       <TextField select fullWidth label="Modelo do convite" value={String(form.layout)}
         onChange={event => setForm({ ...form, layout: INVITE_LAYOUTS.find(item => String(item.layout) === event.target.value)!.layout as InviteLayout })}
@@ -57,6 +58,5 @@ export function InvitationCardSettingsDialog({ card, onClose, onSaved }: { card:
         {fieldErrors.photo && <Alert severity="error" sx={{ mt: 1 }}>{fieldErrors.photo[0]}</Alert>}
       </Box>
     </Stack>
-    <DialogActions sx={{ mt: 2, px: 0 }}><Button disabled={saving} onClick={onClose}>Cancelar</Button><Button type="submit" variant="contained" disabled={saving || uploading}>{saving ? 'Salvando...' : 'Salvar configurações'}</Button></DialogActions></Box>
   </CrudDialog>;
 }

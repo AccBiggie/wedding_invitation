@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
-import { Alert, Box, Button, CircularProgress, DialogActions, Stack, Typography } from '@mui/material';
+import { Alert, Box, Button, CircularProgress, Stack, Typography } from '@mui/material';
 import PictureAsPdfOutlined from '@mui/icons-material/PictureAsPdfOutlined';
 import PrintOutlined from '@mui/icons-material/PrintOutlined';
 import { CrudDialog } from '../../components/common/CrudDialog';
@@ -54,7 +54,12 @@ export function InvitationPrintDialog({ job, card, onClose }: { job: PrintJob | 
   if (!job) return null;
   const scale = Math.min(1, boxWidth / FRAME_WIDTH);
   const sheets = Math.ceil(count / 2);
-  return <CrudDialog title={title} onClose={onClose}>
+  return <CrudDialog title={title} onClose={onClose} actions={<>
+      <Typography variant="caption" color="text.secondary" sx={{ mr: 'auto' }}>Para baixar, escolha "Salvar como PDF" como destino na janela que abrir.</Typography>
+      <Button onClick={onClose}>Fechar</Button>
+      <Button variant="outlined" startIcon={<PrintOutlined />} disabled={!state.ready || (igreja && state.imageFailed)} onClick={print}>Imprimir</Button>
+      <Button variant="contained" startIcon={<PictureAsPdfOutlined />} disabled={!state.ready || (igreja && state.imageFailed)} onClick={print}>Baixar PDF</Button>
+    </>}>
     <Stack spacing={2}>
       <Typography color="text.secondary">{igreja ? (count === 1 ? 'O convite ocupa uma folha A4 deitada.' : `${count} convites em ${count} folhas A4 deitadas, 1 por folha, na ordem da lista.`) : count === 1 ? 'O convite fica na metade de cima de uma folha A4 em pé.' : `${count} convites em ${sheets} folha${sheets > 1 ? 's' : ''} A4 em pé, 2 por folha, na ordem da lista.`}</Typography>
       {state.imageFailed && <Alert severity="warning">{igreja ? 'As imagens do convite não carregaram. Feche e abra a prévia de novo.' : 'A foto do casal não carregou. Confira a foto nas configurações do convite.'}</Alert>}
@@ -66,11 +71,5 @@ export function InvitationPrintDialog({ job, card, onClose }: { job: PrintJob | 
       </Box>
       <Alert severity="info">{igreja ? "Imprima em A4 paisagem, em 100% (sem 'ajustar à página')." : "Imprima em A4 retrato, em 100% (sem 'ajustar à página'), e corte na linha do meio."}</Alert>
     </Stack>
-    <DialogActions sx={{ flexWrap: 'wrap', gap: 1, mt: 2, px: 0 }}>
-      <Typography variant="caption" color="text.secondary" sx={{ mr: 'auto' }}>Para baixar, escolha "Salvar como PDF" como destino na janela que abrir.</Typography>
-      <Button onClick={onClose}>Fechar</Button>
-      <Button variant="outlined" startIcon={<PrintOutlined />} disabled={!state.ready || (igreja && state.imageFailed)} onClick={print}>Imprimir</Button>
-      <Button variant="contained" startIcon={<PictureAsPdfOutlined />} disabled={!state.ready || (igreja && state.imageFailed)} onClick={print}>Baixar PDF</Button>
-    </DialogActions>
   </CrudDialog>;
 }

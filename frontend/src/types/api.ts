@@ -18,5 +18,13 @@ export interface PublicStoreCategoryPage { category: PublicStoreCategory; produc
 export interface PixSettings { _id: string; keyType: 'cpf' | 'cnpj' | 'email' | 'phone' | 'random'; pixKey: string; receiverName: string; receiverCity: string; description: string; active: boolean; createdAt: string; updatedAt: string }
 export type PixInput = Omit<PixSettings, '_id' | 'createdAt' | 'updatedAt'>;
 export interface PixGenerated { amount: number; payload: string; qrCode: string }
-export interface Invitation { _id: string; name: string; status: 'confirmed' | 'unconfirmed'; guests: { confirmed: boolean }[] }
+export interface Invitation { _id: string; name: string; status: 'not_viewed' | 'unconfirmed' | 'partial' | 'confirmed' | 'declined'; guests: { confirmed: boolean; response?: 'yes' | 'no' | 'maybe' | null }[] }
+// Numeros do dashboard (GET /invitations/stats). Pessoas contam pela resposta de cada uma; "none" = sem parte/parentesco.
+export interface PeopleCount { total: number; yes: number }
+export interface InvitationStats {
+  invitations: { total: number; byType: Record<string, number>; byStatus: Record<string, number>; bySide: Record<string, number>; byRelationship: Record<string, number> };
+  people: { total: number; byResponse: { yes: number; no: number; maybe: number; none: number }; byCategory: Record<string, PeopleCount>; bySide: Record<string, PeopleCount>; byRelationship: Record<string, PeopleCount> };
+  tables: { table: string; invitations: number; people: number; yes: number }[];
+  timeline: { invited: Record<string, number>; confirmed: Record<string, number> };
+}
 export interface InvitationListData extends ListData<Invitation> { summary: { total: number; people: number; confirmed: number; unconfirmed: number } }
