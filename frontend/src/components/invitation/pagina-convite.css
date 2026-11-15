@@ -13,15 +13,20 @@
 .cv9 .bencao { font-style: italic; color: var(--tinta-suave); }
 .cv9 .prazo { font-size: 16px; color: var(--tinta-suave); }
 .cv9 .lista { border: 1px solid var(--linha); border-radius: 14px; background: var(--branco); overflow: hidden; }
-.cv9 .lista label { position: relative; display: flex; align-items: center; gap: 14px; padding: 14px 16px; border-top: 1px solid var(--linha); cursor: pointer; min-height: 54px; }
-.cv9 .lista label:first-child { border-top: 0; }
-.cv9 .lista input { position: absolute; opacity: 0; width: 1px; height: 1px; }
-.cv9 .lista .cx { width: 22px; height: 22px; border-radius: 6px; border: 1.5px solid #bcb29c; display: grid; place-items: center; flex: none; transition: .2s; }
-.cv9 .lista .cx svg { width: 14px; height: 14px; stroke: #fff; fill: none; stroke-width: 2.6; opacity: 0; }
-.cv9 .lista input:checked + .cx { background: var(--verde); border-color: var(--verde); }
-.cv9 .lista input:checked + .cx svg { opacity: 1; }
-.cv9 .lista .nome { flex: 1; min-width: 0; font-size: 19px; overflow-wrap: anywhere; }
-.cv9 .selo { font-family: var(--f-ui); font-size: 12.5px; padding: 4px 10px; border-radius: 999px; background: var(--verde-claro); color: var(--verde); white-space: nowrap; }
+/* Uma linha por pessoa: nome e o seletor segmentado Sim / Nao / Nao sei. */
+.cv9 .lista .pessoa { display: flex; flex-wrap: wrap; align-items: center; gap: 10px 14px; padding: 12px 16px; border-top: 1px solid var(--linha); min-height: 58px; }
+.cv9 .lista .pessoa:first-child { border-top: 0; }
+.cv9 .lista .nome { flex: 1 1 150px; min-width: 0; font-size: 19px; overflow-wrap: anywhere; }
+.cv9 .resp { display: inline-flex; flex: none; padding: 3px; gap: 2px; border: 1px solid var(--linha); border-radius: 999px; background: var(--papel-claro); }
+.cv9 .resp label { position: relative; cursor: pointer; }
+.cv9 .resp input { position: absolute; inset: 0; opacity: 0; margin: 0; cursor: pointer; }
+.cv9 .resp span { display: block; padding: 6px 14px; border-radius: 999px; font-family: var(--f-ui); font-size: 13.5px; line-height: 1.2; color: var(--tinta-suave); white-space: nowrap; transition: background .2s, color .2s, box-shadow .2s; }
+.cv9 .resp label:hover span { color: var(--tinta); }
+.cv9 .resp input:checked + span { color: var(--branco); box-shadow: 0 1px 3px rgba(36, 65, 47, .18); }
+.cv9 .resp .r-yes input:checked + span { background: var(--verde); }
+.cv9 .resp .r-no input:checked + span { background: #a4524a; }
+.cv9 .resp .r-maybe input:checked + span { background: var(--ouro); }
+.cv9 .resp input:focus-visible + span { outline: 2px solid #24412f; outline-offset: 1px; }
 .cv9 .bt { display: flex; align-items: center; justify-content: center; gap: 10px; width: 100%; min-height: 56px; border: 0; border-radius: 12px; background: var(--verde); color: var(--papel-claro); font-size: 21px; cursor: pointer; transition: transform .15s, background .2s; }
 .cv9 .bt:hover { background: #1b3424; } .cv9 .bt:active { transform: scale(.99); }
 .cv9 .bt .co { color: var(--ouro-claro); }
@@ -43,12 +48,12 @@
 .cv9 a.tile:hover { border-color: var(--ouro-claro); }
 .cv9 .tile .ic { margin-bottom: 4px; }
 .cv9 .tile b { font-weight: 600; font-size: 18px; } .cv9 .tile span { font-size: 15px; color: var(--tinta-suave); }
-.cv9 a.tile:focus-visible, .cv9 .bt:focus-visible, .cv9 .lista label:focus-within { outline: 2px solid #24412f; outline-offset: 2px; }
+.cv9 a.tile:focus-visible, .cv9 .bt:focus-visible { outline: 2px solid #24412f; outline-offset: 2px; }
 @media (max-width: 760px) {
   .cv9 .hero { grid-template-columns: 1fr; } .cv9 .hero .foto { min-height: 240px; }
   .cv9 .tiles { grid-template-columns: 1fr 1fr; padding: 16px; } .cv9 .hero .lado { padding: 22px 16px; } .cv9 .nm { font-size: 44px; }
 }
-@media (prefers-reduced-motion: reduce) { .cv9 .ok.on { animation: none; } .cv9 .bt { transition: none; } }
+@media (prefers-reduced-motion: reduce) { .cv9 .ok.on { animation: none; } .cv9 .bt, .cv9 .resp span { transition: none; } }
 
 /* No site: a pagina ocupa a area entre a navbar e o rodape, centrada, com o papel claro de fundo. */
 .wed-invitation .pc-main { flex: 1; background: var(--papel-claro, #fbf8f0); }

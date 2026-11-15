@@ -22,38 +22,10 @@ import '@tabler/core/dist/css/tabler.min.css';
 import './style.css';
 
 const AdminApp = React.lazy(() => import('./routes/AdminApp').then(module => ({ default: module.AdminApp })));
+const LoginPage = React.lazy(() => import('./routes/LoginPage').then(module => ({ default: module.LoginPage })));
 const StoreCategoryContent = React.lazy(() => import('./pages/StoreCategory/StoreCategoryContent').then(module => ({ default: module.StoreCategoryContent })));
 
 const slug = value => value.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase().trim().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
-
-function Login({ onSuccess }) {
-  const [form, setForm] = useState({ email: '', password: '' });
-  const [error, setError] = useState('');
-  const [sending, setSending] = useState(false);
-  const submit = async event => {
-    event.preventDefault(); setSending(true); setError('');
-    try {
-      const response = await api.post('/auth/login', form);
-      tokenStore.set(response.data.data.accessToken);
-      onSuccess(response.data.data.user);
-    } catch (requestError) { setError(requestError.response?.data?.message || 'Não foi possível entrar. Tente novamente.'); }
-    finally { setSending(false); }
-  };
-  return <div className="page page-center"><div className="container container-tight py-4">
-    <div className="text-center mb-4"><h1 className="navbar-brand navbar-brand-autodark">Convites de casamento</h1></div>
-    <form className="card card-md" onSubmit={submit}>
-      <div className="card-body">
-        <h2 className="card-title text-center mb-4">Entre na sua conta</h2>
-        <label className="form-label">E-mail</label>
-        <input type="email" required autoFocus autoComplete="username" className="form-control" placeholder="seu@email.com" value={form.email} onChange={event => setForm({ ...form, email: event.target.value })} />
-        <label className="form-label mt-3">Senha</label>
-        <input type="password" required autoComplete="current-password" className="form-control" placeholder="Sua senha" value={form.password} onChange={event => setForm({ ...form, password: event.target.value })} />
-        {error && <div className="alert alert-danger mt-3 mb-0">{error}</div>}
-        <div className="form-footer"><button className="btn btn-primary w-100" disabled={sending}>{sending ? 'Entrando...' : 'Entrar'}</button></div>
-      </div>
-    </form>
-  </div></div>;
-}
 
 // Todo o conteudo do casamento vem de /public/wedding (backend/src/config/wedding.js).
 function useWedding() {
@@ -644,7 +616,7 @@ function Public() {
   // "Visualizar convite" volta ao envelope ja abrindo (autoOpen).
   const [reopened, setReopened] = useState(false);
   const showEnvelope = () => { setReopened(true); setStage('envelope'); };
-  const [item, setItem] = useState(); const [error, setError] = useState(false); const [confirming, setConfirming] = useState(false); const [status, setStatus] = useState(null); const [selectedGuestIds, setSelectedGuestIds] = useState([]);
+  const [item, setItem] = useState(); const [error, setError] = useState(false); const [confirming, setConfirming] = useState(false); const [status, setStatus] = useState(null); const [responses, setResponses] = useState({});
   useEffect(() => {
     const request = byCode ? api.get('/public/invitations/code/' + encodeURIComponent(id || '')) : api.get('/public/invitations/' + id + '/' + name, { params: { token } });
     request.then(response => setItem(response.data.data)).catch(() => setError(true));
@@ -652,15 +624,16 @@ function Public() {
   // Modelo padrao e textos do convite (painel > Configuracoes do convite); sem eles, o envelope usa o modelo Igreja.
   const [card, setCard] = useState();
   useEffect(() => { api.get('/public/invitations/card').then(response => setCard(response.data.data)).catch(() => setCard(null)); }, []);
-  useEffect(() => { if (item?.guests) setSelectedGuestIds(item.guests.filter(guest => guest.confirmed).map(guest => String(guest._id))); }, [item?._id]);
+  // Resposta salva de cada pessoa (sim, nao, nao sei); quem ainda nao respondeu comeca sem opcao marcada.
+  useEffect(() => { if (item?.guests) setResponses(Object.fromEntries(item.guests.map(guest => [String(guest._id), guest.response || null]))); }, [item?._id]);
   // Convite valido: guarda o caminho para a landing saber a qual convite voltar.
   useEffect(() => { if (item) inviteStore.set(location.pathname + location.search); }, [item?._id]);
   const confirm = async () => {
     setConfirming(true); setStatus(null);
     try {
-      const response = await api.post('/public/invitations/' + item._id + '/confirm', { guestIds: selectedGuestIds, ...(byCode && { code: id }) }, byCode ? undefined : { params: { token } });
+      const response = await api.post('/public/invitations/' + item._id + '/confirm', { responses, ...(byCode && { code: id }) }, byCode ? undefined : { params: { token } });
       setItem(response.data.data);
-      setStatus({ error: false, text: 'Confirmação atualizada! Obrigado, estamos ansiosos para ver vocês.' });
+      setStatus({ error: false, text: 'Resposta enviada! Obrigado por nos avisar.' });
     } catch { setStatus({ error: true, text: 'Não foi possível atualizar a confirmação. Tente de novo em instantes.' }); }
     finally { setConfirming(false); }
   };
@@ -670,10 +643,7 @@ function Public() {
     <a className="wed-btn" href="/casamento">Ver o site do casamento</a>
   </div></WeddingShell>;
   if (!item || !wedding || card === undefined) return <WeddingShell><div className="wed-state">Carregando...</div></WeddingShell>;
-  const toggleGuest = guestId => {
-    setStatus(null);
-    setSelectedGuestIds(current => current.includes(guestId) ? current.filter(idValue => idValue !== guestId) : [...current, guestId]);
-  };
+  const chooseResponse = (guestId, value) => { setStatus(null); setResponses(current => ({ ...current, [guestId]: value })); };
   const guests = item.guests || [];
   const deadline = item.confirmationDeadline ? new Date(item.confirmationDeadline).toLocaleDateString('pt-BR', { timeZone: 'UTC' }) : null;
   // O convite do envelope traz o nome e o QR code deste convidado, como o impresso.
@@ -681,7 +651,7 @@ function Public() {
   if (stage === 'envelope') return <EnvelopeOpening invite={invite} autoOpen={reopened} onConfirm={showConfirmation} />;
   return <WeddingShell wedding={wedding}>
     <main className="pc-main pc-entra">
-      <InvitationPage wedding={wedding} guests={guests} selected={selectedGuestIds} onToggle={toggleGuest} onConfirm={confirm} confirming={confirming} status={status} deadline={deadline} onViewInvite={showEnvelope} />
+      <InvitationPage wedding={wedding} guests={guests} responses={responses} onChoose={chooseResponse} onConfirm={confirm} confirming={confirming} status={status} deadline={deadline} onViewInvite={showEnvelope} />
     </main>
   </WeddingShell>;
 }
@@ -694,7 +664,7 @@ function Admin() {
   useEffect(() => { const expire = () => setUser(null); window.addEventListener('auth:expired', expire); return () => window.removeEventListener('auth:expired', expire); }, []);
   const logout = () => { tokenStore.clear(); setUser(null); };
   if (checking) return <div className="page page-center"><div className="text-secondary">Carregando...</div></div>;
-  if (!user) return <Login onSuccess={setUser} />;
+  if (!user) return <React.Suspense fallback={<div className="page page-center">Carregando...</div>}><LoginPage onSuccess={setUser} /></React.Suspense>;
   return <React.Suspense fallback={<div className="page page-center">Carregando painel...</div>}><AdminApp user={user} onLogout={logout} /></React.Suspense>;
 }
 

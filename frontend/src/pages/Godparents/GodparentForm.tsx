@@ -30,8 +30,10 @@ export function GodparentForm({ id, onClose, onSaved }: { id?: string; onClose: 
     try { if (id) await godparentsService.update(id, form); else await godparentsService.create(form); onSaved(id ? 'Padrinho atualizado com sucesso.' : 'Padrinho cadastrado com sucesso.'); }
     catch { setError('Não foi possível salvar o padrinho.'); } finally { setSaving(false); }
   };
-  return <CrudDialog busy={saving} onClose={onClose} title={id ? 'Editar padrinho' : 'Adicionar padrinho'}>
-    {loading ? <CircularProgress aria-label="Carregando cadastro" /> : loadFailed ? <Alert severity="error">{error}</Alert> : <Paper component="form" onSubmit={submit} elevation={0} sx={{ py: 1 }}><Stack spacing={2}>
+  const ready = !loading && !loadFailed;
+  return <CrudDialog busy={saving} onClose={onClose} title={id ? 'Editar padrinho' : 'Adicionar padrinho'} onSubmit={submit}
+    actions={ready ? <><Button onClick={onClose} disabled={saving || uploading}>Cancelar</Button><Button type="submit" variant="contained" startIcon={<SaveOutlined />} disabled={saving || uploading}>{saving ? 'Salvando...' : 'Salvar'}</Button></> : undefined}>
+    {loading ? <CircularProgress aria-label="Carregando cadastro" /> : loadFailed ? <Alert severity="error">{error}</Alert> : <Paper elevation={0} sx={{ py: 1 }}><Stack spacing={2}>
       {error && <Alert severity="error">{error}</Alert>}
       <Box sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr', md: '1fr 1fr' }, gap: 2 }}>
         <TextField autoFocus label="Primeiro nome no card" required value={form.name} onChange={e => change('name', e.target.value)} slotProps={{ htmlInput: { maxLength: 120 } }} />
@@ -47,6 +49,5 @@ export function GodparentForm({ id, onClose, onSaved }: { id?: string; onClose: 
       <ImageUpload value={photos} category="godparent" maxImages={2} disabled={saving} onBusyChange={setUploading} onChange={setPhotos} />
       <TextField label="Descrição" multiline minRows={3} value={form.description} onChange={e => change('description', e.target.value)} slotProps={{ htmlInput: { maxLength: 1000 } }} />
       <FormControlLabel control={<Switch checked={form.active} onChange={e => change('active', e.target.checked)} />} label="Ativo" />
-      <Stack direction="row" spacing={1} sx={{ justifyContent: 'flex-end', pt: 2 }}><Button onClick={onClose} disabled={saving || uploading}>Cancelar</Button><Button type="submit" variant="contained" startIcon={<SaveOutlined />} disabled={saving || uploading}>{saving ? 'Salvando...' : 'Salvar'}</Button></Stack>
     </Stack></Paper>}</CrudDialog>;
 }
