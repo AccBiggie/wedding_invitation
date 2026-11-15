@@ -1,7 +1,7 @@
 import { Fragment, useEffect, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { alpha } from '@mui/material/styles';
-import { Alert, Box, Button, Checkbox, Chip, CircularProgress, Collapse, Divider, IconButton, InputAdornment, Link, List, ListItem, ListItemButton, ListItemIcon, ListItemText, Menu, MenuItem, Pagination, Paper, Popover, Snackbar, Stack, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, TableSortLabel, TextField, ToggleButton, ToggleButtonGroup, Typography } from '@mui/material';
+import { Alert, Badge, Box, Button, Checkbox, Chip, CircularProgress, Collapse, Divider, IconButton, InputAdornment, Link, List, ListItem, ListItemButton, ListItemIcon, ListItemText, Menu, MenuItem, Pagination, Paper, Popover, Snackbar, Stack, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, TableSortLabel, TextField, ToggleButton, ToggleButtonGroup, Tooltip, Typography } from '@mui/material';
 import Add from '@mui/icons-material/Add';
 import PersonAddAlt1Outlined from '@mui/icons-material/PersonAddAlt1Outlined';
 import EditOutlined from '@mui/icons-material/EditOutlined';
@@ -17,7 +17,8 @@ import UnfoldMoreRounded from '@mui/icons-material/UnfoldMoreRounded';
 import RestoreRounded from '@mui/icons-material/RestoreRounded';
 import DragIndicatorRounded from '@mui/icons-material/DragIndicatorRounded';
 import ViewColumnRounded from '@mui/icons-material/ViewColumnRounded';
-import SortByAlphaRounded from '@mui/icons-material/SortByAlphaRounded';
+import FilterListRounded from '@mui/icons-material/FilterListRounded';
+import FilterAltOffRounded from '@mui/icons-material/FilterAltOffRounded';
 import KeyboardArrowDownRounded from '@mui/icons-material/KeyboardArrowDownRounded';
 import RestartAltRounded from '@mui/icons-material/RestartAltRounded';
 import { PageHeader } from '../../components/common/PageHeader';
@@ -41,7 +42,8 @@ const whatsappMask = value => {
 const whatsappValid = value => { const digits = String(value || '').replace(/\D/g, ''); return !digits || /^[1-9]{2}9?\d{8}$/.test(digits); };
 // Tipos de pessoa do convite (mesmos valores do backend: GUEST_CATEGORIES).
 const ADULT_CATEGORIES = [{ value: 'man', label: 'Homem' }, { value: 'woman', label: 'Mulher' }];
-const CHILD_CATEGORIES = [{ value: 'girl_0_5', label: 'Menina até 5 anos' }, { value: 'boy_0_5', label: 'Menino até 5 anos' }, { value: 'girl_6_10', label: 'Menina de 6 a 10 anos' }, { value: 'boy_6_10', label: 'Menino de 6 a 10 anos' }, { value: 'over_10', label: 'Maior de 10 anos' }];
+const CHILD_CATEGORIES = [{ value: 'girl_0_5', label: 'Menina até 5 anos' }, { value: 'boy_0_5', label: 'Menino até 5 anos' }, { value: 'girl_6_10', label: 'Menina de 6 a 10 anos' }, { value: 'boy_6_10', label: 'Menino de 6 a 10 anos' }];
+// A partir de 11 anos a pessoa e cadastrada como adulto.
 // Parte do casal e parentesco do convite (mesmos valores do backend: INVITATION_SIDES e INVITATION_RELATIONSHIPS).
 const SIDES = [{ value: 'groom', label: 'Noivo' }, { value: 'bride', label: 'Noiva' }];
 const RELATIONSHIPS = [{ value: 'relative', label: 'Parente' }, { value: 'friends', label: 'Amigos' }, { value: 'family', label: 'Família' }, { value: 'parents', label: 'Pais' }, { value: 'organization', label: 'Organização' }];
@@ -75,11 +77,6 @@ function StatusChip({ status, onClick, expanded, label }) {
   return <Chip size="small" label={status.label} sx={tonal(status.color)} onClick={onClick} aria-expanded={expanded} aria-label={label} />;
 }
 
-// Totais por tipo: homens, mulheres e uma contagem por opcao de idade das criancas, com o mesmo texto do campo Idade.
-const countsOf = guests => {
-  const count = category => guests.filter(guest => guest.category === category).length;
-  return [[count('man'), 'Homens'], [count('woman'), 'Mulheres'], ...CHILD_CATEGORIES.map(item => [count(item.value), item.label])];
-};
 let guestKey = 0;
 const guestRow = (group, guest = {}) => ({ key: ++guestKey, group, _id: guest._id, name: guest.name || '', category: guest.category || '', response: guestResponse(guest) });
 // Convites antigos podem nao ter a lista de pessoas: ela sai do nome ("Maria; João").
@@ -94,20 +91,24 @@ const yearStart = () => `${new Date().getFullYear()}-01-01`;
 
 // Colunas configuraveis da listagem (o id tambem e o campo de ordenacao do backend, SORT_FIELDS).
 // hidden: comeca desmarcada no seletor de colunas. Selecao e Acoes ficam fixas nas pontas.
+// Colunas com opcoes fixas ganham filtro de varios valores (mesmos valores do backend: columnFilters).
+const NOT_INFORMED = { value: 'none', label: 'Não informado' };
+const TYPES = [{ value: 'in_person', label: 'Presencial' }, { value: 'virtual', label: 'Virtual' }];
+const FILTER_IDS = ['side', 'relationship', 'type', 'status'];
 const COLUMNS = [
-  { id: 'side', label: 'Parte', render: item => optionLabel(SIDES, item.side) },
-  { id: 'relationship', label: 'Parentesco', render: item => optionLabel(RELATIONSHIPS, item.relationship) },
+  { id: 'side', label: 'Parte', options: [...SIDES, NOT_INFORMED], render: item => optionLabel(SIDES, item.side) },
+  { id: 'relationship', label: 'Parentesco', options: [...RELATIONSHIPS, NOT_INFORMED], render: item => optionLabel(RELATIONSHIPS, item.relationship) },
   { id: 'name', label: 'Nomes', render: (item, row) => <Box sx={{ display: 'flex', alignItems: 'center', gap: .5, ml: -1 }}>
     <IconButton size="small" aria-label={`${row.expanded ? 'Ocultar' : 'Ver'} as pessoas de ${item.name}`} aria-expanded={row.expanded} onClick={row.toggle} sx={{ color: 'text.secondary', transition: 'transform .2s', transform: row.expanded ? 'rotate(180deg)' : 'none' }}><KeyboardArrowDownRounded fontSize="small" /></IconButton>
     <span>{item.name}</span>
   </Box> },
-  { id: 'type', label: 'Tipo', render: item => typeLabel(item.type) },
+  { id: 'type', label: 'Tipo', options: TYPES, render: item => typeLabel(item.type) },
   { id: 'table', label: 'Mesa', render: item => item.table || '-' },
   { id: 'whatsapp', label: 'WhatsApp', hidden: true, render: item => item.whatsapp ? <Link href={`https://wa.me/55${item.whatsapp}`} target="_blank" rel="noopener noreferrer" underline="hover">{whatsappMask(item.whatsapp)}</Link> : '-' },
   { id: 'description', label: 'Descrição', render: item => item.description || '-' },
-  { id: 'createdAt', label: 'Data de criação', hidden: true, render: item => new Date(item.createdAt).toLocaleDateString('pt-BR') },
-  { id: 'status', label: 'Status', hidden: true, render: (item, row) => <StatusChip status={STATUSES[item.status] || STATUSES.not_viewed} onClick={row.toggle} expanded={row.expanded} label={`${(STATUSES[item.status] || STATUSES.not_viewed).label}: ${row.expanded ? 'ocultar' : 'ver'} as pessoas de ${item.name}`} /> },
-  { id: 'confirmedAt', label: 'Data de confirmação', hidden: true, render: item => item.confirmedAt ? new Date(item.confirmedAt).toLocaleString('pt-BR') : '-' }
+  { id: 'createdAt', label: 'Data de criação', date: true, hidden: true, render: item => new Date(item.createdAt).toLocaleDateString('pt-BR') },
+  { id: 'status', label: 'Status', options: Object.entries(STATUSES).map(([value, status]) => ({ value, label: status.label })), hidden: true, render: (item, row) => <StatusChip status={STATUSES[item.status] || STATUSES.not_viewed} onClick={row.toggle} expanded={row.expanded} label={`${(STATUSES[item.status] || STATUSES.not_viewed).label}: ${row.expanded ? 'ocultar' : 'ver'} as pessoas de ${item.name}`} /> },
+  { id: 'confirmedAt', label: 'Data de confirmação', date: true, hidden: true, render: item => item.confirmedAt ? new Date(item.confirmedAt).toLocaleString('pt-BR') : '-' }
 ];
 const COLUMN_IDS = COLUMNS.map(column => column.id);
 const columnOf = id => COLUMNS.find(column => column.id === id);
@@ -137,23 +138,57 @@ const sortLabel = {
   '&:hover .MuiTableSortLabel-icon': { opacity: .55 },
   '&.Mui-active .MuiTableSortLabel-icon': { opacity: .6, color: 'text.secondary' }
 };
-// A–Z / Z–A no cabecalho da tabela: controle segmentado em pilula.
+// A–Z / Z–A no menu da coluna: controle segmentado em pilula.
 const segmented = {
   p: .25, gap: .25, borderRadius: 999, bgcolor: 'action.hover',
   '& .MuiToggleButtonGroup-grouped': { border: 0, borderRadius: '999px !important', m: 0, px: 1.5, py: .25, fontWeight: 600, fontSize: 13, textTransform: 'none', color: 'text.secondary' },
-  '& .MuiToggleButtonGroup-grouped.Mui-selected, & .MuiToggleButtonGroup-grouped.Mui-selected:hover': { bgcolor: 'background.paper', color: 'primary.main', boxShadow: '0 1px 3px rgba(20, 35, 28, .14)' }
+  '& .MuiToggleButtonGroup-grouped.Mui-selected, & .MuiToggleButtonGroup-grouped.Mui-selected:hover': { bgcolor: 'background.paper', color: 'primary.main', boxShadow: '0 1px 3px rgba(122, 44, 75, .14)' }
 };
 // Cursor de arrastar (maozinha) na cor do tema, com contorno branco; sem suporte a cursor em SVG, usa o grab do sistema.
 const HAND_PATH = 'M21.5 4c-.83 0-1.5.67-1.5 1.5v5c0 .28-.22.5-.5.5s-.5-.22-.5-.5v-8c0-.83-.67-1.5-1.5-1.5S16 1.67 16 2.5v8c0 .28-.22.5-.5.5s-.5-.22-.5-.5v-9c0-.83-.67-1.5-1.5-1.5S12 .67 12 1.5v8.99c0 .28-.22.5-.5.5s-.5-.22-.5-.5V4.5c0-.83-.67-1.5-1.5-1.5S8 3.67 8 4.5v11.41l-4.12-2.35c-.58-.33-1.3-.24-1.78.22-.6.58-.62 1.54-.03 2.13l6.78 6.89c.75.77 1.77 1.2 2.85 1.2H19c2.21 0 4-1.79 4-4V5.5c0-.83-.67-1.5-1.5-1.5';
-const handCursor = `url("data:image/svg+xml,${encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="-1.5 -1.5 27 27"><path d="${HAND_PATH}" fill="#214938" stroke="#fff" stroke-width="1.6" paint-order="stroke" stroke-linejoin="round"/></svg>`)}") 12 12, grab`;
+const handCursor = `url("data:image/svg+xml,${encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="-1.5 -1.5 27 27"><path d="${HAND_PATH}" fill="#9e3f63" stroke="#fff" stroke-width="1.6" paint-order="stroke" stroke-linejoin="round"/></svg>`)}") 12 12, grab`;
 // Paginacao: botoes arredondados, pagina atual na cor do tema e seletor de tamanho em pilula.
 const pager = {
   '& .MuiPaginationItem-root': { borderRadius: 2, fontWeight: 600, color: 'text.secondary', minWidth: 34, height: 34 },
   '& .MuiPaginationItem-root:not(.Mui-selected):hover': { bgcolor: theme => alpha(theme.palette.primary.main, .08), color: 'primary.main' },
-  '& .MuiPaginationItem-root.Mui-selected': { color: 'primary.contrastText', boxShadow: '0 2px 6px rgba(20, 35, 28, .2)' }
+  '& .MuiPaginationItem-root.Mui-selected': { color: 'primary.contrastText', boxShadow: '0 2px 6px rgba(122, 44, 75, .25)' }
 };
 const pageSize = { minWidth: 150, '& .MuiOutlinedInput-root': { borderRadius: 999, fontSize: 14, bgcolor: 'action.hover' }, '& .MuiOutlinedInput-notchedOutline': { borderColor: 'transparent' } };
-const softPaper = { mt: 1, borderRadius: 3, border: 1, borderColor: 'divider', boxShadow: '0 16px 40px rgba(20, 35, 28, .14)' };
+const softPaper = { mt: 1, borderRadius: 3, border: 1, borderColor: 'divider', boxShadow: '0 16px 40px rgba(122, 44, 75, .14)' };
+
+const ALL = '__todos';
+// Menu do icone de filtro de cada coluna: ordenar (A–Z / Z–A) e, nas colunas com opcoes fixas,
+// um combo de varios valores com checkbox. Tudo vale na hora, sem botao de aplicar.
+function ColumnMenu({ menu, sort, values, onSort, onFilter, onClose }) {
+  const column = menu ? columnOf(menu.id) : null;
+  const options = column?.options || [];
+  const all = options.length > 0 && values.length === options.length;
+  const change = event => {
+    const next = typeof event.target.value === 'string' ? event.target.value.split(',') : event.target.value;
+    onFilter(column.id, next.includes(ALL) ? (all ? [] : options.map(option => option.value)) : next);
+  };
+  const labelOf = value => options.find(option => option.value === value)?.label || value;
+  return <Popover open={Boolean(column)} anchorEl={menu?.anchor} onClose={onClose} anchorOrigin={{ vertical: 'bottom', horizontal: 'left' }} slotProps={{ paper: { sx: { ...softPaper, width: 300, maxWidth: 'calc(100vw - 32px)' } } }}>
+    {column && <Box sx={{ p: 2 }}>
+      <Typography variant="subtitle2" component="h2" sx={{ fontWeight: 700 }}>{column.label}</Typography>
+      <Typography variant="caption" color="text.secondary" component="p" sx={{ mt: 1.5, mb: .75, fontWeight: 600 }}>Ordenar</Typography>
+      <ToggleButtonGroup size="small" exclusive fullWidth value={sort.by === column.id ? sort.order : null} onChange={(_, order) => onSort(column.id, order)} aria-label={`Ordenar ${column.label}`} sx={segmented}>
+        <ToggleButton value="asc" aria-label={column.date ? 'Mais antigas primeiro' : `${column.label} de A a Z`}>{column.date ? 'Mais antigas' : 'A–Z'}</ToggleButton>
+        <ToggleButton value="desc" aria-label={column.date ? 'Mais recentes primeiro' : `${column.label} de Z a A`}>{column.date ? 'Mais recentes' : 'Z–A'}</ToggleButton>
+      </ToggleButtonGroup>
+      {options.length > 0 && <>
+        <Typography variant="caption" color="text.secondary" component="p" sx={{ mt: 2, mb: 1, fontWeight: 600 }}>Filtrar</Typography>
+        <TextField select fullWidth size="small" label={column.label} value={values} onChange={change}
+          slotProps={{ select: { multiple: true, displayEmpty: true, renderValue: selected => selected.length ? <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: .5 }}>{selected.map(value => <Chip key={value} size="small" label={labelOf(value)} sx={{ height: 22, bgcolor: theme => alpha(theme.palette.primary.main, .1), color: 'primary.dark', fontWeight: 600 }} />)}</Box> : <Box component="span" sx={{ color: 'text.secondary' }}>Todos</Box>, MenuProps: { slotProps: { paper: { sx: { ...softPaper, mt: .5 } } } } }, inputLabel: { shrink: true } }}>
+          <MenuItem value={ALL} dense><Checkbox size="small" checked={all} indeterminate={!all && values.length > 0} sx={{ p: .5, mr: 1 }} /><ListItemText primary="Selecionar todos" slotProps={{ primary: { sx: { fontWeight: 600 } } }} /></MenuItem>
+          <Divider />
+          {options.map(option => <MenuItem key={option.value} value={option.value} dense><Checkbox size="small" checked={values.includes(option.value)} sx={{ p: .5, mr: 1 }} /><ListItemText primary={option.label} /></MenuItem>)}
+        </TextField>
+        <Box sx={{ display: 'flex', justifyContent: 'flex-end', mt: 1 }}><Button size="small" startIcon={<FilterAltOffRounded />} disabled={!values.length} onClick={() => onFilter(column.id, [])}>Limpar filtro</Button></Box>
+      </>}
+    </Box>}
+  </Popover>;
+}
 
 function InvitationUrlModal({ url, onClose, notify }) {
   if (!url) return null;
@@ -178,7 +213,7 @@ function GuestTable({ title, group, categories, typeLabel, addLabel, form, setFo
   const change = (key, values) => setForm(current => ({ ...current, guests: current.guests.map(guest => guest.key === key ? { ...guest, ...values } : guest) }));
   const add = () => setForm(current => ({ ...current, guests: [...current.guests, guestRow(group)] }));
   return <Box>
-    <Typography variant="subtitle1" component="h3" sx={{ fontWeight: 700, mb: 1 }}>{title}</Typography>
+    <Typography variant="subtitle1" component="h3" sx={{ fontWeight: 700, lineHeight: 1.3, mb: 1 }}>{title}</Typography>
     {/* Sem scroll proprio: layout fixo cabe na largura do modal e so o modal rola. */}
     <TableContainer sx={{ border: 1, borderColor: 'divider', borderRadius: 1, overflow: 'visible' }}><Table size="small" aria-label={title} sx={{ tableLayout: 'fixed' }}>
       <TableHead><TableRow><TableCell>Nome</TableCell><TableCell sx={{ width: { xs: '32%', sm: 220 } }}>{typeLabel}</TableCell><TableCell sx={{ width: { xs: '30%', sm: 170 } }}>Presença</TableCell><TableCell sx={{ width: 48 }}><Box component="span" sx={visuallyHidden}>Remover</Box></TableCell></TableRow></TableHead>
@@ -192,7 +227,7 @@ function GuestTable({ title, group, categories, typeLabel, addLabel, form, setFo
         {!rows.length && <TableRow><TableCell colSpan={4} sx={{ color: 'text.secondary' }}>Ninguém cadastrado.</TableCell></TableRow>}
       </TableBody>
     </Table></TableContainer>
-    <Button variant="outlined" size="small" startIcon={<PersonAddAlt1Outlined />} disabled={saving} onClick={add} sx={{ mt: 1.5 }}>{addLabel}</Button>
+    <Button variant="outlined" size="small" startIcon={<PersonAddAlt1Outlined />} disabled={saving} onClick={add} sx={{ mt: 2 }}>{addLabel}</Button>
   </Box>;
 }
 
@@ -229,7 +264,6 @@ function InvitationFormModal({ editing, form, setForm, saving, error, deadlineLi
       {error && <Alert severity="error">{error}</Alert>}
       <GuestTable title="Adultos" group="adult" categories={ADULT_CATEGORIES} typeLabel="Sexo" addLabel="Adicionar pessoa" form={form} setForm={setForm} saving={saving} onRemove={requestRemove} />
       <GuestTable title="Crianças" group="child" categories={CHILD_CATEGORIES} typeLabel="Idade" addLabel="Adicionar criança" form={form} setForm={setForm} saving={saving} onRemove={requestRemove} />
-      <Stack direction="row" spacing={1} useFlexGap sx={{ flexWrap: 'wrap' }} aria-label="Total de convidados por tipo">{countsOf(form.guests).map(([value, label]) => <Chip key={label} size="small" variant="outlined" label={`${label}: ${value}`} />)}</Stack>
       <Box sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr', sm: 'repeat(3, 1fr)' }, gap: 2 }}>
         <TextField select required label="Parte" value={form.side} disabled={saving} onChange={event => setForm({ ...form, side: event.target.value })}>{SIDES.map(item => <MenuItem key={item.value} value={item.value}>{item.label}</MenuItem>)}</TextField>
         <TextField select required label="Parentesco" value={form.relationship} disabled={saving} onChange={event => setForm({ ...form, relationship: event.target.value })}>{RELATIONSHIPS.map(item => <MenuItem key={item.value} value={item.value}>{item.label}</MenuItem>)}</TextField>
@@ -255,7 +289,8 @@ export function InvitationsPage() {
   const route = useLocation(); const navigate = useNavigate();
   const [items, setItems] = useState([]);
   // Periodo padrao: do inicio do ano ate a data do casamento (que chega com /public/wedding).
-  const [filters, setFilters] = useState({ startDate: yearStart(), endDate: '' });
+  const [filters, setFilters] = useState({ startDate: yearStart(), endDate: '', side: [], relationship: [], type: [], status: [] });
+  const [columnMenu, setColumnMenu] = useState(null);
   const [filtersReady, setFiltersReady] = useState(false);
   // Mais novos primeiro, como antes da ordenacao por coluna.
   const [sort, setSort] = useState({ by: 'createdAt', order: 'desc' });
@@ -363,7 +398,9 @@ export function InvitationsPage() {
   useEffect(() => { if (!notification) return; const id = setTimeout(() => setNotification(null), 4500); return () => clearTimeout(id); }, [notification]);
   const load = () => {
     setLoading(true);
-    api.get('/invitations', { params: { ...filters, page: pagination.page, limit: pagination.limit, sortBy: sort.by, sortOrder: sort.order } })
+    // Filtros de varios valores vao juntos por virgula (status=confirmed,declined); vazios ficam de fora.
+    const params = Object.fromEntries(Object.entries(filters).map(([key, value]) => [key, Array.isArray(value) ? value.join(',') : value]).filter(([, value]) => value));
+    api.get('/invitations', { params: { ...params, page: pagination.page, limit: pagination.limit, sortBy: sort.by, sortOrder: sort.order } })
       .then(response => { setItems(response.data.data.data); setPagination(current => ({ ...current, ...response.data.data.pagination })); setSummary(response.data.data.summary); })
       .catch(() => notify('danger', 'Não foi possível carregar os convites.'))
       .finally(() => setLoading(false));
@@ -372,9 +409,9 @@ export function InvitationsPage() {
   useEffect(() => { if (filtersReady) load(); }, [filtersReady, filters, pagination.page, pagination.limit, sort]);
   // Clicar na coluna ordenada inverte a direcao; outra coluna comeca crescente. Volta para a primeira pagina.
   const sortBy = key => { setPagination(current => ({ ...current, page: 1 })); setSort(current => ({ by: key, order: current.by === key && current.order === 'asc' ? 'desc' : 'asc' })); };
-  // A–Z / Z–A ordena pelos nomes; desmarcar volta para os mais novos primeiro.
-  const alphabetical = sort.by === 'name' ? sort.order : null;
-  const setAlphabetical = order => { setPagination(current => ({ ...current, page: 1 })); setSort(order ? { by: 'name', order } : { by: 'createdAt', order: 'desc' }); };
+  // A–Z / Z–A pelo menu da coluna; desmarcar volta para os mais novos primeiro.
+  const sortColumn = (id, order) => { setPagination(current => ({ ...current, page: 1 })); setSort(order ? { by: id, order } : { by: 'createdAt', order: 'desc' }); };
+  const activeFilters = FILTER_IDS.filter(id => filters[id].length);
   const applyFilter = values => { setPagination(current => ({ ...current, page: 1 })); setFilters(current => ({ ...current, ...values })); };
   const openNew = () => { setEditing(null); setForm(emptyForm(deadlineLimit)); setFormError(''); setFormOpen(true); };
   const openEdit = item => { setEditing(item); setForm({ side: item.side || '', relationship: item.relationship || '', table: item.table || '', whatsapp: whatsappMask(item.whatsapp), guests: guestRows(item), removed: [], viewed: Boolean(item.status) && item.status !== 'not_viewed', description: item.description || '', type: item.type || 'in_person', confirmationDeadline: item.confirmationDeadline ? item.confirmationDeadline.slice(0, 10) : deadlineLimit }); setFormError(''); setFormOpen(true); };
@@ -424,10 +461,8 @@ export function InvitationsPage() {
     <Snackbar open={Boolean(notification)} autoHideDuration={4500} onClose={() => setNotification(null)}><Alert severity={notification?.type === 'danger' ? 'error' : 'success'} onClose={() => setNotification(null)}>{notification?.message}</Alert></Snackbar>
     <InvitationUrlModal url={viewing} onClose={() => setViewing(null)} notify={notify} />
     <PageHeader title="Convites" subtitle="Gerencie os convites e confirmações de presença." action={<Stack direction="row" spacing={1} useFlexGap sx={{ flexWrap: 'wrap' }}><Button variant="outlined" startIcon={<SettingsOutlined />} disabled={!card} onClick={() => setCardOpen(true)}>Configurações do convite</Button><Button variant="contained" startIcon={<Add />} onClick={() => navigate('/convites/novo')}>Novo convite</Button></Stack>} />
-    <Paper sx={{ p: 2, mb: 2 }}><Box sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr', sm: 'repeat(2, 1fr)', lg: '2fr repeat(4, 1fr)' }, gap: 2 }}>
+    <Paper sx={{ p: 2, mb: 2 }}><Box sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr', sm: 'repeat(2, 1fr)', md: '2fr 1fr 1fr' }, gap: 2 }}>
       <TextField label="Nome" size="small" value={filters.name || ''} onChange={event => applyFilter({ name: event.target.value })} />
-      <TextField select label="Status" size="small" value={filters.status || ''} onChange={event => applyFilter({ status: event.target.value })}><MenuItem value="">Todos</MenuItem>{Object.entries(STATUSES).map(([value, status]) => <MenuItem key={value} value={value}>{status.label}</MenuItem>)}</TextField>
-      <TextField select label="Tipo" size="small" value={filters.type || ''} onChange={event => applyFilter({ type: event.target.value })}><MenuItem value="">Todos</MenuItem><MenuItem value="in_person">Presencial</MenuItem><MenuItem value="virtual">Virtual</MenuItem></TextField>
       <DateField size="small" label="Data inicial" value={filters.startDate} maxDate={filters.endDate || undefined} onChange={value => applyFilter({ startDate: value })} />
       <DateField size="small" label="Data final" value={filters.endDate} minDate={filters.startDate || undefined} onChange={value => applyFilter({ endDate: value })} />
     </Box></Paper>
@@ -437,21 +472,18 @@ export function InvitationsPage() {
       <Button variant="contained" startIcon={preparing ? <CircularProgress size={16} color="inherit" /> : <PrintOutlined />} disabled={preparing || !card} onClick={() => void startPrint(card.layout, selectedInOrder())}>Imprimir em lote{layoutName ? ` — ${layoutName}` : ''}</Button>
     </Paper>}
     <Paper>
-      {/* Cabecalho da tabela: total, ordem alfabetica e seletor de colunas. */}
+      {/* Cabecalho da tabela: total, filtros ativos e seletor de colunas. */}
       <Box sx={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center', gap: 1.5, px: 2, py: 1.5, borderBottom: 1, borderColor: 'divider' }}>
         <Box sx={{ mr: 'auto' }}>
           <Typography variant="subtitle1" component="h2" sx={{ fontWeight: 700, lineHeight: 1.3 }}>Lista de convites</Typography>
           <Typography variant="body2" color="text.secondary">{pagination.total === 1 ? '1 convite no período' : `${pagination.total} convites no período`}</Typography>
         </Box>
-        <Stack direction="row" spacing={1} sx={{ alignItems: 'center' }}>
-          <SortByAlphaRounded fontSize="small" sx={{ color: 'text.secondary' }} aria-hidden />
-          <Typography id="ordem-alfabetica" variant="body2" color="text.secondary">Ordem alfabética</Typography>
-          <ToggleButtonGroup size="small" exclusive value={alphabetical} onChange={(_, value) => setAlphabetical(value)} aria-labelledby="ordem-alfabetica" sx={segmented}>
-            <ToggleButton value="asc" aria-label="Nomes de A a Z">A–Z</ToggleButton>
-            <ToggleButton value="desc" aria-label="Nomes de Z a A">Z–A</ToggleButton>
-          </ToggleButtonGroup>
-        </Stack>
         <Button variant="outlined" size="small" startIcon={<ViewColumnRounded />} aria-haspopup="dialog" aria-expanded={Boolean(columnsMenu)} onClick={event => setColumnsMenu(event.currentTarget)}>Colunas</Button>
+        {activeFilters.length > 0 && <Stack direction="row" spacing={1} useFlexGap sx={{ flexBasis: '100%', flexWrap: 'wrap', alignItems: 'center' }} aria-label="Filtros ativos">
+          {activeFilters.map(id => { const column = columnOf(id); return <Chip key={id} size="small" icon={<FilterListRounded />} label={`${column.label}: ${filters[id].map(value => optionLabel(column.options, value)).join(', ')}`} onClick={event => setColumnMenu({ anchor: event.currentTarget, id })} onDelete={() => applyFilter({ [id]: [] })}
+            sx={{ maxWidth: '100%', bgcolor: theme => alpha(theme.palette.primary.main, .08), color: 'primary.dark', fontWeight: 600, '& .MuiChip-icon': { color: 'primary.main' } }} />; })}
+          <Button size="small" startIcon={<FilterAltOffRounded />} onClick={() => applyFilter(Object.fromEntries(FILTER_IDS.map(id => [id, []])))}>Limpar filtros</Button>
+        </Stack>}
       </Box>
       <TableContainer><Table aria-label="Convites"><TableHead><TableRow>
         <TableCell padding="checkbox"><Checkbox checked={pageSelected} indeterminate={!pageSelected && items.some(item => selected.has(item._id))} disabled={!items.length} onChange={togglePage} slotProps={{ input: { 'aria-label': 'Selecionar os convites desta página' } }} /></TableCell>
@@ -460,6 +492,11 @@ export function InvitationsPage() {
           <Box sx={{ display: 'flex', alignItems: 'center', gap: .25 }}>
             <DragIndicatorRounded className="arrastar" aria-hidden sx={{ fontSize: 16, ml: -1, color: 'text.secondary', opacity: 0, transition: 'opacity .15s' }} />
             <TableSortLabel active={sort.by === column.id} direction={sort.by === column.id ? sort.order : 'asc'} IconComponent={sort.by === column.id ? ArrowUpwardRounded : UnfoldMoreRounded} onClick={() => sortBy(column.id)} sx={sortLabel}>{column.label}</TableSortLabel>
+            <Tooltip title={column.options ? 'Filtrar e ordenar' : 'Ordenar'}><IconButton size="small" draggable={false} aria-haspopup="dialog" aria-expanded={columnMenu?.id === column.id}
+              aria-label={`${column.options ? 'Filtrar e ordenar' : 'Ordenar'} ${column.label}${filters[column.id]?.length ? ' (filtro ativo)' : ''}`} onClick={event => setColumnMenu({ anchor: event.currentTarget, id: column.id })}
+              sx={{ p: .375, color: filters[column.id]?.length ? 'primary.main' : 'text.secondary', opacity: filters[column.id]?.length || columnMenu?.id === column.id ? 1 : .45, '&:hover': { opacity: 1, color: 'primary.main' } }}>
+              <Badge variant="dot" color="primary" invisible={!filters[column.id]?.length}><FilterListRounded sx={{ fontSize: 18 }} /></Badge>
+            </IconButton></Tooltip>
           </Box>
         </TableCell>)}
         <TableCell sx={{ whiteSpace: 'nowrap' }}>Ações</TableCell>
@@ -506,6 +543,7 @@ export function InvitationsPage() {
         <Divider sx={{ mt: .5 }} />
         <Box sx={{ p: 1, display: 'flex', justifyContent: 'flex-end' }}><Button size="small" startIcon={<RestartAltRounded />} onClick={() => setColumns(defaultColumns())}>Restaurar padrão</Button></Box>
       </Popover>
+      <ColumnMenu menu={columnMenu} sort={sort} values={columnMenu ? filters[columnMenu.id] || [] : []} onSort={sortColumn} onFilter={(id, values) => applyFilter({ [id]: values })} onClose={() => setColumnMenu(null)} />
       <Menu anchorEl={rowMenu?.anchor} open={Boolean(rowMenu)} onClose={() => setRowMenu(null)}>
         <MenuItem onClick={() => rowAction(viewLink)}><ListItemIcon><VisibilityOutlined fontSize="small" /></ListItemIcon><ListItemText>Visualizar link</ListItemText></MenuItem>
         <MenuItem onClick={() => rowAction(copyLink)}><ListItemIcon><ContentCopyOutlined fontSize="small" /></ListItemIcon><ListItemText>Copiar link</ListItemText></MenuItem>

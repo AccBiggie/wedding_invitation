@@ -1,6 +1,6 @@
 import crypto from 'node:crypto';
 import mongoose from 'mongoose';
-import Invitation, { GUEST_CATEGORIES, GUEST_RESPONSES, INVITATION_STATUSES, guestResponse, invitationStatus } from '../models/Invitation.js';
+import Invitation, { GUEST_CATEGORIES, GUEST_RESPONSES, INVITATION_RELATIONSHIPS, INVITATION_SIDES, INVITATION_STATUSES, guestResponse, invitationStatus } from '../models/Invitation.js';
 import { defaultDeadline, validateInvitation } from '../validators/invitationValidator.js';
 import { escapeRegex } from '../validators/catalogValidator.js';
 
@@ -95,17 +95,32 @@ const sortValue = field => SORT_LABELS[field]
   ? { $switch: { branches: Object.entries(SORT_LABELS[field]).map(([value, label]) => ({ case: { $eq: ['$' + field, value] }, then: label })), default: '' } }
   : '$' + field;
 
+// Filtros das colunas da lista: cada um aceita varios valores ("a,b" ou repetido na URL).
+// "none" em parte e parentesco sao os convites sem o campo preenchido.
+const COLUMN_FILTERS = { status: INVITATION_STATUSES, type: ['in_person', 'virtual'], side: [...INVITATION_SIDES, 'none'], relationship: [...INVITATION_RELATIONSHIPS, 'none'] };
+export function columnFilters(params) {
+  const query = {};
+  for (const [field, allowed] of Object.entries(COLUMN_FILTERS)) {
+    const raw = params[field];
+    if (raw === undefined || raw === '') continue;
+    const values = [...new Set((Array.isArray(raw) ? raw : [raw]).flatMap(value => String(value).split(',')).map(value => value.trim()).filter(value => allowed.includes(value)))];
+    if (!values.length) continue;
+    // Convite antigo sem o campo conta como o valor padrao (sem status = nao visualizado).
+    const withEmpty = values.includes('none') || (field === 'status' && values.includes('not_viewed'));
+    query[field] = { $in: [...values.filter(value => value !== 'none'), ...(withEmpty ? [null] : [])] };
+  }
+  return query;
+}
+
 export async function list(req, res, next) {
   try {
-    const { name, status, startDate, endDate, type } = req.query;
+    const { name, startDate, endDate } = req.query;
     const page = Math.max(1, Number(req.query.page) || 1);
     const limit = Math.min(200, Math.max(1, Number(req.query.limit) || 20));
     const sortBy = SORT_FIELDS.includes(req.query.sortBy) ? req.query.sortBy : 'createdAt';
     const sortOrder = req.query.sortOrder === 'asc' ? 1 : -1;
-    const query = {};
+    const query = columnFilters(req.query);
     if (name) query.name = { $regex: escapeRegex(String(name)), $options: 'i' };
-    if (INVITATION_STATUSES.includes(status)) query.status = status;
-    if (['in_person', 'virtual'].includes(type)) query.type = type;
     if (startDate || endDate) { query.createdAt = {}; if (startDate) query.createdAt.$gte = new Date(`${startDate}T00:00:00.000Z`); if (endDate) query.createdAt.$lte = new Date(`${endDate}T23:59:59.999Z`); }
 
     const [data, total, allInvitations] = await Promise.all([

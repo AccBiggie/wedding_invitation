@@ -1,5 +1,5 @@
 import test from 'node:test'; import assert from 'node:assert/strict'; import request from 'supertest'; import app from '../src/app.js'; import { signToken } from '../src/controllers/authController.js';
-import { mayConfirm, newCode } from '../src/controllers/invitationController.js';
+import { columnFilters, mayConfirm, newCode } from '../src/controllers/invitationController.js';
 import { validateInvitation } from '../src/validators/invitationValidator.js';
 import { invitationStatus } from '../src/models/Invitation.js';
 const bearer = 'Bearer ' + signToken({ _id: 'test-admin', name: 'Administrador', email: 'accbiggie@gmail.com', role: 'admin' });
@@ -29,6 +29,7 @@ assert.equal(mayConfirm(item,{body:{code:'ABC123XYZ'},query:{}}),false);
 assert.equal(mayConfirm(item,{body:{code:' abc123xyz9 '},query:{}}),true);
 assert.equal(mayConfirm(item,{body:{},query:{token:'token-secreto-do-convite'}}),true);});
 test('convidado sem tipo é rejeitado', async()=>{const r=await request(app).post('/api/invitations').set('Authorization',bearer).send({guests:[{name:'Marco',category:'man'},{name:'Jakeline'}]});assert.equal(r.status,422);assert.ok(r.body.errors.guests);});
+test('maior de 10 anos não é mais um tipo de criança (entra como adulto)', ()=>{assert.ok(validateInvitation({guests:[{name:'Ana',category:'over_10'}]},{partial:true}).errors.guests);assert.deepEqual(validateInvitation({guests:[{name:'Ana',category:'woman'}]},{partial:true}).errors,{});});
 test('convite sem convidados é rejeitado', async()=>{const r=await request(app).post('/api/invitations').set('Authorization',bearer).send({guests:[]});assert.equal(r.status,422);assert.ok(r.body.errors.guests);});
 test('data limite depois de 07/03/2027 é rejeitada', async()=>{const r=await request(app).post('/api/invitations').set('Authorization',bearer).send({side:'groom',relationship:'friends',guests:[{name:'Marco',category:'man'}],confirmationDeadline:'2027-03-08'});assert.equal(r.status,422);assert.match(r.body.errors.confirmationDeadline[0],/07\/03\/2027/);});
 test('validação do convite normaliza os convidados e aceita a data limite', ()=>{
@@ -44,6 +45,11 @@ assert.equal(validateInvitation({whatsapp:''},{partial:true}).fields.whatsapp,''
 assert.ok(validateInvitation({whatsapp:'12345'},{partial:true}).errors.whatsapp);
 assert.ok(validateInvitation({whatsapp:'(04) 99883-3731'},{partial:true}).errors.whatsapp);
 assert.ok(validateInvitation({whatsapp:123},{partial:true}).errors.whatsapp);});
+test('filtros das colunas aceitam varios valores e ignoram os desconhecidos', ()=>{
+assert.deepEqual(columnFilters({status:'confirmed,declined',type:'virtual'}),{status:{$in:['confirmed','declined']},type:{$in:['virtual']}});
+assert.deepEqual(columnFilters({side:['groom','none'],relationship:'x,friends'}),{side:{$in:['groom',null]},relationship:{$in:['friends']}});
+assert.deepEqual(columnFilters({status:'not_viewed'}),{status:{$in:['not_viewed',null]}});
+assert.deepEqual(columnFilters({status:'',type:'abc',side:{$ne:1}}),{});});
 test('convite sem parte e parentesco é rejeitado', async()=>{const r=await request(app).post('/api/invitations').set('Authorization',bearer).send({guests:[{name:'Marco',category:'man'}]});assert.equal(r.status,422);assert.ok(r.body.errors.side);assert.ok(r.body.errors.relationship);});
 test('status do convite segue as respostas de cada pessoa', ()=>{
 const g=(...responses)=>responses.map(response=>({response}));

@@ -2,7 +2,8 @@ import mongoose from 'mongoose';
 
 // Tipo de cada pessoa do convite, para contar homens, mulheres e criancas por idade.
 // Convidados cadastrados antes do campo existir ficam com null ate serem editados.
-export const GUEST_CATEGORIES = ['man', 'woman', 'girl_0_5', 'boy_0_5', 'girl_6_10', 'boy_6_10', 'over_10'];
+// A partir de 11 anos a pessoa entra como adulto (homem ou mulher).
+export const GUEST_CATEGORIES = ['man', 'woman', 'girl_0_5', 'boy_0_5', 'girl_6_10', 'boy_6_10'];
 // Lado do casal que convida e parentesco do convite (convites antigos ficam com null).
 export const INVITATION_SIDES = ['groom', 'bride'];
 export const INVITATION_RELATIONSHIPS = ['relative', 'friends', 'family', 'parents', 'organization'];

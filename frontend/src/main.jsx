@@ -22,38 +22,10 @@ import '@tabler/core/dist/css/tabler.min.css';
 import './style.css';
 
 const AdminApp = React.lazy(() => import('./routes/AdminApp').then(module => ({ default: module.AdminApp })));
+const LoginPage = React.lazy(() => import('./routes/LoginPage').then(module => ({ default: module.LoginPage })));
 const StoreCategoryContent = React.lazy(() => import('./pages/StoreCategory/StoreCategoryContent').then(module => ({ default: module.StoreCategoryContent })));
 
 const slug = value => value.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase().trim().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
-
-function Login({ onSuccess }) {
-  const [form, setForm] = useState({ email: '', password: '' });
-  const [error, setError] = useState('');
-  const [sending, setSending] = useState(false);
-  const submit = async event => {
-    event.preventDefault(); setSending(true); setError('');
-    try {
-      const response = await api.post('/auth/login', form);
-      tokenStore.set(response.data.data.accessToken);
-      onSuccess(response.data.data.user);
-    } catch (requestError) { setError(requestError.response?.data?.message || 'Não foi possível entrar. Tente novamente.'); }
-    finally { setSending(false); }
-  };
-  return <div className="page page-center"><div className="container container-tight py-4">
-    <div className="text-center mb-4"><h1 className="navbar-brand navbar-brand-autodark">Convites de casamento</h1></div>
-    <form className="card card-md" onSubmit={submit}>
-      <div className="card-body">
-        <h2 className="card-title text-center mb-4">Entre na sua conta</h2>
-        <label className="form-label">E-mail</label>
-        <input type="email" required autoFocus autoComplete="username" className="form-control" placeholder="seu@email.com" value={form.email} onChange={event => setForm({ ...form, email: event.target.value })} />
-        <label className="form-label mt-3">Senha</label>
-        <input type="password" required autoComplete="current-password" className="form-control" placeholder="Sua senha" value={form.password} onChange={event => setForm({ ...form, password: event.target.value })} />
-        {error && <div className="alert alert-danger mt-3 mb-0">{error}</div>}
-        <div className="form-footer"><button className="btn btn-primary w-100" disabled={sending}>{sending ? 'Entrando...' : 'Entrar'}</button></div>
-      </div>
-    </form>
-  </div></div>;
-}
 
 // Todo o conteudo do casamento vem de /public/wedding (backend/src/config/wedding.js).
 function useWedding() {
@@ -692,7 +664,7 @@ function Admin() {
   useEffect(() => { const expire = () => setUser(null); window.addEventListener('auth:expired', expire); return () => window.removeEventListener('auth:expired', expire); }, []);
   const logout = () => { tokenStore.clear(); setUser(null); };
   if (checking) return <div className="page page-center"><div className="text-secondary">Carregando...</div></div>;
-  if (!user) return <Login onSuccess={setUser} />;
+  if (!user) return <React.Suspense fallback={<div className="page page-center">Carregando...</div>}><LoginPage onSuccess={setUser} /></React.Suspense>;
   return <React.Suspense fallback={<div className="page page-center">Carregando painel...</div>}><AdminApp user={user} onLogout={logout} /></React.Suspense>;
 }
 

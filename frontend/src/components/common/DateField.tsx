@@ -28,7 +28,7 @@ export function DateField({ label, value, onChange, minDate, maxDate, size, requ
         textField: { size, required, helperText, fullWidth: true },
         openPickerButton: { sx: { color: 'text.secondary' } },
         actionBar: { actions: ['clear', 'today'] },
-        desktopPaper: { sx: { mt: 1, borderRadius: 3, border: 1, borderColor: 'divider', boxShadow: '0 16px 40px rgba(20, 35, 28, .14)' } },
+        desktopPaper: { sx: { mt: 1, borderRadius: 3, border: 1, borderColor: 'divider', boxShadow: '0 16px 40px rgba(122, 44, 75, .14)' } },
         mobilePaper: { sx: { borderRadius: 4 } },
         layout: {
           sx: {

@@ -36,8 +36,8 @@ const STATUSES = [
   { key: 'confirmed', label: 'Confirmado', color: STATUS_COLORS.good, Icon: CheckCircleRounded },
   { key: 'declined', label: 'Não vai', color: STATUS_COLORS.critical, Icon: CancelRounded }
 ];
-const CATEGORIES: [string, string][] = [['man', 'Homens'], ['woman', 'Mulheres'], ['girl_0_5', 'Menina até 5 anos'], ['boy_0_5', 'Menino até 5 anos'], ['girl_6_10', 'Menina de 6 a 10 anos'], ['boy_6_10', 'Menino de 6 a 10 anos'], ['over_10', 'Maior de 10 anos']];
-const CHILDREN = ['girl_0_5', 'boy_0_5', 'girl_6_10', 'boy_6_10', 'over_10'];
+const CATEGORIES: [string, string][] = [['woman', 'Mulheres'], ['man', 'Homens'], ['girl_0_5', 'Menina até 5 anos'], ['boy_0_5', 'Menino até 5 anos'], ['girl_6_10', 'Menina de 6 a 10 anos'], ['boy_6_10', 'Menino de 6 a 10 anos']];
+const CHILDREN = ['girl_0_5', 'boy_0_5', 'girl_6_10', 'boy_6_10'];
 
 // Dias até a data do casamento (cadastro do convite), contados pelo calendário local.
 function diasAte(date?: { dia: number; mes: number; ano: number }) {
@@ -104,10 +104,10 @@ export function DashboardPage() {
 
   const withOther = (entries: [string, string][], counts: Record<string, number>) => [...entries, ['none', 'Não informado'] as [string, string]].filter(([key]) => key !== 'none' || counts.none);
   const sideParts: Part[] = withOther(SIDES, Object.fromEntries(Object.entries(people.bySide).map(([key, value]) => [key, value.total]))).map(([key, label], index) => ({
-    key, label, value: people.bySide[key]?.total || 0, color: key === 'none' ? VIZ.other : [VIZ.green, VIZ.gold][index], ink: key === 'none' ? INK.dark : INK.light,
+    key, label, value: people.bySide[key]?.total || 0, color: key === 'none' ? VIZ.other : [VIZ.rose, VIZ.gold][index], ink: key === 'none' ? INK.dark : INK.light,
     detail: `${plural(stats.invitations.bySide[key] || 0, 'convite', 'convites')} · ${formatNumber(people.bySide[key]?.yes || 0)} confirmados`
   }));
-  const typeParts: Part[] = [['in_person', 'Presencial', VIZ.green, INK.light], ['virtual', 'Virtual', VIZ.gold, INK.light]].map(([key, label, color, ink]) => ({ key, label, value: stats.invitations.byType[key] || 0, color, ink }));
+  const typeParts: Part[] = [['in_person', 'Presencial', VIZ.rose, INK.light], ['virtual', 'Virtual', VIZ.gold, INK.light]].map(([key, label, color, ink]) => ({ key, label, value: stats.invitations.byType[key] || 0, color, ink }));
   // A cor segue o parentesco (ordem fixa do cadastro), nunca a posicao.
   const relationshipParts: Part[] = withOther(RELATIONSHIPS, Object.fromEntries(Object.entries(people.byRelationship).map(([key, value]) => [key, value.total])))
     .map(([key, label], index) => ({
@@ -119,13 +119,12 @@ export function DashboardPage() {
   const guestParts: Part[] = [
     { key: 'adults', label: 'Adultos', value: adults, color: CATEGORY_COLORS[0] },
     { key: 'kids_0_5', label: 'Crianças até 5 anos', value: sum(['girl_0_5', 'boy_0_5'], 'total'), color: CATEGORY_COLORS[2] },
-    { key: 'kids_6_10', label: 'Crianças de 6 a 10 anos', value: sum(['girl_6_10', 'boy_6_10'], 'total'), color: CATEGORY_COLORS[3] },
-    { key: 'over_10', label: 'Maiores de 10 anos', value: category('over_10').total, color: CATEGORY_COLORS[6] },
+    { key: 'kids_6_10', label: 'Crianças de 6 a 10 anos', value: sum(['girl_6_10', 'boy_6_10'], 'total'), color: CATEGORY_COLORS[4] },
     ...(unknown.total ? [{ key: 'unknown', label: 'Tipo não informado', value: unknown.total, color: VIZ.other }] : [])
   ];
   const goingParts: Part[] = [
-    { key: 'woman', label: 'Mulheres', value: category('woman').yes, color: CATEGORY_COLORS[1] },
-    { key: 'man', label: 'Homens', value: category('man').yes, color: CATEGORY_COLORS[0] },
+    { key: 'woman', label: 'Mulheres', value: category('woman').yes, color: CATEGORY_COLORS[0] },
+    { key: 'man', label: 'Homens', value: category('man').yes, color: CATEGORY_COLORS[1] },
     { key: 'children', label: 'Crianças', value: sum(CHILDREN, 'yes'), color: CATEGORY_COLORS[2] },
     ...(unknown.yes ? [{ key: 'unknown', label: 'Tipo não informado', value: unknown.yes, color: VIZ.other }] : [])
   ];
@@ -197,7 +196,7 @@ export function DashboardPage() {
       </ChartCard>
 
       <ChartCard title="Convites e confirmações no tempo" subtitle="Pessoas convidadas (pela data de criação do convite) e pessoas confirmadas (pela data de confirmação), acumuladas." table={{ columns: ['Data', 'Pessoas convidadas', 'Pessoas confirmadas'], rows: line.days.filter((_, index) => index === line.days.length - 1 || line.invited[index] !== line.invited[index + 1] || line.confirmed[index] !== line.confirmed[index + 1]).map(day => { const index = line.days.indexOf(day); return [day.split('-').reverse().join('/'), line.invited[index], line.confirmed[index]]; }) }}>
-        <LineChart label="Pessoas convidadas e confirmadas por dia, acumulado" days={line.days} series={[{ key: 'invited', label: 'Pessoas convidadas', color: VIZ.green, values: line.invited }, { key: 'confirmed', label: 'Pessoas confirmadas', color: VIZ.gold, values: line.confirmed }]} />
+        <LineChart label="Pessoas convidadas e confirmadas por dia, acumulado" days={line.days} series={[{ key: 'invited', label: 'Pessoas convidadas', color: VIZ.rose, values: line.invited }, { key: 'confirmed', label: 'Pessoas confirmadas', color: VIZ.gold, values: line.confirmed }]} />
       </ChartCard>
 
       <Box sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr', md: 'repeat(3, 1fr)' }, gap: 2 }}>

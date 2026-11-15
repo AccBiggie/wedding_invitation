@@ -3,21 +3,21 @@ import { Box, Paper, Stack, Table, TableBody, TableCell, TableHead, TableRow, To
 import BarChartRounded from '@mui/icons-material/BarChartRounded';
 import TableRowsRounded from '@mui/icons-material/TableRowsRounded';
 
-// Cores dos graficos, derivadas do tema (verde e dourado) e validadas com o validador de paletas
+// Cores dos graficos, derivadas do tema (rose e champanhe) e validadas com o validador de paletas
 // (faixa de luminosidade, croma, separacao para daltonismo e contraste sobre o card branco).
 export const VIZ = {
-  green: '#1d7f56', // serie 1 (e unica cor quando so ha uma serie)
+  rose: '#b4507a', // serie 1 (e unica cor quando so ha uma serie)
   gold: '#c4892a', // serie 2
-  greenSoft: '#a8d5c0', // mesmo verde, mais claro: o "resto" de uma barra empilhada
-  other: '#c3c8c1', // "Nao informado" / sem resposta
-  track: '#f0f2ef', // trilho atras das barras
-  grid: '#e7eae5', // linhas de grade
-  axis: '#c9cec8' // linha de base
+  roseSoft: '#ebc3d3', // mesmo rose, mais claro: o "resto" de uma barra empilhada
+  other: '#cdc3c7', // "Nao informado" / sem resposta
+  track: '#f8eef2', // trilho atras das barras
+  grid: '#f1e5ea', // linhas de grade
+  axis: '#dbc9d0' // linha de base
 };
 // Cores de status (significam bom/ruim): sempre com icone e texto ao lado.
 export const STATUS_COLORS = { good: '#2e7d53', warning: '#fab219', critical: '#b74445', neutral: VIZ.other };
 // Texto dentro de um bloco colorido: branco nos escuros, quase preto nos claros.
-export const INK = { light: '#ffffff', dark: '#1b1f1c' };
+export const INK = { light: '#ffffff', dark: '#2b1f24' };
 
 export const formatNumber = (value: number) => value.toLocaleString('pt-BR');
 const percent = (value: number, total: number) => total ? Math.round(value / total * 100) : 0;
@@ -30,9 +30,9 @@ function Tip({ value, label, detail }: { value: string; label: string; detail?: 
     {detail && <Typography sx={{ fontSize: 12, opacity: .7 }}>{detail}</Typography>}
   </Box>;
 }
-const tipProps = { arrow: true, placement: 'top' as const, slotProps: { tooltip: { sx: { bgcolor: '#1f2a24', borderRadius: 2, px: 1.25, py: .75, boxShadow: '0 8px 24px rgba(20, 35, 28, .25)' } }, arrow: { sx: { color: '#1f2a24' } } } };
+const tipProps = { arrow: true, placement: 'top' as const, slotProps: { tooltip: { sx: { bgcolor: '#3b2a32', borderRadius: 2, px: 1.25, py: .75, boxShadow: '0 8px 24px rgba(122, 44, 75, .25)' } }, arrow: { sx: { color: '#3b2a32' } } } };
 // Marca com foco de teclado: mostra o mesmo tooltip do mouse.
-const focusRing = { outline: 'none', '&:focus-visible': { boxShadow: '0 0 0 2px #fff, 0 0 0 4px #214938' } };
+const focusRing = { outline: 'none', '&:focus-visible': { boxShadow: '0 0 0 2px #fff, 0 0 0 4px #9e3f63' } };
 
 export interface TableData { columns: string[]; rows: (string | number)[][] }
 
@@ -47,7 +47,7 @@ function DataTable({ columns, rows, label }: TableData & { label: string }) {
 const segmented = {
   p: .25, gap: .25, borderRadius: 999, bgcolor: 'action.hover', alignSelf: 'flex-start',
   '& .MuiToggleButtonGroup-grouped': { border: 0, borderRadius: '999px !important', m: 0, px: 1, py: .25, color: 'text.secondary' },
-  '& .MuiToggleButtonGroup-grouped.Mui-selected, & .MuiToggleButtonGroup-grouped.Mui-selected:hover': { bgcolor: 'background.paper', color: 'primary.main', boxShadow: '0 1px 3px rgba(20, 35, 28, .14)' }
+  '& .MuiToggleButtonGroup-grouped.Mui-selected, & .MuiToggleButtonGroup-grouped.Mui-selected:hover': { bgcolor: 'background.paper', color: 'primary.main', boxShadow: '0 1px 3px rgba(122, 44, 75, .16)' }
 };
 
 // Card de grafico: titulo, subtitulo e a troca entre grafico e tabela.
@@ -86,7 +86,8 @@ export interface Part { key: string; label: string; value: number; color: string
 
 // Ordem fixa das cores de categorias no donut (validada com o validador de paletas, incluindo o
 // par que fecha o circulo). A cor segue a categoria, nunca a posicao: filtrar nao repinta ninguem.
-export const CATEGORY_COLORS = ['#1d7f56', '#e87ba4', '#2a78d6', '#c4892a', '#0f8ea8', '#eb6834', '#6250d6'];
+// Ordem: rose, azul, dourado, verde, violeta, laranja (todos os pares vizinhos passam, inclusive o que fecha o circulo).
+export const CATEGORY_COLORS = ['#b4507a', '#2a78d6', '#c4892a', '#1d7f56', '#7b5cd6', '#eb6834'];
 
 // Donut fino com espaco de 2px entre as fatias. O centro mostra o total ou a fatia sob o ponteiro/foco;
 // a legenda ao lado traz nome, numero e porcentagem e acende a fatia correspondente.
@@ -163,7 +164,7 @@ export function SegmentedBar({ parts, label, tall = true }: { parts: Part[]; lab
 
 export interface BarRow { key: string; label: string; value: number; detail?: string }
 // Barras horizontais em ordem, uma cor so: nome e numero em cima, barra embaixo sobre um trilho.
-export function BarList({ rows, label, color = VIZ.green, unit }: { rows: BarRow[]; label: string; color?: string; unit: [string, string] }) {
+export function BarList({ rows, label, color = VIZ.rose, unit }: { rows: BarRow[]; label: string; color?: string; unit: [string, string] }) {
   const max = Math.max(0, ...rows.map(row => row.value));
   if (!max) return <EmptyChart />;
   return <Stack component="ul" spacing={1.5} aria-label={label} style={{ listStyle: 'none', margin: 0, padding: 0 }}>
@@ -183,12 +184,12 @@ export function BarList({ rows, label, color = VIZ.green, unit }: { rows: BarRow
 }
 
 export interface StackRow { key: string; label: string; done: number; total: number }
-// Barras horizontais empilhadas: confirmados (verde) + demais (verde claro), escala pelo maior total.
+// Barras horizontais empilhadas: confirmados (rose) + demais (rose claro), escala pelo maior total.
 export function StackedBarList({ rows, label, doneLabel, restLabel }: { rows: StackRow[]; label: string; doneLabel: string; restLabel: string }) {
   const max = Math.max(0, ...rows.map(row => row.total));
   if (!max) return <EmptyChart />;
   return <Stack spacing={2}>
-    <Legend items={[{ label: doneLabel, color: VIZ.green }, { label: restLabel, color: VIZ.greenSoft }]} />
+    <Legend items={[{ label: doneLabel, color: VIZ.rose }, { label: restLabel, color: VIZ.roseSoft }]} />
     <Stack component="ul" spacing={1.5} aria-label={label} style={{ listStyle: 'none', margin: 0, padding: 0 }}>
       {rows.map(row => {
         const rest = row.total - row.done;
@@ -198,7 +199,7 @@ export function StackedBarList({ rows, label, doneLabel, restLabel }: { rows: St
             <Typography variant="body2" sx={{ whiteSpace: 'nowrap' }}><b>{formatNumber(row.done)}</b><Box component="span" sx={{ color: 'text.secondary' }}> de {formatNumber(row.total)}</Box></Typography>
           </Box>
           <Box sx={{ display: 'flex', gap: '2px', height: 10, width: `${row.total / max * 100}%`, minWidth: row.total ? 6 : 0 }}>
-            {[[row.done, VIZ.green, doneLabel], [rest, VIZ.greenSoft, restLabel]].filter(([value]) => Number(value) > 0).map(([value, color, name], index, list) =>
+            {[[row.done, VIZ.rose, doneLabel], [rest, VIZ.roseSoft, restLabel]].filter(([value]) => Number(value) > 0).map(([value, color, name], index, list) =>
               <Tooltip key={String(name)} {...tipProps} title={<Tip value={formatNumber(Number(value))} label={`${row.label} · ${name}`} />}>
                 <Box tabIndex={0} aria-label={`${row.label}, ${name}: ${formatNumber(Number(value))}`}
                   sx={{ flex: `${value} 1 0`, minWidth: 4, bgcolor: String(color), borderRadius: index === list.length - 1 ? '0 4px 4px 0' : 0, '&:hover': { filter: 'brightness(1.08)' }, ...focusRing }} />
@@ -231,7 +232,7 @@ export function ColumnChart({ columns, label, doneLabel, restLabel }: { columns:
   const top = ticks[ticks.length - 1];
   const plot = 180;
   return <Stack spacing={2}>
-    <Legend items={[{ label: doneLabel, color: VIZ.green }, { label: restLabel, color: VIZ.greenSoft }]} />
+    <Legend items={[{ label: doneLabel, color: VIZ.rose }, { label: restLabel, color: VIZ.roseSoft }]} />
     <Box sx={{ display: 'flex', gap: 1 }}>
       <Box aria-hidden sx={{ position: 'relative', width: 28, height: plot, flex: 'none' }}>
         {ticks.map(tick => <Typography key={tick} sx={{ position: 'absolute', right: 0, bottom: `${tick / top * 100}%`, transform: 'translateY(50%)', fontSize: 11, color: 'text.secondary', fontVariantNumeric: 'tabular-nums' }}>{tick}</Typography>)}
@@ -247,8 +248,8 @@ export function ColumnChart({ columns, label, doneLabel, restLabel }: { columns:
                 <Tooltip {...tipProps} title={<Tip value={`${formatNumber(column.total)} ${column.total === 1 ? 'pessoa' : 'pessoas'}`} label={column.label} detail={`${formatNumber(column.done)} ${doneLabel.toLowerCase()}${column.detail ? ` · ${column.detail}` : ''}`} />}>
                   <Box tabIndex={0} aria-label={`${column.label}: ${formatNumber(column.total)} pessoas, ${formatNumber(column.done)} ${doneLabel.toLowerCase()}`}
                     sx={{ width: '60%', maxWidth: 24, height: `${column.total / top * 100}%`, display: 'flex', flexDirection: 'column', gap: '2px', cursor: 'default', '&:hover > *': { filter: 'brightness(1.08)' }, ...focusRing }}>
-                    {rest > 0 && <Box sx={{ flex: `${rest} 1 0`, bgcolor: VIZ.greenSoft, borderRadius: '4px 4px 0 0' }} />}
-                    {column.done > 0 && <Box sx={{ flex: `${column.done} 1 0`, bgcolor: VIZ.green, borderRadius: rest > 0 ? 0 : '4px 4px 0 0' }} />}
+                    {rest > 0 && <Box sx={{ flex: `${rest} 1 0`, bgcolor: VIZ.roseSoft, borderRadius: '4px 4px 0 0' }} />}
+                    {column.done > 0 && <Box sx={{ flex: `${column.done} 1 0`, bgcolor: VIZ.rose, borderRadius: rest > 0 ? 0 : '4px 4px 0 0' }} />}
                   </Box>
                 </Tooltip>
               </Box>;
@@ -322,7 +323,7 @@ export function LineChart({ days, series, label }: { days: string[]; series: Lin
         {series.map(item => <path key={item.key} d={item.values.map((value, index) => `${index ? 'L' : 'M'}${x(index)},${y(value)}`).join(' ')} fill="none" stroke={item.color} strokeWidth={2} strokeLinejoin="round" strokeLinecap="round" />)}
         {series.map(item => <g key={item.key}>
           <circle cx={x(last)} cy={y(item.values[last])} r={4} fill={item.color} stroke="#fff" strokeWidth={2} />
-          {endLabels && <text x={x(last) + 8} y={y(item.values[last])} dy="0.32em" fontSize={12} fontWeight={700} fill="#1f2a24">{formatNumber(item.values[last])}</text>}
+          {endLabels && <text x={x(last) + 8} y={y(item.values[last])} dy="0.32em" fontSize={12} fontWeight={700} fill="#3b2a32">{formatNumber(item.values[last])}</text>}
         </g>)}
         {active !== null && <g aria-hidden>
           <line x1={x(active)} x2={x(active)} y1={topPad} y2={topPad + plotHeight} stroke="#9aa39d" strokeWidth={1} />
@@ -330,7 +331,7 @@ export function LineChart({ days, series, label }: { days: string[]; series: Lin
         </g>}
         <rect x={left} y={topPad} width={plotWidth} height={plotHeight} fill="transparent" />
       </svg>}
-      {active !== null && <Box aria-hidden sx={{ position: 'absolute', top: 0, left: tipLeft, width: 170, pointerEvents: 'none', bgcolor: '#1f2a24', color: '#fff', borderRadius: 2, px: 1.25, py: 1, boxShadow: '0 8px 24px rgba(20, 35, 28, .25)' }}>
+      {active !== null && <Box aria-hidden sx={{ position: 'absolute', top: 0, left: tipLeft, width: 170, pointerEvents: 'none', bgcolor: '#3b2a32', color: '#fff', borderRadius: 2, px: 1.25, py: 1, boxShadow: '0 8px 24px rgba(122, 44, 75, .25)' }}>
         <Typography sx={{ fontSize: 12, opacity: .8, mb: .5 }}>{longDate(days[active])}</Typography>
         {series.map(item => <Box key={item.key} sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
           <Box sx={{ width: 12, height: 2, borderRadius: 1, bgcolor: item.color, flex: 'none' }} />
@@ -345,7 +346,7 @@ export function LineChart({ days, series, label }: { days: string[]; series: Lin
 // Numero de destaque com rotulo e uma linha de apoio.
 export function StatTile({ label, value, hint, icon }: { label: string; value: number | string; hint?: string; icon?: ReactNode }) {
   return <Paper variant="outlined" sx={{ p: 2, borderRadius: 3, display: 'flex', gap: 1.5, alignItems: 'flex-start', minWidth: 0 }}>
-    {icon && <Box aria-hidden sx={{ width: 36, height: 36, borderRadius: 2, display: 'grid', placeItems: 'center', bgcolor: 'rgba(29, 127, 86, .1)', color: VIZ.green, flex: 'none' }}>{icon}</Box>}
+    {icon && <Box aria-hidden sx={{ width: 36, height: 36, borderRadius: 2, display: 'grid', placeItems: 'center', bgcolor: '#f6e8ee', color: '#9e3f63', flex: 'none' }}>{icon}</Box>}
     <Box sx={{ minWidth: 0 }}>
       <Typography variant="body2" color="text.secondary" sx={{ lineHeight: 1.3 }}>{label}</Typography>
       <Typography sx={{ fontSize: 26, fontWeight: 700, lineHeight: 1.2 }}>{typeof value === 'number' ? formatNumber(value) : value}</Typography>
