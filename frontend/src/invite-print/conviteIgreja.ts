@@ -1,7 +1,7 @@
 import { qrSvg, type InviteData } from './convite';
 
 export const IGREJA_FUNDO = '/fundo-convite.png';
-export const IGREJA_TEXTOS = '/textos-convite-ouro.svg?v=2';
+export const IGREJA_TEXTOS = '/textos-convite-ouro.svg?v=3';
 
 // Cantoneiras cinza de textos-convite.svg, anteriores a eabe19d,
 // com os vértices alinhados à antiga borda interna.
