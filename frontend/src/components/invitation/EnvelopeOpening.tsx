@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import type { CSSProperties, KeyboardEvent } from 'react';
 import { qrSvg, type InviteData, type InviteLayout, type SheetLayout } from '../../invite-print/convite';
+import { IGREJA_TEXTOS } from '../../invite-print/conviteIgreja';
 import { inviteCardDocument, prepareInviteFrame } from '../../invite-print/printDocument';
 import './abertura-envelope.css';
 
@@ -20,9 +21,7 @@ export interface OnlineInvite { layout: InviteLayout; data: InviteData }
 function ConviteIgreja({ link }: { link?: string }) {
   const qr = useMemo(() => link ? qrSvg(link) : '', [link]);
   return <div className="cv-ouro">
-    <img className="cv-brilho cv-brilho-superior" src="/textos-convite-ouro.svg" alt="" />
-    <img className="cv-brilho cv-brilho-inferior" src="/textos-convite-ouro.svg" alt="" />
-    <img src="/textos-convite-ouro.svg" alt="" /><img src="/borda-dupla-ouro.svg" alt="" />
+    <img src={IGREJA_TEXTOS} alt="" /><img src="/borda-dupla-ouro.svg" alt="" />
     {qr && <div className="cv-qr" dangerouslySetInnerHTML={{ __html: qr }} />}</div>;
 }
 
