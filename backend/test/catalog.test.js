@@ -98,6 +98,13 @@ test('CRUD de presentes exige categoria valida, filtra por ela e publica por slu
   const hidden = await request(app).post(base).set('Authorization', bearer).send({ name: 'Frigideira', price: 80, categoryId: cozinha._id, active: false });
   const list = await request(app).get(base + '?name=Pan&categoryId=' + cozinha._id + '&minPrice=100&maxPrice=200&page=1&limit=1').set('Authorization', bearer);
   assert.equal(list.body.data.pagination.total, 1); assert.equal(list.body.data.data[0].category.name, 'Cozinha Gourmet');
+  assert.deepEqual(list.body.data.summary, { total: 1, active: 1, inactive: 0 });
+  const categoryPage = await request(app).get(base + '?categoryId=' + cozinha._id + '&page=2&limit=1').set('Authorization', bearer);
+  assert.equal(categoryPage.body.data.data.length, 1);
+  assert.deepEqual(categoryPage.body.data.summary, { total: 2, active: 1, inactive: 1 });
+  const inactivePage = await request(app).get(base + '?categoryId=' + cozinha._id + '&active=false').set('Authorization', bearer);
+  assert.equal(inactivePage.body.data.pagination.total, 1);
+  assert.deepEqual(inactivePage.body.data.summary, { total: 1, active: 0, inactive: 1 });
   assert.equal((await request(app).get(base + '?categoryId=' + mesa._id).set('Authorization', bearer)).body.data.pagination.total, 0);
   assert.equal((await request(app).get(base + '/' + id).set('Authorization', bearer)).status, 200);
   assert.equal((await request(app).put(base + '/' + id).set('Authorization', bearer).send({ price: 200 })).body.data.price, 200);

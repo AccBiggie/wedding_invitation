@@ -38,11 +38,16 @@ function resource(Model, validate, fields, entityType, hooks = {}) {
         if (typeof req.query.name === 'string' && req.query.name.trim()) query.name = { $regex: escapeRegex(req.query.name.trim().slice(0, 120)), $options: 'i' };
         if (req.query.active === 'true' || req.query.active === 'false') query.active = req.query.active === 'true';
         hooks.filter?.(req.query, query);
-        const [data, total] = await Promise.all([
+        const [data, counts] = await Promise.all([
           Model.find(query).sort({ [sortBy]: sortOrder, _id: 1 }).skip((page - 1) * limit).limit(limit),
-          Model.countDocuments(query)
+          Model.aggregate([
+            { $match: query },
+            { $group: { _id: null, total: { $sum: 1 }, active: { $sum: { $cond: [{ $eq: ['$active', true] }, 1, 0] } } } }
+          ])
         ]);
-        ok(res, { data: await present(data), pagination: { page, limit, total, totalPages: Math.ceil(total / limit) } });
+        const { total, active } = counts[0] || { total: 0, active: 0 };
+        const summary = { total, active, inactive: total - active };
+        ok(res, { data: await present(data), pagination: { page, limit, total, totalPages: Math.ceil(total / limit) }, summary });
       } catch (error) { next(error); }
     },
     async getById(req, res, next) {
@@ -124,7 +129,7 @@ export const gifts = resource(GiftProduct, validateGift, ['order', 'name', 'pric
   filter(params, query) {
     // categoryId=none lista os produtos antigos ainda sem categoria.
     if (params.categoryId === 'none') query.categoryId = null;
-    else if (validObjectId(params.categoryId)) query.categoryId = params.categoryId;
+    else if (validObjectId(params.categoryId)) query.categoryId = new mongoose.Types.ObjectId(params.categoryId);
     const min = Number(params.minPrice); const max = Number(params.maxPrice);
     if (params.minPrice !== undefined && Number.isFinite(min) && min >= 0) query.price = { ...query.price, $gte: min };
     if (params.maxPrice !== undefined && Number.isFinite(max) && max >= 0) query.price = { ...query.price, $lte: max };
