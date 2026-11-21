@@ -6,7 +6,7 @@ export const wedding = {
   photo: '/casal.jpg',
   // Data e hora reais da cerimonia, no fuso de Brasilia. O contador regressivo
   // da landing page e calculado a partir deste campo.
-  datetime: '2027-04-10T17:00:00-03:00',
+  datetime: '2027-04-10T16:00:00-03:00',
   date: ['10 de abril', 'de 2027'],
   // Ultimo dia para confirmar presenca (AAAA-MM-DD). E o maximo aceito no cadastro do
   // convite e a data mostrada aos convidados quando o convite nao tem data propria.
