@@ -1,4 +1,4 @@
-import { Fragment, useEffect, useState } from 'react';
+import { Fragment, useEffect, useRef, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { alpha } from '@mui/material/styles';
 import { Alert, Badge, Box, Button, Checkbox, Chip, CircularProgress, Collapse, Divider, IconButton, InputAdornment, Link, List, ListItem, ListItemButton, ListItemIcon, ListItemText, Menu, MenuItem, Pagination, Paper, Popover, Snackbar, Stack, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, TableSortLabel, TextField, ToggleButton, ToggleButtonGroup, Tooltip, Typography } from '@mui/material';
@@ -21,6 +21,13 @@ import FilterListRounded from '@mui/icons-material/FilterListRounded';
 import FilterAltOffRounded from '@mui/icons-material/FilterAltOffRounded';
 import KeyboardArrowDownRounded from '@mui/icons-material/KeyboardArrowDownRounded';
 import RestartAltRounded from '@mui/icons-material/RestartAltRounded';
+import MailOutlineRounded from '@mui/icons-material/MailOutlineRounded';
+import GroupsRounded from '@mui/icons-material/GroupsRounded';
+import CheckCircleRounded from '@mui/icons-material/CheckCircleRounded';
+import CancelOutlined from '@mui/icons-material/CancelOutlined';
+import HelpRounded from '@mui/icons-material/HelpRounded';
+import ScheduleRounded from '@mui/icons-material/ScheduleRounded';
+import { StatTile } from '../../components/common/StatTile';
 import { PageHeader } from '../../components/common/PageHeader';
 import { CrudDialog } from '../../components/common/CrudDialog';
 import { ConfirmDialog } from '../../components/common/ConfirmDialog';
@@ -299,7 +306,8 @@ export function InvitationsPage() {
   const [drag, setDrag] = useState(null);
   const [dropAt, setDropAt] = useState(null);
   const [pagination, setPagination] = useState({ page: 1, limit: 20, total: 0, totalPages: 0 });
-  const [summary, setSummary] = useState({ total: 0, inPerson: 0, virtual: 0, people: 0, confirmed: 0, declined: 0, maybe: 0, unconfirmed: 0 });
+  const [summary, setSummary] = useState(null);
+  const listRequest = useRef(0);
   const [loading, setLoading] = useState(true);
   const [editLoading, setEditLoading] = useState(false);
   const [formOpen, setFormOpen] = useState(false);
@@ -397,16 +405,30 @@ export function InvitationsPage() {
 
   useEffect(() => { if (!notification) return; const id = setTimeout(() => setNotification(null), 4500); return () => clearTimeout(id); }, [notification]);
   const load = () => {
+    const request = ++listRequest.current;
     setLoading(true);
     // Filtros de varios valores vao juntos por virgula (status=confirmed,declined); vazios ficam de fora.
     const params = Object.fromEntries(Object.entries(filters).map(([key, value]) => [key, Array.isArray(value) ? value.join(',') : value]).filter(([, value]) => value));
     api.get('/invitations', { params: { ...params, page: pagination.page, limit: pagination.limit, sortBy: sort.by, sortOrder: sort.order } })
-      .then(response => { setItems(response.data.data.data); setPagination(current => ({ ...current, ...response.data.data.pagination })); setSummary(response.data.data.summary); })
-      .catch(() => notify('danger', 'Não foi possível carregar os convites.'))
-      .finally(() => setLoading(false));
+      .then(response => {
+        if (request !== listRequest.current) return;
+        const { data, pagination: pageInfo, summary: totals } = response.data.data;
+        setItems(data);
+        setPagination(current => ({ ...current, ...pageInfo }));
+        setSummary(totals);
+      })
+      .catch(() => {
+        if (request !== listRequest.current) return;
+        setSummary(null);
+        notify('danger', 'Não foi possível carregar os convites.');
+      })
+      .finally(() => { if (request === listRequest.current) setLoading(false); });
   };
   // So busca depois de saber a data do casamento (fim do periodo padrao).
-  useEffect(() => { if (filtersReady) load(); }, [filtersReady, filters, pagination.page, pagination.limit, sort]);
+  useEffect(() => {
+    if (filtersReady) load();
+    return () => { listRequest.current += 1; };
+  }, [filtersReady, filters, pagination.page, pagination.limit, sort]);
   // Clicar na coluna ordenada inverte a direcao; outra coluna comeca crescente. Volta para a primeira pagina.
   const sortBy = key => { setPagination(current => ({ ...current, page: 1 })); setSort(current => ({ by: key, order: current.by === key && current.order === 'asc' ? 'desc' : 'asc' })); };
   // A–Z / Z–A pelo menu da coluna; desmarcar volta para os mais novos primeiro.
@@ -457,6 +479,7 @@ export function InvitationsPage() {
   const closeForm = () => { setFormOpen(false); navigate('/convites'); };
   const span = visibleColumns.length + 2;
   const visibleCount = columns.order.length - columns.hidden.length;
+  const totals = loading ? null : summary;
   return <>
     <Snackbar open={Boolean(notification)} autoHideDuration={4500} onClose={() => setNotification(null)}><Alert severity={notification?.type === 'danger' ? 'error' : 'success'} onClose={() => setNotification(null)}>{notification?.message}</Alert></Snackbar>
     <InvitationUrlModal url={viewing} onClose={() => setViewing(null)} notify={notify} />
@@ -466,6 +489,16 @@ export function InvitationsPage() {
       <DateField size="small" label="Data inicial" value={filters.startDate} maxDate={filters.endDate || undefined} onChange={value => applyFilter({ startDate: value })} />
       <DateField size="small" label="Data final" value={filters.endDate} minDate={filters.startDate || undefined} onChange={value => applyFilter({ endDate: value })} />
     </Box></Paper>
+    <Box role="region" aria-label="Totais da listagem" aria-busy={loading}
+      sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr', sm: 'repeat(2, minmax(0, 1fr))', md: 'repeat(3, minmax(0, 1fr))' }, gap: 2, mb: 2 }}>
+      <StatTile label="Total de convites" value={totals?.total ?? '—'} icon={<MailOutlineRounded />}
+        hint={totals ? `${totals.inPerson.toLocaleString('pt-BR')} presenciais · ${totals.virtual.toLocaleString('pt-BR')} virtuais` : undefined} />
+      <StatTile label="Total de convidados" value={totals?.people ?? '—'} icon={<GroupsRounded />} />
+      <StatTile label="Confirmados" value={totals?.confirmed ?? '—'} icon={<CheckCircleRounded />} />
+      <StatTile label="Não vão" value={totals ? totals.declined || 0 : '—'} icon={<CancelOutlined />} />
+      <StatTile label="Não sabem" value={totals ? totals.maybe || 0 : '—'} icon={<HelpRounded />} />
+      <StatTile label="Sem resposta" value={totals ? Math.max(0, totals.people - totals.confirmed - (totals.declined || 0) - (totals.maybe || 0)) : '—'} icon={<ScheduleRounded />} />
+    </Box>
     {selected.size > 0 && <Paper sx={{ p: 1.5, mb: 2, display: 'flex', flexWrap: 'wrap', alignItems: 'center', gap: 1 }} role="region" aria-label="Convites selecionados">
       <Typography sx={{ mr: 'auto' }}>{selected.size === 1 ? '1 convite selecionado' : `${selected.size} convites selecionados`}</Typography>
       <Button onClick={() => setSelected(new Map())}>Limpar seleção</Button>
@@ -552,7 +585,9 @@ export function InvitationsPage() {
         <Divider />
         <MenuItem disabled={preparing || !card} onClick={() => rowAction(item => void startPrint(card.layout, [item]))}><ListItemIcon><PrintOutlined fontSize="small" /></ListItemIcon><ListItemText secondary={layoutName ? `Modelo ${layoutName}` : undefined}>Imprimir convite</ListItemText></MenuItem>
       </Menu>
-      <Stack direction="row" spacing={1} useFlexGap sx={{ flexWrap: 'wrap', px: 2, pt: 2 }}>{[[summary.total, 'Convites'], [summary.inPerson, 'Presenciais'], [summary.virtual, 'Online'], [summary.people, 'Pessoas'], [summary.confirmed, 'Confirmados'], [summary.declined || 0, 'Não vão'], [summary.maybe || 0, 'Não sabem'], [Math.max(0, summary.people - summary.confirmed - (summary.declined || 0) - (summary.maybe || 0)), 'Sem resposta'], ...categoryTotals(summary.categories)].map(([value, label]) => <Chip key={label} variant="outlined" label={`${label}: ${value}`} />)}</Stack>
+      {totals && <Stack direction="row" spacing={1} useFlexGap sx={{ flexWrap: 'wrap', px: 2, pt: 2 }}>
+        {categoryTotals(totals.categories).map(([value, label]) => <Chip key={label} variant="outlined" label={`${label}: ${value}`} />)}
+      </Stack>}
       {/* Rodape da tabela: quantos convites aparecem, convites por pagina e paginas numeradas. */}
       <Box sx={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center', justifyContent: 'space-between', gap: 2, px: 2, py: 1.5, mt: 2, borderTop: 1, borderColor: 'divider' }}>
         <Typography variant="body2" color="text.secondary" role="status">{pagination.total ? <>Mostrando <Box component="strong" sx={{ color: 'text.primary' }}>{(pagination.page - 1) * pagination.limit + 1}–{Math.min(pagination.page * pagination.limit, pagination.total)}</Box> de <Box component="strong" sx={{ color: 'text.primary' }}>{pagination.total}</Box> {pagination.total === 1 ? 'convite' : 'convites'}</> : 'Nenhum convite para mostrar'}</Typography>

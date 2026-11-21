@@ -1,7 +1,7 @@
 import api from './api';
-import type { ApiResponse, ListData, ListFilters, PublicStoreCategory, PublicStoreCategoryPage, StoreCategory, StoreCategoryInput } from '../types/api';
+import type { ApiResponse, CatalogListData, ListData, ListFilters, PublicStoreCategory, PublicStoreCategoryPage, StoreCategory, StoreCategoryInput } from '../types/api';
 export const storeCategoriesService = {
-  list: (params: ListFilters) => api.get<ApiResponse<ListData<StoreCategory>>>('/store-categories', { params }).then(r => r.data.data),
+  list: (params: ListFilters) => api.get<ApiResponse<CatalogListData<StoreCategory>>>('/store-categories', { params }).then(r => r.data.data),
   // Todas as categorias (ativas e inativas) em ordem, para selects e filtros do painel.
   listAll: () => api.get<ApiResponse<ListData<StoreCategory>>>('/store-categories', { params: { limit: 100, sortBy: 'order', sortOrder: 'asc' } }).then(r => r.data.data.data),
   getById: (id: string) => api.get<ApiResponse<StoreCategory>>(`/store-categories/${id}`).then(r => r.data.data),

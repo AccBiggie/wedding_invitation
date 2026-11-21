@@ -1,10 +1,12 @@
 import { GiftForm } from './GiftForm';
-import { useCallback, useEffect, useState } from 'react'; import { useLocation, useNavigate, useParams, useSearchParams } from 'react-router-dom';
+import { useEffect, useState } from 'react'; import { useLocation, useNavigate, useParams, useSearchParams } from 'react-router-dom';
 import { Alert, Box, Button, IconButton, MenuItem, Paper, Snackbar, Stack, TextField, Tooltip, useMediaQuery } from '@mui/material'; import { useTheme } from '@mui/material/styles';
 import { DataGrid, type GridColDef, type GridPaginationModel, type GridSortModel } from '@mui/x-data-grid';
 import Add from '@mui/icons-material/Add'; import EditOutlined from '@mui/icons-material/EditOutlined'; import DeleteOutline from '@mui/icons-material/DeleteOutlined';
+import CardGiftcardOutlined from '@mui/icons-material/CardGiftcardOutlined';
+import { CatalogTotals } from '../../components/common/CatalogTotals';
 import { PageHeader } from '../../components/common/PageHeader'; import { ConfirmDialog } from '../../components/common/ConfirmDialog'; import { EmptyState } from '../../components/common/EmptyState';
-import { giftsService, type GiftFilters } from '../../services/gifts.service'; import { storeCategoriesService } from '../../services/storeCategories.service'; import type { GiftProduct, StoreCategory } from '../../types/api';
+import { giftsService, type GiftFilters } from '../../services/gifts.service'; import { storeCategoriesService } from '../../services/storeCategories.service'; import type { CatalogSummary, GiftProduct, StoreCategory } from '../../types/api';
 import { resolveImageUrl } from '../../services/images.service';
 const currency = (value: number) => new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(value);
 export function GiftsPage() {
@@ -16,10 +18,24 @@ export function GiftsPage() {
   const [categories, setCategories] = useState<StoreCategory[]>([]);
   useEffect(() => { storeCategoriesService.listAll().then(setCategories).catch(() => setCategories([])); }, []);
   const [pagination, setPagination] = useState<GridPaginationModel>({ page: 0, pageSize: 20 }); const [sort, setSort] = useState<GridSortModel>([{ field: 'order', sort: 'asc' }]);
-  const [rows, setRows] = useState<GiftProduct[]>([]); const [total, setTotal] = useState(0); const [loading, setLoading] = useState(true); const [error, setError] = useState('');
+  const [rows, setRows] = useState<GiftProduct[]>([]); const [summary, setSummary] = useState<CatalogSummary | null>(null); const [total, setTotal] = useState(0); const [loading, setLoading] = useState(true); const [error, setError] = useState('');
   const [deleting, setDeleting] = useState<GiftProduct | null>(null); const [busy, setBusy] = useState(false); const [notice, setNotice] = useState<string>(location.state?.notice || ''); const [refresh, setRefresh] = useState(0);
-  const load = useCallback(() => { setLoading(true); setError(''); giftsService.list({ ...filters, categoryId, page: pagination.page + 1, limit: pagination.pageSize, sortBy: sort[0]?.field || 'order', sortOrder: sort[0]?.sort || 'asc' }).then(data => { setRows(data.data); setTotal(data.pagination.total); }).catch(() => setError('Não foi possível carregar os presentes.')).finally(() => setLoading(false)); }, [filters, categoryId, pagination, sort, refresh]);
-  useEffect(load, [load]);
+  useEffect(() => {
+    let current = true;
+    setLoading(true);
+    setError('');
+    giftsService.list({ ...filters, categoryId, page: pagination.page + 1, limit: pagination.pageSize, sortBy: sort[0]?.field || 'order', sortOrder: sort[0]?.sort || 'asc' }).then(data => {
+      if (!current) return;
+      setRows(data.data);
+      setTotal(data.pagination.total);
+      setSummary(data.summary);
+    }).catch(() => {
+      if (!current) return;
+      setSummary(null);
+      setError('Não foi possível carregar os presentes.');
+    }).finally(() => { if (current) setLoading(false); });
+    return () => { current = false; };
+  }, [filters, categoryId, pagination, sort, refresh]);
   const changeFilter = (patch: GiftFilters) => { setPagination(current => ({ ...current, page: 0 })); setFilters(current => ({ ...current, ...patch })); };
   const changeCategory = (value: string) => { setPagination(current => ({ ...current, page: 0 })); setSearchParams(value ? { categoryId: value } : {}, { replace: true }); };
   const go = (path: string) => navigate({ pathname: path, search: location.search });
@@ -39,6 +55,7 @@ export function GiftsPage() {
   return <><PageHeader title="Presentes" subtitle="Gerencie os produtos disponíveis na lista de presentes." action={<Button variant="contained" startIcon={<Add />} onClick={() => go('/presentes/novo')}>Adicionar presente</Button>} />
     {error && <Alert severity="error" action={<Button onClick={() => setRefresh(v => v + 1)}>Tentar novamente</Button>} sx={{ mb: 2 }}>{error}</Alert>}
     <Paper sx={{ p: 2, mb: 2 }}><Stack direction={{ xs: 'column', sm: 'row' }} spacing={2}><TextField label="Nome" size="small" value={filters.name} onChange={e => changeFilter({ name: e.target.value })} /><TextField select label="Categoria" size="small" value={categoryId === 'none' || categories.some(category => category._id === categoryId) ? categoryId : ''} onChange={e => changeCategory(e.target.value)} sx={{ minWidth: 200 }}><MenuItem value="">Todas as categorias</MenuItem>{categories.map(category => <MenuItem key={category._id} value={category._id}>{category.name}{category.active ? '' : ' (inativa)'}</MenuItem>)}<MenuItem value="none">Sem categoria</MenuItem></TextField><TextField select label="Status" size="small" value={filters.active === '' ? '' : String(filters.active)} onChange={e => changeFilter({ active: e.target.value === '' ? '' : e.target.value === 'true' })} sx={{ minWidth: 120 }}><MenuItem value="">Todos</MenuItem><MenuItem value="true">Ativo</MenuItem><MenuItem value="false">Inativo</MenuItem></TextField></Stack></Paper>
+    <CatalogTotals summary={summary} loading={loading} label="Total de presentes" icon={<CardGiftcardOutlined />} />
     <Paper sx={{ minHeight: 360 }}>{!loading && rows.length === 0 && !error ? <EmptyState title={categoryId ? 'Nenhum presente nesta categoria.' : 'Nenhum presente cadastrado.'} action={<Button onClick={() => go('/presentes/novo')}>Adicionar presente</Button>} /> : <Box sx={{ height: 550, width: '100%' }}><DataGrid rows={rows} columns={columns} getRowId={row => row._id} rowCount={total} loading={loading} paginationMode="server" sortingMode="server" paginationModel={pagination} onPaginationModelChange={setPagination} sortModel={sort} onSortModelChange={setSort} pageSizeOptions={[10, 20, 50]} columnVisibilityModel={mobile ? { image: false, category: false, order: false, createdAt: false } : {}} disableRowSelectionOnClick /></Box>}</Paper>
     {formOpen && <GiftForm key={id || 'new'} id={id} onClose={closeForm} onSaved={message => { setNotice(message); setRefresh(value => value + 1); closeForm(); }} />}
     <ConfirmDialog open={Boolean(deleting)} title="Excluir presente?" description="Esta ação não poderá ser desfeita." busy={busy} onCancel={() => setDeleting(null)} onConfirm={remove} />
