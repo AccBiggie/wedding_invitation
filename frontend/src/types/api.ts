@@ -1,6 +1,8 @@
 export interface ApiResponse<T> { success: boolean; message?: string; data: T }
 export interface Pagination { page: number; limit: number; total: number; totalPages: number }
 export interface ListData<T> { data: T[]; pagination: Pagination }
+export interface CatalogSummary { total: number; active: number; inactive: number }
+export interface CatalogListData<T> extends ListData<T> { summary: CatalogSummary }
 export interface ListFilters { name?: string; active?: boolean | ''; page?: number; limit?: number; sortBy?: string; sortOrder?: 'asc' | 'desc' }
 export interface Godparent { _id: string; name: string; partnerName: string; role: 'groomsman' | 'bridesmaid' | 'mother' | 'father' | 'other'; cardRole: string; phone: string; email: string; description: string; image: string; images: string[]; order: number; active: boolean; createdAt: string; updatedAt: string }
 export type GodparentInput = Omit<Godparent, '_id' | 'createdAt' | 'updatedAt'>;

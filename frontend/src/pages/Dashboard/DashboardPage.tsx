@@ -12,13 +12,14 @@ import EventRounded from '@mui/icons-material/EventRounded';
 import VisibilityOffRounded from '@mui/icons-material/VisibilityOffRounded';
 import PendingRounded from '@mui/icons-material/PendingRounded';
 import TimelapseRounded from '@mui/icons-material/TimelapseRounded';
+import { StatTile } from '../../components/common/StatTile';
 import { PageHeader } from '../../components/common/PageHeader';
 import api from '../../services/api';
 import { invitationsService } from '../../services/invitations.service';
 import { godparentsService } from '../../services/godparents.service';
 import { giftsService } from '../../services/gifts.service';
 import type { InvitationStats } from '../../types/api';
-import { CATEGORY_COLORS, ChartCard, ColumnChart, DonutChart, INK, LineChart, SegmentedBar, StatTile, STATUS_COLORS, VIZ, formatNumber, type Part } from './charts';
+import { CATEGORY_COLORS, ChartCard, ColumnChart, DonutChart, INK, LineChart, SegmentedBar, STATUS_COLORS, VIZ, formatNumber, type Part } from './charts';
 
 interface Resumo { stats: InvitationStats; padrinhos: number; presentes: number; dias: number | null; data: string }
 
